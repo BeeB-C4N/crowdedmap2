@@ -15,27 +15,37 @@
     <script src="https://unpkg.com/lucide@0.390.0/dist/umd/lucide.js"></script>
 
     <style>
-        html { scroll-behavior: smooth; }
+        html { 
+            scroll-behavior: smooth;
+            height: 100%; /* [UPDATE] */
+        }
         body {
             font-family: 'Noto Sans JP', sans-serif;
-            background-image: url('./bk.svg'); /* [UPDATE] 最背面のベース背景 */
+            background-image: url('./bk.svg');
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             color: #333;
             position: relative;
-            min-height: 100vh;
+            min-height: 100vh; /* [UPDATE] 常にビューポートの高さを確保 */
+            display: flex; /* [UPDATE] */
+            flex-direction: column; /* [UPDATE] */
+        }
+        
+        /* [UPDATE] メインコンテンツが伸縮するように */
+        main {
+            flex-grow: 1;
         }
 
         /* [UPDATE] 背景SVGラッパー (共通) */
         .background-svg-top,
         .background-svg-bottom {
             width: 100%;
-            z-index: -5; /* bk.svg の上、コンテンツの下 */
+            z-index: -5; 
             pointer-events: none;
             background-repeat: no-repeat;
-            position: absolute; /* コンテンツフローから切り離す */
+            position: absolute; 
             left: 0;
             right: 0;
         }
@@ -44,26 +54,26 @@
         @media (min-width: 768px) {
             .background-svg-top {
                 background-image: url('./top_point_bk.svg');
-                background-position: top center; /* 上部中央 */
-                background-size: 100% auto; /* 横幅100% */
+                background-position: top center; 
+                background-size: 100% auto; 
                 top: 0;
-                height: 500px; /* 画像の高さ（適宜調整） */
+                height: 500px; 
             }
             .background-svg-bottom {
                 background-image: url('./down_point_bk.svg');
-                background-position: bottom center; /* 下部中央 */
-                background-size: 100% auto; /* 横幅100% */
-                bottom: 0;
-                height: 500px; /* 画像の高さ（適宜調整） */
+                background-position: bottom center; 
+                background-size: 100% auto; 
+                bottom: 0; /* [UPDATE] 常に最下部に固定 */
+                height: 500px; 
             }
         }
 
-        /* [UPDATE] モバイル用 背景SVG (スマホ版は良さそうとのことですが、念のためPC版と合わせる) */
+        /* [UPDATE] モバイル用 背景SVG */
         @media (max-width: 767px) {
             .background-svg-top {
                 background-image: url('./top_point_bk.svg');
                 background-position: top center;
-                background-size: 150% auto; /* スマホでは少し拡大 */
+                background-size: 150% auto; 
                 opacity: 0.7;
                 top: 0;
                 height: 300px;
@@ -71,9 +81,9 @@
             .background-svg-bottom {
                 background-image: url('./down_point_bk.svg');
                 background-position: bottom center;
-                background-size: 150% auto; /* スマホでは少し拡大 */
+                background-size: 150% auto; 
                 opacity: 0.7;
-                bottom: 0;
+                bottom: 0; /* [UPDATE] 常に最下部に固定 */
                 height: 300px;
             }
         }
@@ -84,360 +94,98 @@
             z-index: 10;
         }
 
-        .logo-pc {
-            height: 50px;
-            width: auto;
-        }
-        .logo-mobile {
-            height: 40px;
-            width: auto;
-        }
-
-        .icon {
-            width: 24px;
-            height: 24px;
-            stroke-width: 2;
-        }
-        .icon-sm {
-            width: 20px;
-            height: 20px;
-        }
-        .btn-primary .icon-sm,
-        .btn-primary .icon {
-            filter: brightness(0) invert(1);
-        }
-
-        .tab-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            cursor: pointer;
-            color: #888;
-            transition: all 0.2s;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
+        .logo-pc { height: 50px; width: auto; }
+        .logo-mobile { height: 40px; width: auto; }
+        .icon { width: 24px; height: 24px; stroke-width: 2; }
+        .icon-sm { width: 20px; height: 20px; }
+        .btn-primary .icon-sm, .btn-primary .icon { filter: brightness(0) invert(1); }
+        .tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; color: #888; transition: all 0.2s; border-radius: 8px; font-size: 0.8rem; font-weight: 500; }
         .tab-btn .icon-active { display: none; }
         .tab-btn.active .icon-default { display: none; }
         .tab-btn.active .icon-active { display: block; }
-
-
-        .pc-tab-btn {
-            padding: 0.75rem 1.5rem;
-            background-color: rgba(255, 255, 255, 0.8);
-            border: 1px solid #e0e0e0;
-            backdrop-filter: blur(4px);
-            width: 160px;
-        }
-        .pc-tab-btn:hover {
-            background-color: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .pc-tab-btn.active {
-            color: #5A3A8A;
-            background-color: white;
-            border-color: #5A3A8A;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .pc-tab-btn.active span {
-            color: #5A3A8A;
-        }
-
-        .mobile-tab-btn {
-            flex-grow: 1;
-            padding: 0.5rem 0;
-        }
-        .mobile-tab-btn.active {
-            color: #5A3A8A;
-        }
-
+        .pc-tab-btn { padding: 0.75rem 1.5rem; background-color: rgba(255, 255, 255, 0.8); border: 1px solid #e0e0e0; backdrop-filter: blur(4px); width: 160px; }
+        .pc-tab-btn:hover { background-color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .pc-tab-btn.active { color: #5A3A8A; background-color: white; border-color: #5A3A8A; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .pc-tab-btn.active span { color: #5A3A8A; }
+        .mobile-tab-btn { flex-grow: 1; padding: 0.5rem 0; }
+        .mobile-tab-btn.active { color: #5A3A8A; }
         main .tab-content { display: none; }
         main .tab-content.active { display: block; }
 
-        #map { 
-            height: 80vh; 
-            width: 100%; 
-            border-radius: 12px; 
-            background-color: #e0e0e0;
-            border: 1px solid #ccc;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
+        #map { height: 80vh; width: 100%; border-radius: 12px; background-color: #e0e0e0; border: 1px solid #ccc; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         
-        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-            background: white;
-            color: #333;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: white; color: #333; border: 1px solid #ddd; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .leaflet-popup-content-wrapper { padding: 4px; }
         .leaflet-popup-content { margin: 12px 16px; }
-        .leaflet-popup-content h3 {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 8px;
-        }
+        .leaflet-popup-content h3 { font-size: 1.25rem; font-weight: bold; color: #333; margin-bottom: 8px; }
         .leaflet-popup-content p { margin: 0.5em 0; }
-        .leaflet-popup-close-button {
-            color: #888;
-            padding: 8px;
-        }
-        .leaflet-popup-close-button:hover {
-            color: #333;
-            background-color: #f0f0f0;
-            border-radius: 50%;
-        }
+        .leaflet-popup-close-button { color: #888; padding: 8px; }
+        .leaflet-popup-close-button:hover { color: #333; background-color: #f0f0f0; border-radius: 50%; }
 
-        .custom-div-icon .marker-pin-container {
-            width: 80px;
-            height: 80px;
-            position: relative;
-            transform: translate(-40px, -80px);
-            transition: transform 0.2s ease-in-out;
-        }
-        .custom-div-icon .marker-pin-container:hover {
-            transform: translate(-40px, -80px) scale(1.1);
-        }
-        .custom-div-icon .marker-image-wrapper {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            background-color: #1a1a1a;
-            border: 4px solid white;
-        }
+        .custom-div-icon .marker-pin-container { width: 80px; height: 80px; position: relative; transform: translate(-40px, -80px); transition: transform 0.2s ease-in-out; }
+        .custom-div-icon .marker-pin-container:hover { transform: translate(-40px, -80px) scale(1.1); }
+        .custom-div-icon .marker-image-wrapper { width: 80px; height: 80px; border-radius: 50%; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.2); background-color: #1a1a1a; border: 4px solid white; }
         .custom-div-icon .level-1-border { border-color: #22c55e; }
         .custom-div-icon .level-2-border { border-color: #f59e0b; }
         .custom-div-icon .level-3-border { border-color: #ef4444; }
-        
         .custom-div-icon img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .custom-div-icon .marker-pin {
-            width: 0;
-            height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 15px solid white;
-            position: absolute;
-            bottom: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: -1;
-        }
+        .custom-div-icon .marker-pin { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 15px solid white; position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); z-index: -1; }
         .custom-div-icon .level-1-border .marker-pin { border-top-color: #22c55e; }
         .custom-div-icon .level-2-border .marker-pin { border-top-color: #f59e0b; }
         .custom-div-icon .level-3-border .marker-pin { border-top-color: #ef4444; }
 
-
-        .calendar-container-wrapper {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            padding: 1.5rem;
-            overflow-x: auto;
-        }
-        .calendar-table {
-            border-collapse: collapse;
-            width: 100%;
-            table-layout: fixed;
-            min-width: 800px;
-        }
-        .calendar-table th, .calendar-table td {
-            text-align: center;
-            padding: 12px 4px;
-            border: 1px solid #eee;
-            font-size: 0.9rem;
-        }
-        .calendar-table th {
-            background-color: #f9fafb;
-            color: #333;
-            font-weight: 500;
-            height: 60px;
-            vertical-align: middle;
-            font-size: 0.8rem;
-        }
-        .calendar-table td.time-header {
-            background-color: #f9fafb;
-            font-weight: 500;
-            color: #333;
-            text-align: center;
-            width: 80px;
-            font-size: 0.9rem;
-        }
-
+        .calendar-container-wrapper { background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 1.5rem; overflow-x: auto; }
+        .calendar-table { border-collapse: collapse; width: 100%; table-layout: fixed; min-width: 800px; }
+        .calendar-table th, .calendar-table td { text-align: center; padding: 12px 4px; border: 1px solid #eee; font-size: 0.9rem; }
+        .calendar-table th { background-color: #f9fafb; color: #333; font-weight: 500; height: 60px; vertical-align: middle; font-size: 0.8rem; }
+        .calendar-table td.time-header { background-color: #f9fafb; font-weight: 500; color: #333; text-align: center; width: 80px; font-size: 0.9rem; }
         .calendar-table .today-header { color: #5A3A8A; font-weight: bold; }
         .calendar-table .today-column { background-color: #f9f8f4; }
         .calendar-table th.today-column { border: 1px solid #5A3A8A; }
         .calendar-table tr:not(:first-child) td.today-column { border-left: 1px solid #5A3A8A; border-right: 1px solid #5A3A8A; }
         .calendar-table tr:last-child td.today-column { border-bottom: 1px solid #5A3A8A;}
 
-        .facility-card {
-            background-color: white;
-            border-radius: 12px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            transition: all 0.2s;
-            height: 100%; 
-        }
-        .facility-card:hover {
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            transform: translateY(-4px);
-        }
-        .facility-card img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-        }
+        .facility-card { background-color: white; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.2s; height: 100%; }
+        .facility-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.1); transform: translateY(-4px); }
+        .facility-card img { width: 100%; height: 220px; object-fit: cover; }
 
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 1rem;
-        }
-        .modal-container {
-            background: white;
-            color: #333;
-            border-radius: 12px;
-            padding: 0;
-            width: 100%;
-            max-width: 600px;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        .modal-header {
-            border-bottom: 1px solid #eee;
-            padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+        .modal-container { background: white; color: #333; border-radius: 12px; padding: 0; width: 100%; max-width: 600px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        .modal-header { border-bottom: 1px solid #eee; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
         .modal-header h2 { font-size: 1.25rem; font-weight: 700; }
-        .modal-close-btn {
-            background: #f0f0f0;
-            color: #888;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        .modal-close-btn { background: #f0f0f0; color: #888; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
         .modal-close-btn:hover { background: #e0e0e0; color: #333; }
-        
-        .modal-content {
-            overflow-y: auto;
-            flex-grow: 1;
-            padding: 1.5rem;
-        }
-        .modal-footer {
-            border-top: 1px solid #eee;
-            padding: 1rem 1.5rem;
-            text-align: right;
-            background-color: #f9fafb;
-        }
-
-        .facility-modal-image {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-        }
-
+        .modal-content { overflow-y: auto; flex-grow: 1; padding: 1.5rem; }
+        .modal-footer { border-top: 1px solid #eee; padding: 1rem 1.5rem; text-align: right; background-color: #f9fafb; display: flex; justify-content: flex-end; gap: 0.5rem; /* [UPDATE] */ }
+        .facility-modal-image { width: 100%; height: 250px; object-fit: cover; }
         .legend-item { display: flex; align-items: center; }
-        .legend-color-box {
-            height: 1rem;
-            width: 1rem;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            margin-right: 0.5rem;
-            flex-shrink: 0;
-        }
+        .legend-color-box { height: 1rem; width: 1rem; border-radius: 4px; border: 1px solid #ccc; margin-right: 0.5rem; flex-shrink: 0; }
 
-        .level-1-bg { background-color: #a7d0a0; }
-        .level-2-bg { background-color: #f9d991; }
-        .level-3-bg { background-color: #d76a6a; }
+        .level-1-bg { background-color: #a7d0a0; } .level-2-bg { background-color: #f9d991; } .level-3-bg { background-color: #d76a6a; }
         .future-time-bg { background-color: #f0f0f0; }
+        .level-1-text { color: #166534; } .level-2-text { color: #a16207; } .level-3-text { color: #991b1b; }
 
-        .level-1-text { color: #166534; }
-        .level-2-text { color: #a16207; }
-        .level-3-text { color: #991b1b; }
+        .btn-primary { background-color: #5A3A8A; color: white; padding: 10px 20px; border-radius: 8px; border: none; transition: all 0.2s; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary:hover { background-color: #482e6e; box-shadow: 0 4px 10px rgba(90, 58, 138, 0.3); }
+        .btn-outline { background-color: white; color: #5A3A8A; border: 1px solid #5A3A8A; padding: 10px 20px; border-radius: 8px; transition: all 0.2s; font-weight: 600; }
+        .btn-outline:hover { background-color: #f5f3f9; }
 
-        .btn-primary {
-            background-color: #5A3A8A;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: none;
-            transition: all 0.2s;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn-primary:hover {
-            background-color: #482e6e;
-            box-shadow: 0 4px 10px rgba(90, 58, 138, 0.3);
-        }
-        .btn-outline {
-            background-color: white;
-            color: #5A3A8A;
-            border: 1px solid #5A3A8A;
-            padding: 10px 20px;
-            border-radius: 8px;
-            transition: all 0.2s;
-            font-weight: 600;
-        }
-        .btn-outline:hover {
-            background-color: #f5f3f9;
-        }
+        .popup-calendar { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        .popup-calendar th { font-size: 0.7rem; color: #555; font-weight: 500; padding: 4px; }
+        .popup-calendar td { height: 12px; border: 1px solid #fff; font-size: 0.7rem; text-align: center; }
 
-        .popup-calendar {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 12px;
-        }
-        .popup-calendar th {
-            font-size: 0.7rem;
-            color: #555;
-            font-weight: 500;
-            padding: 4px;
-        }
-        .popup-calendar td {
-            height: 12px;
-            border: 1px solid #fff;
-            font-size: 0.7rem;
-            text-align: center;
-        }
-
-        /* [UPDATE] ポップアップアイコン (サイズ 40px に) */
-        img.popup-congestion-icon {
-            width: 40px; /* 期待値画像 (image_8093ea.jpg) に合わせる */
+        /* [UPDATE] ポップアップアイコン (サイズ 40px + CSSセレクタ制御) */
+        .popup-congestion-icon {
+            width: 40px; 
             height: 40px;
             border-radius: 50%;
             transition: opacity 0.2s;
+            opacity: 0.2; /* デフォルトは薄く */
         }
+        /* [NEW] data属性に基づいて表示を制御 */
+        [data-congestion-level="1"] .congestion-icon-1 { opacity: 1; }
+        [data-congestion-level="2"] .congestion-icon-2 { opacity: 1; }
+        [data-congestion-level="3"] .congestion-icon-3 { opacity: 1; }
 
     </style>
 </head>
@@ -446,7 +194,6 @@
     <div class="background-svg-top"></div>
 
     <header class="hidden md:block sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
-        <!-- ... (変更なし) ... -->
         <div class="container mx-auto px-8 py-4 flex justify-between items-center">
             <a href="#">
                 <img src="./logo_kanazawa.svg" alt="金沢 観光混雑度 MAP" class="logo-pc">
@@ -473,7 +220,6 @@
     </header>
 
     <header class="md:hidden sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-200 p-4">
-        <!-- ... (変更なし) ... -->
         <div class="flex justify-center items-center">
             <a href="#">
                 <img src="./logo_kanazawa.svg" alt="金沢 観光混雑度 MAP" class="logo-mobile">
@@ -484,7 +230,6 @@
     <main class="container mx-auto p-4 md:p-8">
         
         <div id="map-content" class="tab-content active">
-            <!-- ... (変更なし) ... -->
             <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">リアルタイム混雑状況</h2>
@@ -500,7 +245,6 @@
         </div>
         
         <div id="calendar-content" class="tab-content">
-             <!-- ... (変更なし) ... -->
              <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
                     <h2 id="calendar-title" class="text-2xl font-bold text-gray-800">時間帯別 混雑度実績</h2>
@@ -520,7 +264,6 @@
         </div>
 
         <div id="introduction-content" class="tab-content">
-            <!-- ... (変更なし) ... -->
             <h2 class="text-2xl font-bold text-gray-800 mb-1">観光スポット</h2>
             <p class="text-gray-500 mb-6">金沢の主要な観光スポットをご紹介します。</p>
             
@@ -533,13 +276,11 @@
     <div class="background-svg-bottom"></div>
 
     <footer class="text-center mt-8 mb-24 md:mb-12 text-gray-500 text-sm">
-        <!-- ... (変更なし) ... -->
         <p>&copy; Code for Noto. All Rights Reserved.</p>
         <a href="#" id="disclaimer-link" class="underline hover:text-purple-700 transition">免責事項</a>
     </footer>
 
     <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg flex justify-around">
-        <!-- ... (変更なし) ... -->
         <button class="tab-btn mobile-tab-btn active" data-tab-id="map-content">
             <img src="./sp_map_icon.svg" alt="マップ" class="icon icon-default">
             <img src="./sp_hover_map_icon.svg" alt="マップ" class="icon icon-active">
@@ -557,7 +298,6 @@
         </button>
     </nav>
 
-    <!-- ... (Modals は変更なし) ... -->
     <div id="modal-overlay" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
@@ -578,6 +318,7 @@
         </div>
     </div>
 
+    <!-- [UPDATE] 施設モーダルの変更 -->
     <div id="facility-modal-overlay" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
@@ -593,29 +334,27 @@
                     <p id="facility-modal-name-en" class="text-gray-500 mb-4"></p>
                     
                     <div class="space-y-4">
-                        <div>
-                            <h4 class="font-bold text-sm text-gray-500 mb-1">所在地</h4>
-                            <p id="facility-modal-address" class="text-gray-700"></p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-sm text-gray-500 mb-1">アクセス</h4>
-                            <p id="facility-modal-access" class="text-gray-700"></p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-sm text-gray-500 mb-1">Web情報</h4>
-                            <a id="facility-modal-web" href="#" target="_blank" rel="noopener noreferrer" class="text-purple-700 hover:underline"></a>
-                        </div>
+                        <!-- 所在地・アクセス・Web情報を削除 -->
                         <div>
                             <h4 class="font-bold text-sm text-gray-500 mb-1">観光スポット情報</h4>
                             <p id="facility-modal-description" class="text-gray-700 leading-relaxed"></p>
+                        </div>
+                        
+                        <!-- [NEW] カレンダーボタンを本文内に移動 -->
+                        <div>
+                             <button id="facility-modal-calendar-btn" class="btn-outline w-full">
+                                <img src="./calendar_icon.svg" class="icon-sm" alt="カレンダー" style="filter: brightness(0.5) sepia(1) hue-rotate(220deg) saturate(5);">
+                                混雑カレンダーを見る
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="facility-modal-calendar-btn" class="btn-primary">
-                    <img src="./white_calendar.svg" class="icon-sm" alt="カレンダー">
-                    混雑カレンダーを見る
+                <!-- [UPDATE] 「ここに行く」ボタンを追加 -->
+                <button id="facility-modal-gmaps-btn" class="btn-primary">
+                    <i data-lucide="map-pin" class="icon-sm"></i>
+                    ここに行く
                 </button>
             </div>
         </div>
@@ -624,7 +363,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             // --- Configuration (流用) ---
-            // ... (変更なし) ...
             const AREA1_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area1_m5.csv';
             
             const FACILITY_CSV_URLS = {
@@ -661,7 +399,6 @@
             lucide.createIcons();
 
             // --- Utility Functions (流用) ---
-            // ... (変更なし) ...
             const processNewCsvData = (data) => {
                 if (!data || data.length === 0) return [];
                 const hourlyAgg = {};
@@ -726,7 +463,6 @@
             };
 
             // --- Main Application Logic (流用) ---
-            // ... (変更なし) ...
             let facilityData = [];
             let latestDateObj = new Date();
             let mapInstance = null;
@@ -798,7 +534,6 @@
             }
             
             // --- Event Listeners (流用) ---
-            // ... (変更なし) ...
             function setupEventListeners(facilityData, latestDateObj) {
                 const tabs = document.querySelectorAll('.tab-btn');
                 const map = L.Util.getMapInstance();
@@ -824,7 +559,6 @@
                 });
 
                 document.getElementById('introduction-content').addEventListener('click', (e) => {
-                    // [UPDATE] 施設カードのボタンロジック
                     const detailsBtn = e.target.closest('.intro-details-btn');
                     
                     if (detailsBtn) {
@@ -852,7 +586,6 @@
             }
 
             function switchToTab(tabId, map) {
-                // ... (変更なし) ...
                 document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
                 document.querySelectorAll(`.tab-btn[data-tab-id="${tabId}"]`).forEach(t => t.classList.add('active'));
@@ -866,8 +599,8 @@
                 }
             }
             
+            // [UPDATE] 施設モーダルの表示内容を更新
             function showFacilityModal(facility, facilityData, latestDateObj) {
-                // ... (変更なし) ...
                 const overlay = document.getElementById('facility-modal-overlay');
                 const imageUrl = IMAGE_URLS[facility.地点名] || placeholderImg(facility.地点名);
                 
@@ -876,12 +609,9 @@
                 document.getElementById('facility-modal-title').textContent = facility.地点名;
                 document.getElementById('facility-modal-name').textContent = facility.地点名;
                 document.getElementById('facility-modal-name-en').textContent = facility.英語名称 || '';
-                document.getElementById('facility-modal-address').textContent = facility.所在地 || '情報なし';
-                document.getElementById('facility-modal-access').textContent = facility.アクセス || '情報なし';
-                document.getElementById('facility-modal-web').textContent = facility.Web || '情報なし';
-                document.getElementById('facility-modal-web').href = facility.Web || '#';
                 document.getElementById('facility-modal-description').textContent = facility.説明 || '情報なし';
                 
+                // カレンダーボタンのロジック
                 const calBtn = document.getElementById('facility-modal-calendar-btn');
                 calBtn.onclick = () => {
                     displayDailyCalendarForFacility(facility, facilityData, latestDateObj);
@@ -889,14 +619,20 @@
                     overlay.style.display = 'none';
                 };
 
+                // [NEW] Google Maps ボタンのロジック
+                const gmapsBtn = document.getElementById('facility-modal-gmaps-btn');
+                const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${facility.緯度},${facility.経度}`;
+                gmapsBtn.onclick = () => {
+                    window.open(gmapsUrl, '_blank');
+                };
+
                 overlay.style.display = 'flex';
-                lucide.createIcons();
+                lucide.createIcons(); // アイコンを再描画
             }
 
             // --- Core Functions (流用・修正) ---
 
             function getCongestionLevel(count, criterion) {
-                // ... (変更なし) ...
                 if (!criterion) return 1;
                 const num = parseInt(count, 10);
                 if (isNaN(num)) return 1;
@@ -906,7 +642,6 @@
             }
             
             function createCustomIcon(level, facilityName) {
-                // ... (変更なし) ...
                 const levelInfo = CONGESTION_LEVELS[level];
                 const imageUrl = IMAGE_URLS[facilityName] || placeholderImg(facilityName);
                 const borderColorClass = `${levelInfo.className}-border`;
@@ -926,7 +661,7 @@
                 });
             }
 
-            // [UPDATE] ポップアップアイコン (opacity 制御, gap-4)
+            // [UPDATE] ポップアップアイコン (CSSセレクタ制御方式)
             function createPopupContent(facility, latestDateObj) {
                 const latestDateString = formatDateForCsv(latestDateObj);
                 const facilityMilli = facility.milli.filter(d => d.年月日 === latestDateString);
@@ -939,12 +674,12 @@
                 const level = latestRecord ? getCongestionLevel(latestRecord.人数, facility.criterion) : 1;
                 const currentLevelInfo = CONGESTION_LEVELS[level];
                 
-                // [UPDATE] 期待値 (image_8093ea.jpg) に基づき opacity 制御
+                // [UPDATE] data-congestion-level 属性を追加
                 let levelIcons = `
-                    <div class="flex gap-4 items-center">
-                        <img src="./realtime_S.svg" alt="ゆっくり" class="popup-congestion-icon ${level === 1 ? 'opacity-100' : 'opacity-20'}">
-                        <img src="./realtime_N.svg" alt="通常" class="popup-congestion-icon ${level === 2 ? 'opacity-100' : 'opacity-20'}">
-                        <img src="./realtime_B.svg" alt="混雑" class="popup-congestion-icon ${level === 3 ? 'opacity-100' : 'opacity-20'}">
+                    <div class="flex gap-4 items-center" data-congestion-level="${level}">
+                        <img src="./realtime_S.svg" alt="ゆっくり" class="popup-congestion-icon congestion-icon-1">
+                        <img src="./realtime_N.svg" alt="通常" class="popup-congestion-icon congestion-icon-2">
+                        <img src="./realtime_B.svg" alt="混雑" class="popup-congestion-icon congestion-icon-3">
                     </div>`;
 
                 let calHtml = '<table class="popup-calendar"><thead><tr>';
@@ -967,7 +702,6 @@
                 }
                 calHtml += '</tr></tbody></table>';
 
-                // [UPDATE] アイコンとテキストの間の gap-4 に
                 return `
                     <h3 class="text-lg font-bold">${facility.地点名}</h3>
                     <div class="flex items-center gap-4 my-2">
@@ -984,7 +718,6 @@
 
 
             function updateMap(facilityData, latestDateObj) {
-                // ... (変更なし) ...
                 const map = L.Util.getMapInstance('map');
                 if (!map) return;
                 
@@ -1020,7 +753,6 @@
                 });
             }
             
-            // [UPDATE] 観光スポットタブ (グリッドレイアウト + 期待値のボタン)
             function populateIntroductionTab(facilityData) {
                 const container = document.getElementById('introduction-content');
                 const cardContainer = document.getElementById('facility-card-container');
@@ -1029,7 +761,6 @@
                 
                 facilityData.forEach(facility => {
                     const imageUrl = IMAGE_URLS[facility.地点名] || placeholderImg(facility.地点名);
-                    // [UPDATE] カードのHTML構造
                     const cardHtml = `
                         <div class="facility-card flex flex-col">
                             <img src="${imageUrl}" alt="${facility.地点名}" onerror="this.onerror=null;this.src='${placeholderImg(facility.地点名)}';">
@@ -1037,7 +768,6 @@
                                 <h3 class="text-xl font-bold text-gray-800">${facility.地点名}</h3>
                                 <p class="text-gray-600 flex-grow my-4">${(facility.説明 || '').substring(0, 100)}...</p>
                                 <div class="mt-auto"> 
-                                    <!-- [UPDATE] "続きを見る" ボタンが モーダルを開くように -->
                                     <button class="btn-primary intro-details-btn w-full" data-facility-name="${facility.地点名}">
                                         続きを見る
                                     </button>
@@ -1049,7 +779,6 @@
             }
 
             // --- Calendar Functions (流用) ---
-            // ... (変更なし) ...
             function displayTodayAllFacilitiesCalendar(facilityData, latestDateObj) {
                 const map = L.Util.getMapInstance();
                 const latestDateString = formatDateForCsv(latestDateObj);
