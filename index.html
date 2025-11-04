@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <!-- ... (head内は変更なし) ... -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>金沢中心部 観光混雑度マップ (v2)</title>
@@ -19,8 +18,7 @@
         html { scroll-behavior: smooth; }
         body {
             font-family: 'Noto Sans JP', sans-serif;
-            /* [UPDATE] ベース背景 */
-            background-image: url('./bk.svg');
+            background-image: url('./bk.svg'); /* ベース背景 */
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
@@ -29,49 +27,55 @@
             position: relative;
         }
 
-        /* [REMOVE] 以前の body::before, body::after スタイルを削除 */
-
-        /* [NEW] 背景SVGラッパー (共通) */
+        /* 背景SVGラッパー (共通) */
         .background-svg-top,
         .background-svg-bottom {
-            position: relative; /* ページのフローに従う */
             width: 100%;
             z-index: -5;
             pointer-events: none;
             background-repeat: no-repeat;
+            /* [UPDATE] 高さを確保し、メニューを押し下げないように調整 */
+            height: 500px; /* PC/Mobile共通で高さを設定 */
+            position: absolute; /* 親要素のフローから切り離す */
         }
 
-        /* [NEW] PC用 背景SVG */
+        /* [UPDATE] PC用 背景SVG */
         @media (min-width: 768px) {
             .background-svg-top {
                 background-image: url('./top_point_bk.svg');
-                background-position: top right;
-                background-size: 80% auto; /* 幅80%で高さを自動 */
-                height: 500px; /* 高さを確保 */
+                background-position: top left; /* 左上に寄せる */
+                background-size: auto 100%; /* 高さに合わせて幅を自動調整 */
+                top: 0;
+                left: 0;
             }
             .background-svg-bottom {
                 background-image: url('./down_point_bk.svg');
-                background-position: bottom left;
-                background-size: 80% auto; /* 幅80%で高さを自動 */
-                height: 500px; /* 高さを確保 */
+                background-position: bottom right; /* 右下に寄せる */
+                background-size: auto 100%; /* 高さに合わせて幅を自動調整 */
+                bottom: 0;
+                right: 0;
             }
         }
 
-        /* [NEW] モバイル用 背景SVG */
+        /* [UPDATE] モバイル用 背景SVG */
         @media (max-width: 767px) {
             .background-svg-top {
                 background-image: url('./top_point_bk.svg');
-                background-position: top center;
-                background-size: 150% auto; /* 拡大 */
-                height: 300px; /* 高さを確保 */
+                background-position: top left; /* 左上に寄せる */
+                background-size: auto 100%; /* 高さに合わせて幅を自動調整 */
                 opacity: 0.7;
+                top: 0;
+                left: 0;
+                height: 300px; /* モバイルでの高さ */
             }
             .background-svg-bottom {
                 background-image: url('./down_point_bk.svg');
-                background-position: bottom center;
-                background-size: 150% auto; /* 拡大 */
-                height: 300px; /* 高さを確保 */
+                background-position: bottom right; /* 右下に寄せる */
+                background-size: auto 100%; /* 高さに合わせて幅を自動調整 */
                 opacity: 0.7;
+                bottom: 0;
+                right: 0;
+                height: 300px; /* モバイルでの高さ */
             }
         }
 
@@ -81,7 +85,6 @@
             z-index: 10;
         }
 
-        /* ... (以降のCSSは変更なし) ... */
         .logo-pc {
             height: 50px;
             width: auto;
@@ -426,23 +429,20 @@
             text-align: center;
         }
 
+        /* [UPDATE] ポップアップアイコンはopacityではなくdisplayで制御 */
         img.popup-congestion-icon {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            transition: opacity 0.2s;
         }
 
     </style>
 </head>
 <body>
 
-    <!-- [NEW] 上部背景ラッパー -->
-    <div class="background-svg-top"></div>
+    <!-- [UPDATE] 上部背景ラッパー --><div class="background-svg-top"></div>
 
-    <!-- PC Header -->
-    <header class="hidden md:block sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
-        <!-- ... (変更なし) ... -->
+    <!-- PC Header --><header class="hidden md:block sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
         <div class="container mx-auto px-8 py-4 flex justify-between items-center">
             <a href="#">
                 <img src="./logo_kanazawa.svg" alt="金沢 観光混雑度 MAP" class="logo-pc">
@@ -468,9 +468,7 @@
         </div>
     </header>
 
-    <!-- Mobile Header -->
-    <header class="md:hidden sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-200 p-4">
-        <!-- ... (変更なし) ... -->
+    <!-- Mobile Header --><header class="md:hidden sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-200 p-4">
         <div class="flex justify-center items-center">
             <a href="#">
                 <img src="./logo_kanazawa.svg" alt="金沢 観光混雑度 MAP" class="logo-mobile">
@@ -478,10 +476,9 @@
         </div>
     </header>
 
-    <!-- メインコンテンツ -->
-    <main class="container mx-auto p-4 md:p-8">
-        <!-- ... (変更なし) ... -->
-        <div id="map-content" class="tab-content active">
+    <!-- メインコンテンツ --><main class="container mx-auto p-4 md:p-8">
+        
+        <!-- マップタブ (デフォルトで active) --><div id="map-content" class="tab-content active">
             <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">リアルタイム混雑状況</h2>
@@ -496,7 +493,7 @@
             <div id="map"></div>
         </div>
         
-        <div id="calendar-content" class="tab-content">
+        <!-- カレンダータブ (デフォルトで非表示) --><div id="calendar-content" class="tab-content">
              <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
                     <h2 id="calendar-title" class="text-2xl font-bold text-gray-800">時間帯別 混雑度実績</h2>
@@ -515,28 +512,22 @@
             </div>
         </div>
 
-        <div id="introduction-content" class="tab-content">
+        <!-- 施設紹介（観光スポット）タブ (デフォルトで非表示) --><div id="introduction-content" class="tab-content">
             <h2 class="text-2xl font-bold text-gray-800 mb-1">観光スポット</h2>
             <p class="text-gray-500 mb-6">金沢の主要な観光スポットをご紹介します。</p>
             <div class="space-y-8">
-                <!-- 施設カードはJSでここに追加されます -->
-            </div>
+                <!-- 施設カードはJSでここに追加されます --></div>
         </div>
     </main>
 
-    <!-- [NEW] 下部背景ラッパー -->
-    <div class="background-svg-bottom"></div>
+    <!-- [UPDATE] 下部背景ラッパー --><div class="background-svg-bottom"></div>
 
-    <!-- フッター (免責事項) -->
-    <footer class="text-center mt-8 mb-24 md:mb-12 text-gray-500 text-sm">
-        <!-- ... (変更なし) ... -->
+    <!-- フッター (免責事項) --><footer class="text-center mt-8 mb-24 md:mb-12 text-gray-500 text-sm">
         <p>&copy; Code for Noto. All Rights Reserved.</p>
         <a href="#" id="disclaimer-link" class="underline hover:text-purple-700 transition">免責事項</a>
     </footer>
 
-    <!-- Mobile Footer Tab Bar -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg flex justify-around">
-        <!-- ... (変更なし) ... -->
+    <!-- Mobile Footer Tab Bar --><nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg flex justify-around">
         <button class="tab-btn mobile-tab-btn active" data-tab-id="map-content">
             <img src="./sp_map_icon.svg" alt="マップ" class="icon icon-default">
             <img src="./sp_hover_map_icon.svg" alt="マップ" class="icon icon-active">
@@ -554,9 +545,7 @@
         </button>
     </nav>
 
-    <!-- ... (Modals は変更なし) ... -->
-    <!-- 免責事項モーダル -->
-    <div id="modal-overlay" class="modal-overlay">
+    <!-- 免責事項モーダル --><div id="modal-overlay" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
                 <h2 class="text-gray-800">免責事項</h2>
@@ -576,8 +565,7 @@
         </div>
     </div>
 
-    <!-- 施設詳細モーダル -->
-    <div id="facility-modal-overlay" class="modal-overlay">
+    <!-- 施設詳細モーダル --><div id="facility-modal-overlay" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
                 <h2 id="facility-modal-title" class="text-gray-800">施設詳細</h2>
@@ -623,7 +611,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             // --- Configuration (流用) ---
-            // ... (変更なし) ...
             const AREA1_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area1_m5.csv';
             
             const FACILITY_CSV_URLS = {
@@ -660,7 +647,6 @@
             lucide.createIcons();
 
             // --- Utility Functions (流用) ---
-            // ... (変更なし) ...
             const processNewCsvData = (data) => {
                 if (!data || data.length === 0) return [];
                 const hourlyAgg = {};
@@ -725,7 +711,6 @@
             };
 
             // --- Main Application Logic (流用) ---
-            // ... (変更なし) ...
             let facilityData = [];
             let latestDateObj = new Date();
             let mapInstance = null;
@@ -797,7 +782,6 @@
             }
             
             // --- Event Listeners (流用) ---
-            // ... (変更なし) ...
             function setupEventListeners(facilityData, latestDateObj) {
                 const tabs = document.querySelectorAll('.tab-btn');
                 const map = L.Util.getMapInstance();
@@ -901,7 +885,6 @@
             // --- Core Functions (流用・修正) ---
 
             function getCongestionLevel(count, criterion) {
-                // ... (変更なし) ...
                 if (!criterion) return 1;
                 const num = parseInt(count, 10);
                 if (isNaN(num)) return 1;
@@ -911,7 +894,6 @@
             }
             
             function createCustomIcon(level, facilityName) {
-                // ... (変更なし) ...
                 const levelInfo = CONGESTION_LEVELS[level];
                 const imageUrl = IMAGE_URLS[facilityName] || placeholderImg(facilityName);
                 const borderColorClass = `${levelInfo.className}-border`;
@@ -931,46 +913,49 @@
                 });
             }
 
-            // [FIX] ポップアップアイコン (opacity-20 で薄く表示)
-            function createPopupContent(facility, levelInfo, latestDateObj) {
-                // ... (変更なし) ...
+            // [UPDATE] ポップアップアイコンはdisplayで制御
+            function createPopupContent(facility, latestDateObj) {
                 const latestDateString = formatDateForCsv(latestDateObj);
                 const facilityMilli = facility.milli.filter(d => d.年月日 === latestDateString);
                 
-                // [FIX] currentHour を popoup 生成時にも取得
                 const currentHour = new Date().getHours();
                 const latestRecord = facility.milli
                     .filter(d => d.年月日 === latestDateString && parseInt(d.時刻, 10) <= currentHour)
                     .sort((a, b) => parseInt(b.時刻, 10) - parseInt(a.時刻, 10))[0];
 
                 const level = latestRecord ? getCongestionLevel(latestRecord.人数, facility.criterion) : 1;
-                // [FIX] levelInfo も最新の record に基づいて更新
                 const currentLevelInfo = CONGESTION_LEVELS[level];
                 
-                // [FIX] CSSクラスで opacity を制御 (インライン style 削除)
+                // [UPDATE] 選択されたレベルのアイコンのみを表示
+                let iconS_display = 'none';
+                let iconN_display = 'none';
+                let iconB_display = 'none';
+
+                if (level === 1) iconS_display = 'block';
+                else if (level === 2) iconN_display = 'block';
+                else if (level === 3) iconB_display = 'block';
+
                 let levelIcons = `
-                    <div class="flex gap-4">
-                        <img src="./realtime_S.svg" alt="ゆっくり" class="popup-congestion-icon ${level === 1 ? 'opacity-100' : 'opacity-20'}">
-                        <img src="./realtime_N.svg" alt="通常" class="popup-congestion-icon ${level === 2 ? 'opacity-100' : 'opacity-20'}">
-                        <img src="./realtime_B.svg" alt="混雑" class="popup-congestion-icon ${level === 3 ? 'opacity-100' : 'opacity-20'}">
+                    <div class="flex gap-4 items-center">
+                        <img src="./realtime_S.svg" alt="ゆっくり" class="popup-congestion-icon" style="display: ${iconS_display};">
+                        <img src="./realtime_N.svg" alt="通常" class="popup-congestion-icon" style="display: ${iconN_display};">
+                        <img src="./realtime_B.svg" alt="混雑" class="popup-congestion-icon" style="display: ${iconB_display};">
                     </div>`;
 
                 let calHtml = '<table class="popup-calendar"><thead><tr>';
                 for (let h = 8; h <= 20; h++) { calHtml += `<th>${h}</th>`; }
                 calHtml += '</tr></thead><tbody><tr>';
                 for (let h = 8; h <= 20; h++) {
-                    // [FIX] 簡易カレンダーも currentHour を考慮
                     const isFuture = h > currentHour;
                     const record = facilityMilli.find(d => parseInt(d.時刻, 10) === h);
                     const count = record ? record.人数 : 0;
                     const cellLevel = record ? getCongestionLevel(count, facility.criterion) : 1;
                     
-                    let bgClass = 'future-time-bg'; // デフォルトは未来
+                    let bgClass = 'future-time-bg';
                     if (!isFuture && record) {
                         bgClass = `${CONGESTION_LEVELS[cellLevel].className}-bg`;
                     } else if (!isFuture && !record) {
-                        // 過去だがデータがない場合（例：8時より前）
-                        bgClass = 'future-time-bg'; // データなしも薄い色に
+                        bgClass = 'future-time-bg';
                     }
                     
                     calHtml += `<td class="${bgClass}"></td>`;
@@ -993,7 +978,6 @@
 
 
             function updateMap(facilityData, latestDateObj) {
-                // ... (変更なし) ...
                 const map = L.Util.getMapInstance('map');
                 if (!map) return;
                 
@@ -1021,8 +1005,8 @@
 
                     const marker = L.marker([lat, lon], { icon: createCustomIcon(level, facility.地点名) }).addTo(map);
                     
-                    // [FIX] ポップアップ生成ロジックを最新時刻基準（levelInfo）ではなく、リアルタイム（latestDateObj）で渡す
-                    const popupContent = createPopupContent(facility, levelInfo, latestDateObj);
+                    // [UPDATE] createPopupContent に latestDateObj のみ渡す
+                    const popupContent = createPopupContent(facility, latestDateObj);
                     marker.bindPopup(popupContent);
                 });
                 
@@ -1030,9 +1014,8 @@
                 });
             }
             
-            // [FIX] 施設紹介タブ (ブレークポイントを md: に修正)
+            // [UPDATE] 施設紹介タブ (ボタンの幅修正)
             function populateIntroductionTab(facilityData) {
-                // ... (変更なし) ...
                 const container = document.getElementById('introduction-content');
                 container.innerHTML = '<h2 class="text-2xl font-bold text-gray-800 mb-1">観光スポット</h2><p class="text-gray-500 mb-6">金沢の主要な観光スポットをご紹介します。</p>';
                 const cardContainer = document.createElement('div');
@@ -1048,10 +1031,10 @@
                                 <p class="text-gray-400 mb-4">${facility.英語名称 || ''}</p>
                                 <p class="text-gray-600 flex-grow mb-6">${(facility.説明 || '').substring(0, 100)}...</p>
                                 <div class="flex flex-col md:flex-row gap-4 mt-4">
-                                    <button class="btn-outline intro-details-btn w-full md:w-auto" data-facility-name="${facility.地点名}">
+                                    <button class="btn-outline intro-details-btn w-full md:w-auto !important" data-facility-name="${facility.地点名}">
                                         続きを読む
                                     </button>
-                                    <button class="btn-primary intro-calendar-btn w-full md:w-auto" data-facility-name="${facility.地点名}">
+                                    <button class="btn-primary intro-calendar-btn w-full md:w-auto !important" data-facility-name="${facility.地点名}">
                                         <img src="./white_calendar.svg" class="icon-sm" alt="カレンダー">
                                         混雑度を確認
                                     </button>
@@ -1064,7 +1047,6 @@
             }
 
             // --- Calendar Functions (流用) ---
-            // ... (変更なし) ...
             function displayTodayAllFacilitiesCalendar(facilityData, latestDateObj) {
                 const map = L.Util.getMapInstance();
                 const latestDateString = formatDateForCsv(latestDateObj);
