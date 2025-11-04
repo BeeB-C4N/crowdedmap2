@@ -17,28 +17,26 @@
     <style>
         html { 
             scroll-behavior: smooth;
-            height: 100%; /* [UPDATE] */
+            height: 100%; 
         }
         body {
             font-family: 'Noto Sans JP', sans-serif;
-            background-image: url('./bk.svg');
+            background-image: url('./bk.svg'); 
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             color: #333;
             position: relative;
-            min-height: 100vh; /* [UPDATE] 常にビューポートの高さを確保 */
-            display: flex; /* [UPDATE] */
-            flex-direction: column; /* [UPDATE] */
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
         }
         
-        /* [UPDATE] メインコンテンツが伸縮するように */
         main {
             flex-grow: 1;
         }
 
-        /* [UPDATE] 背景SVGラッパー (共通) */
         .background-svg-top,
         .background-svg-bottom {
             width: 100%;
@@ -50,7 +48,6 @@
             right: 0;
         }
 
-        /* [UPDATE] PC用 背景SVG */
         @media (min-width: 768px) {
             .background-svg-top {
                 background-image: url('./top_point_bk.svg');
@@ -63,12 +60,11 @@
                 background-image: url('./down_point_bk.svg');
                 background-position: bottom center; 
                 background-size: 100% auto; 
-                bottom: 0; /* [UPDATE] 常に最下部に固定 */
+                bottom: 0; 
                 height: 500px; 
             }
         }
 
-        /* [UPDATE] モバイル用 背景SVG */
         @media (max-width: 767px) {
             .background-svg-top {
                 background-image: url('./top_point_bk.svg');
@@ -83,12 +79,11 @@
                 background-position: bottom center;
                 background-size: 150% auto; 
                 opacity: 0.7;
-                bottom: 0; /* [UPDATE] 常に最下部に固定 */
+                bottom: 0; 
                 height: 300px;
             }
         }
 
-        /* メインコンテンツやフッターが背景より手前に来るように */
         main, footer, header, nav {
             position: relative;
             z-index: 10;
@@ -156,7 +151,17 @@
         .modal-close-btn { background: #f0f0f0; color: #888; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
         .modal-close-btn:hover { background: #e0e0e0; color: #333; }
         .modal-content { overflow-y: auto; flex-grow: 1; padding: 1.5rem; }
-        .modal-footer { border-top: 1px solid #eee; padding: 1rem 1.5rem; text-align: right; background-color: #f9fafb; display: flex; justify-content: flex-end; gap: 0.5rem; /* [UPDATE] */ }
+        
+        /* [UPDATE] モーダルフッターを中央寄せに */
+        .modal-footer { 
+            border-top: 1px solid #eee; 
+            padding: 1rem 1.5rem; 
+            background-color: #f9fafb; 
+            display: flex; 
+            justify-content: center; /* [UPDATE] flex-end から center に変更 */ 
+            gap: 0.5rem; 
+        }
+
         .facility-modal-image { width: 100%; height: 250px; object-fit: cover; }
         .legend-item { display: flex; align-items: center; }
         .legend-color-box { height: 1rem; width: 1rem; border-radius: 4px; border: 1px solid #ccc; margin-right: 0.5rem; flex-shrink: 0; }
@@ -174,19 +179,13 @@
         .popup-calendar th { font-size: 0.7rem; color: #555; font-weight: 500; padding: 4px; }
         .popup-calendar td { height: 12px; border: 1px solid #fff; font-size: 0.7rem; text-align: center; }
 
-        /* [UPDATE] ポップアップアイコン (サイズ 40px + CSSセレクタ制御) */
         .popup-congestion-icon {
             width: 40px; 
             height: 40px;
             border-radius: 50%;
             transition: opacity 0.2s;
-            opacity: 0.2; /* デフォルトは薄く */
         }
-        /* [NEW] data属性に基づいて表示を制御 */
-        [data-congestion-level="1"] .congestion-icon-1 { opacity: 1; }
-        [data-congestion-level="2"] .congestion-icon-2 { opacity: 1; }
-        [data-congestion-level="3"] .congestion-icon-3 { opacity: 1; }
-
+        
     </style>
 </head>
 <body>
@@ -194,6 +193,7 @@
     <div class="background-svg-top"></div>
 
     <header class="hidden md:block sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
+        <!-- ... (変更なし) ... -->
         <div class="container mx-auto px-8 py-4 flex justify-between items-center">
             <a href="#">
                 <img src="./logo_kanazawa.svg" alt="金沢 観光混雑度 MAP" class="logo-pc">
@@ -220,6 +220,7 @@
     </header>
 
     <header class="md:hidden sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-200 p-4">
+        <!-- ... (変更なし) ... -->
         <div class="flex justify-center items-center">
             <a href="#">
                 <img src="./logo_kanazawa.svg" alt="金沢 観光混雑度 MAP" class="logo-mobile">
@@ -230,6 +231,7 @@
     <main class="container mx-auto p-4 md:p-8">
         
         <div id="map-content" class="tab-content active">
+            <!-- ... (変更なし) ... -->
             <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">リアルタイム混雑状況</h2>
@@ -245,6 +247,7 @@
         </div>
         
         <div id="calendar-content" class="tab-content">
+             <!-- ... (変更なし) ... -->
              <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
                     <h2 id="calendar-title" class="text-2xl font-bold text-gray-800">時間帯別 混雑度実績</h2>
@@ -264,6 +267,7 @@
         </div>
 
         <div id="introduction-content" class="tab-content">
+            <!-- ... (変更なし) ... -->
             <h2 class="text-2xl font-bold text-gray-800 mb-1">観光スポット</h2>
             <p class="text-gray-500 mb-6">金沢の主要な観光スポットをご紹介します。</p>
             
@@ -276,11 +280,13 @@
     <div class="background-svg-bottom"></div>
 
     <footer class="text-center mt-8 mb-24 md:mb-12 text-gray-500 text-sm">
+        <!-- ... (変更なし) ... -->
         <p>&copy; Code for Noto. All Rights Reserved.</p>
         <a href="#" id="disclaimer-link" class="underline hover:text-purple-700 transition">免責事項</a>
     </footer>
 
     <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg flex justify-around">
+        <!-- ... (変更なし) ... -->
         <button class="tab-btn mobile-tab-btn active" data-tab-id="map-content">
             <img src="./sp_map_icon.svg" alt="マップ" class="icon icon-default">
             <img src="./sp_hover_map_icon.svg" alt="マップ" class="icon icon-active">
@@ -299,6 +305,7 @@
     </nav>
 
     <div id="modal-overlay" class="modal-overlay">
+        <!-- ... (変更なし) ... -->
         <div class="modal-container">
             <div class="modal-header">
                 <h2 class="text-gray-800">免責事項</h2>
@@ -312,7 +319,7 @@
                 <p class="mb-4">本ウェブサイトの利用によって生じたいかなる損害についても、運営者は一切の責任を負いません。お出かけの際の判断は、ご自身の責任でお願いいたします。</p>
                 <p>掲載されている情報は、予告なく変更または削除されることがありますので、あらかじめご了承ください。</p>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer"> <!-- [UPDATE] CSS側で justify-center になっています -->
                 <button id="close-modal-btn-footer" class="btn-primary">閉じる</button>
             </div>
         </div>
@@ -334,13 +341,11 @@
                     <p id="facility-modal-name-en" class="text-gray-500 mb-4"></p>
                     
                     <div class="space-y-4">
-                        <!-- 所在地・アクセス・Web情報を削除 -->
                         <div>
                             <h4 class="font-bold text-sm text-gray-500 mb-1">観光スポット情報</h4>
                             <p id="facility-modal-description" class="text-gray-700 leading-relaxed"></p>
                         </div>
                         
-                        <!-- [NEW] カレンダーボタンを本文内に移動 -->
                         <div>
                              <button id="facility-modal-calendar-btn" class="btn-outline w-full">
                                 <img src="./calendar_icon.svg" class="icon-sm" alt="カレンダー" style="filter: brightness(0.5) sepia(1) hue-rotate(220deg) saturate(5);">
@@ -350,8 +355,7 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <!-- [UPDATE] 「ここに行く」ボタンを追加 -->
+            <div class="modal-footer"> <!-- [UPDATE] CSS側で justify-center になっています -->
                 <button id="facility-modal-gmaps-btn" class="btn-primary">
                     <i data-lucide="map-pin" class="icon-sm"></i>
                     ここに行く
@@ -611,7 +615,6 @@
                 document.getElementById('facility-modal-name-en').textContent = facility.英語名称 || '';
                 document.getElementById('facility-modal-description').textContent = facility.説明 || '情報なし';
                 
-                // カレンダーボタンのロジック
                 const calBtn = document.getElementById('facility-modal-calendar-btn');
                 calBtn.onclick = () => {
                     displayDailyCalendarForFacility(facility, facilityData, latestDateObj);
@@ -619,7 +622,6 @@
                     overlay.style.display = 'none';
                 };
 
-                // [NEW] Google Maps ボタンのロジック
                 const gmapsBtn = document.getElementById('facility-modal-gmaps-btn');
                 const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${facility.緯度},${facility.経度}`;
                 gmapsBtn.onclick = () => {
@@ -627,7 +629,7 @@
                 };
 
                 overlay.style.display = 'flex';
-                lucide.createIcons(); // アイコンを再描画
+                lucide.createIcons(); 
             }
 
             // --- Core Functions (流用・修正) ---
@@ -661,7 +663,7 @@
                 });
             }
 
-            // [UPDATE] ポップアップアイコン (CSSセレクタ制御方式)
+            // [UPDATE] ポップアップアイコン (該当する1つだけを表示)
             function createPopupContent(facility, latestDateObj) {
                 const latestDateString = formatDateForCsv(latestDateObj);
                 const facilityMilli = facility.milli.filter(d => d.年月日 === latestDateString);
@@ -674,12 +676,20 @@
                 const level = latestRecord ? getCongestionLevel(latestRecord.人数, facility.criterion) : 1;
                 const currentLevelInfo = CONGESTION_LEVELS[level];
                 
-                // [UPDATE] data-congestion-level 属性を追加
+                // [UPDATE] JSで表示するアイコンのHTMLを決定
+                let iconHtml = '';
+                if (level === 1) {
+                    iconHtml = `<img src="./realtime_S.svg" alt="ゆっくり" class="popup-congestion-icon">`;
+                } else if (level === 2) {
+                    iconHtml = `<img src="./realtime_N.svg" alt="通常" class="popup-congestion-icon">`;
+                } else {
+                    iconHtml = `<img src="./realtime_B.svg" alt="混雑" class="popup-congestion-icon">`;
+                }
+
+                // [UPDATE] アイコンのラッパー
                 let levelIcons = `
-                    <div class="flex gap-4 items-center" data-congestion-level="${level}">
-                        <img src="./realtime_S.svg" alt="ゆっくり" class="popup-congestion-icon congestion-icon-1">
-                        <img src="./realtime_N.svg" alt="通常" class="popup-congestion-icon congestion-icon-2">
-                        <img src="./realtime_B.svg" alt="混雑" class="popup-congestion-icon congestion-icon-3">
+                    <div class="flex gap-4 items-center">
+                        ${iconHtml}
                     </div>`;
 
                 let calHtml = '<table class="popup-calendar"><thead><tr>';
