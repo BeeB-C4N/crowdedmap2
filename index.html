@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    <!-- ... (head内は変更なし) ... -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>金沢中心部 観光混雑度マップ (v2)</title>
@@ -12,14 +13,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
-    <!-- [FIX] モーダルの閉じるボタンなどで 'x' アイコンを引き続き使用するため Lucide を読み込みます -->
     <script src="https://unpkg.com/lucide@0.390.0/dist/umd/lucide.js"></script>
 
     <style>
         html { scroll-behavior: smooth; }
         body {
             font-family: 'Noto Sans JP', sans-serif;
-            /* [UPDATE] ベース背景SVGを指定 */
             background-image: url('./bk.svg');
             background-repeat: no-repeat;
             background-size: cover;
@@ -29,7 +28,6 @@
             position: relative;
         }
 
-        /* [NEW] PC用の上下の背景模様 */
         @media (min-width: 768px) {
             body::before {
                 content: '';
@@ -58,52 +56,47 @@
                 pointer-events: none;
             }
         }
-        /* [NEW] モバイル用の上部背景模様 (mbl_TOP.jpg参照) */
         @media (max-width: 767px) {
             body::before {
                 content: '';
-                position: absolute; /* fixedだとスクロールしない */
+                position: absolute;
                 top: 0;
                 left: 0;
                 width: 100%;
-                height: 300px; /* 模様の高さに応じて調整 */
-                background-image: url('./top_point_bk.svg'); /* PCと同じものを流用（sp_menubk.svg の指示はなかったため） */
+                height: 300px;
+                background-image: url('./top_point_bk.svg');
                 background-repeat: no-repeat;
                 background-position: top center;
-                background-size: 150%; /* モバイル用に拡大 */
+                background-size: 150%;
                 z-index: -5;
                 pointer-events: none;
                 opacity: 0.7;
             }
         }
 
-        /* [NEW] ロゴのスタイル */
         .logo-pc {
-            height: 50px; /* PC_TOP.jpg に合わせる */
+            height: 50px;
             width: auto;
         }
         .logo-mobile {
-            height: 40px; /* mbl_TOP.jpg に合わせる */
+            height: 40px;
             width: auto;
         }
 
-        /* アイコン (SVGとLucide共通) */
         .icon {
             width: 24px;
             height: 24px;
-            stroke-width: 2; /* Lucide用 */
+            stroke-width: 2;
         }
         .icon-sm {
             width: 20px;
             height: 20px;
         }
-        /* ボタン内のSVGアイコン用 */
         .btn-primary .icon-sm,
         .btn-primary .icon {
-            filter: brightness(0) invert(1); /* .btn-primaryの背景色に合わせて白にする */
+            filter: brightness(0) invert(1);
         }
 
-        /* PC/モバイル共通タブボタン */
         .tab-btn {
             display: flex;
             flex-direction: column;
@@ -118,19 +111,17 @@
             font-weight: 500;
         }
 
-        /* [NEW] アイコン切り替え (Active) */
         .tab-btn .icon-active { display: none; }
         .tab-btn.active .icon-default { display: none; }
         .tab-btn.active .icon-active { display: block; }
 
 
-        /* PC用タブボタンスタイル */
         .pc-tab-btn {
             padding: 0.75rem 1.5rem;
             background-color: rgba(255, 255, 255, 0.8);
             border: 1px solid #e0e0e0;
             backdrop-filter: blur(4px);
-            width: 160px; /* 幅を固定 */
+            width: 160px;
         }
         .pc-tab-btn:hover {
             background-color: white;
@@ -142,12 +133,10 @@
             border-color: #5A3A8A;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        /* PCタブのアクティブ時テキスト色（アイコン側で制御） */
         .pc-tab-btn.active span {
             color: #5A3A8A;
         }
 
-        /* モバイル用タブボタンスタイル */
         .mobile-tab-btn {
             flex-grow: 1;
             padding: 0.5rem 0;
@@ -156,7 +145,10 @@
             color: #5A3A8A;
         }
 
-        /* ... (既存の .tab-content, #map, .leaflet-popup-* スタイルは流用) ... */
+        /* [FIX] タブコンテンツ (セレクタの詳細度を上げて確実に適用) */
+        main .tab-content { display: none; }
+        main .tab-content.active { display: block; }
+
         /* Map Styles */
         #map { 
             height: 80vh; 
@@ -167,7 +159,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         
-        /* 新しいポップアップスタイル (白基調) */
         .leaflet-popup-content-wrapper, .leaflet-popup-tip {
             background: white;
             color: #333;
@@ -194,12 +185,11 @@
             border-radius: 50%;
         }
 
-        /* 新しいマーカーアイコン (mbl_TOP.jpg参照) */
         .custom-div-icon .marker-pin-container {
             width: 80px;
             height: 80px;
             position: relative;
-            transform: translate(-40px, -80px); /* Anchor調整 */
+            transform: translate(-40px, -80px);
             transition: transform 0.2s ease-in-out;
         }
         .custom-div-icon .marker-pin-container:hover {
@@ -214,22 +204,20 @@
             background-color: #1a1a1a;
             border: 4px solid white;
         }
-        /* 混雑レベルに応じた枠線 */
         .custom-div-icon .level-1-border { border-color: #22c55e; }
         .custom-div-icon .level-2-border { border-color: #f59e0b; }
         .custom-div-icon .level-3-border { border-color: #ef4444; }
         
         .custom-div-icon img { width: 100%; height: 100%; object-fit: cover; }
         
-        /* マーカーのピン（下部） */
         .custom-div-icon .marker-pin {
             width: 0;
             height: 0;
             border-left: 10px solid transparent;
             border-right: 10px solid transparent;
-            border-top: 15px solid white; /* 枠線と同じ色 */
+            border-top: 15px solid white;
             position: absolute;
-            bottom: -15px; /* .marker-image-wrapperの下にくっつく */
+            bottom: -15px;
             left: 50%;
             transform: translateX(-50%);
             z-index: -1;
@@ -239,7 +227,6 @@
         .custom-div-icon .level-3-border .marker-pin { border-top-color: #ef4444; }
 
 
-        /* Calendar Styles (PC_カレンダー.jpg参照) */
         .calendar-container-wrapper {
             background-color: white;
             border-radius: 12px;
@@ -248,22 +235,22 @@
             overflow-x: auto;
         }
         .calendar-table {
-            border-collapse: collapse; /* collapseに変更 */
+            border-collapse: collapse;
             width: 100%;
             table-layout: fixed;
-            min-width: 800px; /* 横スクロール用 */
+            min-width: 800px;
         }
         .calendar-table th, .calendar-table td {
             text-align: center;
-            padding: 12px 4px; /* パディング調整 */
-            border: 1px solid #eee; /* 罫線を薄く */
+            padding: 12px 4px;
+            border: 1px solid #eee;
             font-size: 0.9rem;
         }
         .calendar-table th {
-            background-color: #f9fafb; /* ヘッダー背景色 */
+            background-color: #f9fafb;
             color: #333;
             font-weight: 500;
-            height: 60px; /* 高さを調整 */
+            height: 60px;
             vertical-align: middle;
             font-size: 0.8rem;
         }
@@ -272,18 +259,16 @@
             font-weight: 500;
             color: #333;
             text-align: center;
-            width: 80px; /* 幅を調整 */
+            width: 80px;
             font-size: 0.9rem;
         }
 
-        /* Today's Column Highlight (デザイン変更) */
         .calendar-table .today-header { color: #5A3A8A; font-weight: bold; }
         .calendar-table .today-column { background-color: #f9f8f4; }
         .calendar-table th.today-column { border: 1px solid #5A3A8A; }
         .calendar-table tr:not(:first-child) td.today-column { border-left: 1px solid #5A3A8A; border-right: 1px solid #5A3A8A; }
         .calendar-table tr:last-child td.today-column { border-bottom: 1px solid #5A3A8A;}
 
-        /* Introduction Tab Styles (PC_list.jpg参照) */
         .facility-card {
             background-color: white;
             border-radius: 12px;
@@ -301,14 +286,13 @@
         .facility-card img { width: 100%; height: 220px; object-fit: cover; }
         @media (min-width: 768px) { .facility-card img { width: 340px; height: auto; flex-shrink: 0; } }
 
-        /* Modal Styles (白基調に変更) */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* 黒の半透明背景 */
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(4px);
             display: none;
             align-items: center;
@@ -320,7 +304,7 @@
             background: white;
             color: #333;
             border-radius: 12px;
-            padding: 0; /* ヘッダー/コンテンツ/フッターでpadding管理 */
+            padding: 0;
             width: 100%;
             max-width: 600px;
             max-height: 90vh;
@@ -363,38 +347,33 @@
             background-color: #f9fafb;
         }
 
-        /* 施設詳細モーダルの画像 */
         .facility-modal-image {
             width: 100%;
             height: 250px;
             object-fit: cover;
         }
 
-        /* 凡例スタイル */
         .legend-item { display: flex; align-items: center; }
         .legend-color-box {
             height: 1rem;
             width: 1rem;
-            border-radius: 4px; /* 四角に変更 */
+            border-radius: 4px;
             border: 1px solid #ccc;
             margin-right: 0.5rem;
             flex-shrink: 0;
         }
 
-        /* 混雑レベルの背景色（流用） */
-        .level-1-bg { background-color: #a7d0a0; } /* PC_カレンダー.jpg の緑 */
-        .level-2-bg { background-color: #f9d991; } /* PC_カレンダー.jpg の黄（通常）*/
-        .level-3-bg { background-color: #d76a6a; } /* PC_カレンダー.jpg の赤 */
-        .future-time-bg { background-color: #f0f0f0; } /* 未来時間 */
+        .level-1-bg { background-color: #a7d0a0; }
+        .level-2-bg { background-color: #f9d991; }
+        .level-3-bg { background-color: #d76a6a; }
+        .future-time-bg { background-color: #f0f0f0; }
 
-        /* 混雑レベルのテキスト色（流用） */
         .level-1-text { color: #166534; }
         .level-2-text { color: #a16207; }
         .level-3-text { color: #991b1b; }
 
-        /* 新しいボタン (紫) */
         .btn-primary {
-            background-color: #5A3A8A; /* 紫系 */
+            background-color: #5A3A8A;
             color: white;
             padding: 10px 20px;
             border-radius: 8px;
@@ -423,7 +402,6 @@
             background-color: #f5f3f9;
         }
 
-        /* ポップアップ内の簡易カレンダー */
         .popup-calendar {
             width: 100%;
             border-collapse: collapse;
@@ -442,10 +420,10 @@
             text-align: center;
         }
 
-        /* [NEW] ポップアップ内の混雑アイコン */
-        .popup-congestion-icon {
-            width: 40px;
-            height: 40px;
+        /* [FIX] ポップアップ内の混雑アイコンのサイズをCSSで指定 */
+        img.popup-congestion-icon {
+            width: 40px !important;
+            height: 40px !important;
             border-radius: 50%;
             transition: opacity 0.2s;
         }
@@ -457,12 +435,10 @@
     <!-- PC Header -->
     <header class="hidden md:block sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
         <div class="container mx-auto px-8 py-4 flex justify-between items-center">
-            <!-- [UPDATE] ロゴ -->
             <a href="#">
                 <img src="./logo_kanazawa.svg" alt="金沢 観光混雑度 MAP" class="logo-pc">
             </a>
             
-            <!-- [UPDATE] PC用タブナビゲーション -->
             <nav class="flex space-x-4">
                 <button class="tab-btn pc-tab-btn active" data-tab-id="map-content">
                     <img src="./map_icon.svg" alt="マップ" class="icon icon-default">
@@ -486,25 +462,22 @@
     <!-- Mobile Header -->
     <header class="md:hidden sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-200 p-4">
         <div class="flex justify-center items-center">
-            <!-- [UPDATE] ロゴ -->
             <a href="#">
                 <img src="./logo_kanazawa.svg" alt="金沢 観光混雑度 MAP" class="logo-mobile">
             </a>
         </div>
     </header>
 
-    <!-- ... (メインコンテンツとカレンダータブは変更なし) ... -->
     <!-- メインコンテンツ -->
     <main class="container mx-auto p-4 md:p-8">
         
-        <!-- マップタブ -->
+        <!-- マップタブ (デフォルトで active) -->
         <div id="map-content" class="tab-content active">
             <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">リアルタイム混雑状況</h2>
                     <p class="text-gray-500">現在の混雑状況をマップで確認できます。</p>
                 </div>
-                <!-- 凡例 -->
                 <div class="flex flex-wrap justify-start md:justify-end gap-x-4 gap-y-2 text-sm">
                     <div class="legend-item"><span class="legend-color-box border-[#22c55e] bg-white"></span>ゆっくり</div>
                     <div class="legend-item"><span class="legend-color-box border-[#f59e0b] bg-white"></span>通常</div>
@@ -514,7 +487,7 @@
             <div id="map"></div>
         </div>
         
-        <!-- カレンダータブ -->
+        <!-- カレンダータブ (デフォルトで非表示) -->
         <div id="calendar-content" class="tab-content">
              <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
@@ -534,7 +507,7 @@
             </div>
         </div>
 
-        <!-- 施設紹介（観光スポット）タブ -->
+        <!-- 施設紹介（観光スポット）タブ (デフォルトで非表示) -->
         <div id="introduction-content" class="tab-content">
             <h2 class="text-2xl font-bold text-gray-800 mb-1">観光スポット</h2>
             <p class="text-gray-500 mb-6">金沢の主要な観光スポットをご紹介します。</p>
@@ -550,7 +523,7 @@
         <a href="#" id="disclaimer-link" class="underline hover:text-purple-700 transition">免責事項</a>
     </footer>
 
-    <!-- [UPDATE] Mobile Footer Tab Bar -->
+    <!-- Mobile Footer Tab Bar -->
     <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg flex justify-around">
         <button class="tab-btn mobile-tab-btn active" data-tab-id="map-content">
             <img src="./sp_map_icon.svg" alt="マップ" class="icon icon-default">
@@ -569,7 +542,7 @@
         </button>
     </nav>
 
-    <!-- 免責事項モーダル (Lucide 'x' icon) -->
+    <!-- 免責事項モーダル -->
     <div id="modal-overlay" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
@@ -590,7 +563,7 @@
         </div>
     </div>
 
-    <!-- 施設詳細モーダル (Lucide 'x' icon) -->
+    <!-- 施設詳細モーダル -->
     <div id="facility-modal-overlay" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
@@ -626,7 +599,6 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <!-- [UPDATE] ボタンアイコン -->
                 <button id="facility-modal-calendar-btn" class="btn-primary">
                     <img src="./white_calendar.svg" class="icon-sm" alt="カレンダー">
                     混雑カレンダーを見る
@@ -638,7 +610,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             // --- Configuration (流用) ---
-            // ... (変更なし) ...
             const AREA1_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area1_m5.csv';
             
             const FACILITY_CSV_URLS = {
@@ -655,7 +626,6 @@
                 criterion: './data/crowded_milli_criterion.csv',
             };
 
-            // 画像URL (流用しつつ、フォールバックをプレースホルダーに変更)
             const placeholderImg = (text = 'Image') => `https://placehold.co/300x200/cccccc/333333?text=${encodeURIComponent(text)}`;
             
             const IMAGE_URLS = {
@@ -673,11 +643,9 @@
                 3: { message: "多くの観光客で賑わっています", className: "level-3" }
             };
 
-            // Lucideアイコンの初期化 (モーダルの 'x' ボタン用)
             lucide.createIcons();
 
             // --- Utility Functions (流用) ---
-            // ... (変更なし) ...
             const processNewCsvData = (data) => {
                 if (!data || data.length === 0) return [];
                 const hourlyAgg = {};
@@ -741,9 +709,7 @@
                 return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
             };
 
-
             // --- Main Application Logic (流用) ---
-            // ... (変更なし) ...
             let facilityData = [];
             let latestDateObj = new Date();
             let mapInstance = null;
@@ -796,9 +762,8 @@
                     throw new Error("No valid dates (年月日) found in processed congestion data.");
                 }
 
-                // --- アプリケーション初期化 ---
                 mapInstance = L.map('map').setView([36.565, 136.658], 14);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { // 明るいマップに変更
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
                 }).addTo(mapInstance);
                 
@@ -806,7 +771,7 @@
 
                 populateIntroductionTab(facilityData);
                 updateMap(facilityData, latestDateObj);
-                displayTodayAllFacilitiesCalendar(facilityData, latestDateObj); // デフォルトは全施設
+                displayTodayAllFacilitiesCalendar(facilityData, latestDateObj);
                 setupEventListeners(facilityData, latestDateObj);
 
             } catch (error) {
@@ -814,9 +779,8 @@
                 const mainContent = document.querySelector('main');
                 mainContent.innerHTML = `<div class="text-center p-8"><h2 class="text-2xl text-red-500">エラー</h2><p class="mt-4 text-gray-500">データの読み込みに失敗しました。CSVファイルの内容やURLを確認してください。</p><p class="text-gray-400 mt-2">${error.message}</p></div>`;
             }
-
-            // --- Event Listeners (流用・修正) ---
-            // ... (setupEventListeners, switchToTab, showFacilityModal は変更なし) ...
+            
+            // --- Event Listeners (流用) ---
             function setupEventListeners(facilityData, latestDateObj) {
                 const tabs = document.querySelectorAll('.tab-btn');
                 const map = L.Util.getMapInstance();
@@ -861,7 +825,6 @@
                     }
                 });
 
-                // 免責事項モーダル
                 const disclaimerLink = document.getElementById('disclaimer-link');
                 const modalOverlay = document.getElementById('modal-overlay');
                 const closeModalBtn = document.getElementById('close-modal-btn');
@@ -872,22 +835,22 @@
                 closeModalBtnFooter.addEventListener('click', () => modalOverlay.style.display = 'none');
                 modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) modalOverlay.style.display = 'none'; });
 
-                // 施設詳細モーダル
                 const facilityModalOverlay = document.getElementById('facility-modal-overlay');
                 const closeFacilityModalBtn = document.getElementById('close-facility-modal-btn');
                 closeFacilityModalBtn.addEventListener('click', () => facilityModalOverlay.style.display = 'none');
                 facilityModalOverlay.addEventListener('click', (e) => { if (e.target === facilityModalOverlay) facilityModalOverlay.style.display = 'none'; });
             }
 
+            // [FIX] switchToTab (CSSの active クラスを付け替える)
             function switchToTab(tabId, map) {
                 // すべてのタブボタンから active を削除
                 document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
-                // すべてのタブコンテンツを非表示
+                // すべてのタブコンテンツから active を削除
                 document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
 
                 // クリックされたタブIDを持つボタンに active を追加
                 document.querySelectorAll(`.tab-btn[data-tab-id="${tabId}"]`).forEach(t => t.classList.add('active'));
-                // クリックされたタブIDを持つコンテンツを表示
+                // クリックされたタブIDを持つコンテンツに active を追加
                 const content = document.getElementById(tabId);
                 if (content) {
                     content.classList.add('active');
@@ -913,21 +876,19 @@
                 document.getElementById('facility-modal-web').href = facility.Web || '#';
                 document.getElementById('facility-modal-description').textContent = facility.説明 || '情報なし';
                 
-                // モーダル内のカレンダーボタン
                 const calBtn = document.getElementById('facility-modal-calendar-btn');
                 calBtn.onclick = () => {
                     displayDailyCalendarForFacility(facility, facilityData, latestDateObj);
                     switchToTab('calendar-content', L.Util.getMapInstance());
-                    overlay.style.display = 'none'; // モーダルを閉じる
+                    overlay.style.display = 'none';
                 };
 
                 overlay.style.display = 'flex';
-                lucide.createIcons(); // 'x' アイコンを描画
+                lucide.createIcons();
             }
 
-
             // --- Core Functions (流用・修正) ---
-            // ... (getCongestionLevel, createCustomIcon は変更なし) ...
+
             function getCongestionLevel(count, criterion) {
                 if (!criterion) return 1;
                 const num = parseInt(count, 10);
@@ -937,7 +898,6 @@
                 return 3;
             }
             
-            // アイコンを新しいデザインに変更
             function createCustomIcon(level, facilityName) {
                 const levelInfo = CONGESTION_LEVELS[level];
                 const imageUrl = IMAGE_URLS[facilityName] || placeholderImg(facilityName);
@@ -952,30 +912,28 @@
                             </div>
                         </div>`,
                     className: 'custom-div-icon',
-                    iconSize: [0, 0], // CSSでサイズ制御するため
+                    iconSize: [0, 0],
                     iconAnchor: [0, 0],
-                    popupAnchor: [0, -40] // ポップアップがマーカーの上に出るように調整
+                    popupAnchor: [0, -40]
                 });
             }
 
-            // [UPDATE] ポップアップの内容をSVGアイコンに変更
+            // [FIX] ポップアップ内のアイコンにインラインstyleを追加
             function createPopupContent(facility, levelInfo, latestDateObj) {
                 const latestDateString = formatDateForCsv(latestDateObj);
                 const facilityMilli = facility.milli.filter(d => d.年月日 === latestDateString);
                 
-                // 混雑レベルアイコン (mbl_modal.jpg参照)
                 const latestRecord = facilityMilli.length > 0 ? facilityMilli[facilityMilli.length - 1] : null;
                 const level = latestRecord ? getCongestionLevel(latestRecord.人数, facility.criterion) : 1;
                 
-                // [UPDATE] 混雑アイコンをSVGに変更
+                // [FIX] アイコンに style="width: 40px; height: 40px;" を追加
                 let levelIcons = `
                     <div class="flex gap-4">
-                        <img src="./realtime_S.svg" alt="ゆっくり" class="popup-congestion-icon ${level === 1 ? 'opacity-100' : 'opacity-30'}">
-                        <img src="./realtime_N.svg" alt="通常" class="popup-congestion-icon ${level === 2 ? 'opacity-100' : 'opacity-30'}">
-                        <img src="./realtime_B.svg" alt="混雑" class="popup-congestion-icon ${level === 3 ? 'opacity-100' : 'opacity-30'}">
+                        <img src="./realtime_S.svg" alt="ゆっくり" class="popup-congestion-icon ${level === 1 ? 'opacity-100' : 'opacity-30'}" style="width: 40px; height: 40px;">
+                        <img src="./realtime_N.svg" alt="通常" class="popup-congestion-icon ${level === 2 ? 'opacity-100' : 'opacity-30'}" style="width: 40px; height: 40px;">
+                        <img src="./realtime_B.svg" alt="混雑" class="popup-congestion-icon ${level === 3 ? 'opacity-100' : 'opacity-30'}" style="width: 40px; height: 40px;">
                     </div>`;
 
-                // 簡易カレンダー (mbl_modal.jpg参照)
                 let calHtml = '<table class="popup-calendar"><thead><tr>';
                 for (let h = 8; h <= 20; h++) { calHtml += `<th>${h}</th>`; }
                 calHtml += '</tr></thead><tbody><tr>';
@@ -988,7 +946,6 @@
                 }
                 calHtml += '</tr></tbody></table>';
 
-                // [UPDATE] ボタンアイコン
                 return `
                     <h3 class="text-lg font-bold">${facility.地点名}</h3>
                     <div class="flex items-center gap-4 my-2">
@@ -1003,12 +960,11 @@
                     </button>`;
             }
 
-
+            // ... (updateMap, populateIntroductionTab, displayTodayAllFacilitiesCalendar, displayDailyCalendarForFacility は変更なし) ...
             function updateMap(facilityData, latestDateObj) {
                 const map = L.Util.getMapInstance('map');
                 if (!map) return;
                 
-                // マーカーをクリア (再描画用)
                 map.eachLayer(layer => {
                     if (layer instanceof L.Marker) {
                         map.removeLayer(layer);
@@ -1038,14 +994,13 @@
                 });
                 
                 map.on('popupopen', function() {
-                    // lucide.createIcons(); // ポップアップ内にはLucideアイコンがなくなった
+                    // ポップアップ内のSVGアイコンはLucideではないので、ここでは不要
                 });
             }
             
-            // [UPDATE] 施設紹介タブのHTMLを生成 (ボタンアイコン変更)
             function populateIntroductionTab(facilityData) {
                 const container = document.getElementById('introduction-content');
-                container.innerHTML = '<h2 class="text-2xl font-bold text-gray-800 mb-1">観光スポット</h2><p class="text-gray-500 mb-6">金沢の主要な観光スポットをご紹介します。</p>'; // タイトルを再挿入
+                container.innerHTML = '<h2 class="text-2xl font-bold text-gray-800 mb-1">観光スポット</h2><p class="text-gray-500 mb-6">金沢の主要な観光スポットをご紹介します。</p>';
                 const cardContainer = document.createElement('div');
                 cardContainer.className = 'space-y-8';
                 
@@ -1072,11 +1027,8 @@
                     cardContainer.innerHTML += cardHtml;
                 });
                 container.appendChild(cardContainer);
-                // lucide.createIcons(); // Lucideアイコンは使わなくなった
             }
 
-            // --- Calendar Functions (流用) ---
-            // ... (displayTodayAllFacilitiesCalendar, displayDailyCalendarForFacility は変更なし) ...
             function displayTodayAllFacilitiesCalendar(facilityData, latestDateObj) {
                 const map = L.Util.getMapInstance();
                 const latestDateString = formatDateForCsv(latestDateObj);
@@ -1120,10 +1072,9 @@
                 document.getElementById('calendar-container').innerHTML = `<table class="calendar-table"><thead>${headerHtml}</thead><tbody>${bodyHtml}</tbody></table>`;
             }
 
-            // カレンダー (施設別・7日間)
             function displayDailyCalendarForFacility(facility, facilityData, latestDateObj) {
                 const map = L.Util.getMapInstance();
-                document.getElementById('calendar-title').textContent = `${facility.地点名} 混雑度実績`;
+                document.getElementById('calendar-title').textContent = `${facility.地点名} 雑度実績`;
                 document.getElementById('calendar-info').textContent = '施設別（日別） - 直近7日間';
                 const toggleBtn = document.getElementById('calendar-toggle-btn');
                 toggleBtn.textContent = '施設全体表示に戻る';
