@@ -152,13 +152,12 @@
         .modal-close-btn:hover { background: #e0e0e0; color: #333; }
         .modal-content { overflow-y: auto; flex-grow: 1; padding: 1.5rem; }
         
-        /* [UPDATE] モーダルフッターを中央寄せに */
         .modal-footer { 
             border-top: 1px solid #eee; 
             padding: 1rem 1.5rem; 
             background-color: #f9fafb; 
             display: flex; 
-            justify-content: center; /* [UPDATE] flex-end から center に変更 */ 
+            justify-content: center; 
             gap: 0.5rem; 
         }
 
@@ -179,11 +178,11 @@
         .popup-calendar th { font-size: 0.7rem; color: #555; font-weight: 500; padding: 4px; }
         .popup-calendar td { height: 12px; border: 1px solid #fff; font-size: 0.7rem; text-align: center; }
 
+        /* [UPDATE] ポップアップアイコンのサイズを 80px に */
         .popup-congestion-icon {
-            width: 40px; 
-            height: 40px;
+            width: 80px; 
+            height: 80px;
             border-radius: 50%;
-            transition: opacity 0.2s;
         }
         
     </style>
@@ -325,7 +324,7 @@
         </div>
     </div>
 
-    <!-- [UPDATE] 施設モーダルの変更 -->
+    <!-- 施設モーダル -->
     <div id="facility-modal-overlay" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
@@ -603,7 +602,6 @@
                 }
             }
             
-            // [UPDATE] 施設モーダルの表示内容を更新
             function showFacilityModal(facility, facilityData, latestDateObj) {
                 const overlay = document.getElementById('facility-modal-overlay');
                 const imageUrl = IMAGE_URLS[facility.地点名] || placeholderImg(facility.地点名);
@@ -663,7 +661,7 @@
                 });
             }
 
-            // [UPDATE] ポップアップアイコン (該当する1つだけを表示)
+            // [UPDATE] ポップアップアイコン (該当する1つだけを表示 + レイアウト調整)
             function createPopupContent(facility, latestDateObj) {
                 const latestDateString = formatDateForCsv(latestDateObj);
                 const facilityMilli = facility.milli.filter(d => d.年月日 === latestDateString);
@@ -676,7 +674,7 @@
                 const level = latestRecord ? getCongestionLevel(latestRecord.人数, facility.criterion) : 1;
                 const currentLevelInfo = CONGESTION_LEVELS[level];
                 
-                // [UPDATE] JSで表示するアイコンのHTMLを決定
+                // [UPDATE] JSで表示するアイコンのHTMLを決定 (1つだけ)
                 let iconHtml = '';
                 if (level === 1) {
                     iconHtml = `<img src="./realtime_S.svg" alt="ゆっくり" class="popup-congestion-icon">`;
@@ -686,9 +684,9 @@
                     iconHtml = `<img src="./realtime_B.svg" alt="混雑" class="popup-congestion-icon">`;
                 }
 
-                // [UPDATE] アイコンのラッパー
-                let levelIcons = `
-                    <div class="flex gap-4 items-center">
+                // [UPDATE] アイコンのラッパー (w-1/2 を適用)
+                let levelIconsWrapper = `
+                    <div class="w-1/2 flex justify-center items-center">
                         ${iconHtml}
                     </div>`;
 
@@ -712,11 +710,14 @@
                 }
                 calHtml += '</tr></tbody></table>';
 
+                // [UPDATE] 全体のHTML構造 (w-1/2 を適用)
                 return `
                     <h3 class="text-lg font-bold">${facility.地点名}</h3>
-                    <div class="flex items-center gap-4 my-2">
-                        ${levelIcons}
-                        <p class="font-bold text-base ${currentLevelInfo.className}-text">${currentLevelInfo.message}</p>
+                    <div class="flex items-center gap-2 my-2"> <!-- gap-4からgap-2に -->
+                        ${levelIconsWrapper}
+                        <div class="w-1/2">
+                            <p class="font-bold text-base ${currentLevelInfo.className}-text">${currentLevelInfo.message}</p>
+                        </div>
                     </div>
                     <p class="text-xs text-gray-500 mb-2">混雑度実績 (${latestDateString})</p>
                     ${calHtml}
@@ -890,4 +891,3 @@
     </script>
 </body>
 </html>
-
