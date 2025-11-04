@@ -16,6 +16,7 @@
     <script src="https://unpkg.com/lucide@0.390.0/dist/umd/lucide.js"></script>
 
     <style>
+        /* ... (body, logo, icon, tab-btn スタイルは変更なし) ... */
         html { scroll-behavior: smooth; }
         body {
             font-family: 'Noto Sans JP', sans-serif;
@@ -145,11 +146,9 @@
             color: #5A3A8A;
         }
 
-        /* [FIX] タブコンテンツ (セレクタの詳細度を上げて確実に適用) */
         main .tab-content { display: none; }
         main .tab-content.active { display: block; }
 
-        /* Map Styles */
         #map { 
             height: 80vh; 
             width: 100%; 
@@ -185,6 +184,7 @@
             border-radius: 50%;
         }
 
+        /* ... (marker-pin-container スタイルは変更なし) ... */
         .custom-div-icon .marker-pin-container {
             width: 80px;
             height: 80px;
@@ -227,6 +227,7 @@
         .custom-div-icon .level-3-border .marker-pin { border-top-color: #ef4444; }
 
 
+        /* ... (calendar スタイルは変更なし) ... */
         .calendar-container-wrapper {
             background-color: white;
             border-radius: 12px;
@@ -269,6 +270,7 @@
         .calendar-table tr:not(:first-child) td.today-column { border-left: 1px solid #5A3A8A; border-right: 1px solid #5A3A8A; }
         .calendar-table tr:last-child td.today-column { border-bottom: 1px solid #5A3A8A;}
 
+        /* ... (facility-card スタイルは変更なし) ... */
         .facility-card {
             background-color: white;
             border-radius: 12px;
@@ -286,6 +288,7 @@
         .facility-card img { width: 100%; height: 220px; object-fit: cover; }
         @media (min-width: 768px) { .facility-card img { width: 340px; height: auto; flex-shrink: 0; } }
 
+        /* ... (modal スタイルは変更なし) ... */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -353,6 +356,7 @@
             object-fit: cover;
         }
 
+        /* ... (legend, level, btn スタイルは変更なし) ... */
         .legend-item { display: flex; align-items: center; }
         .legend-color-box {
             height: 1rem;
@@ -402,6 +406,7 @@
             background-color: #f5f3f9;
         }
 
+        /* ... (popup-calendar スタイルは変更なし) ... */
         .popup-calendar {
             width: 100%;
             border-collapse: collapse;
@@ -420,10 +425,10 @@
             text-align: center;
         }
 
-        /* [FIX] ポップアップ内の混雑アイコンのサイズをCSSで指定 */
+        /* [FIX] ポップアップアイコン (Tailwindのopacityを有効にするため !important を削除) */
         img.popup-congestion-icon {
-            width: 40px !important;
-            height: 40px !important;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             transition: opacity 0.2s;
         }
@@ -432,6 +437,7 @@
 </head>
 <body>
 
+    <!-- ... (header, mobile-header は変更なし) ... -->
     <!-- PC Header -->
     <header class="hidden md:block sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
         <div class="container mx-auto px-8 py-4 flex justify-between items-center">
@@ -473,6 +479,7 @@
         
         <!-- マップタブ (デフォルトで active) -->
         <div id="map-content" class="tab-content active">
+            <!-- ... (変更なし) ... -->
             <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">リアルタイム混雑状況</h2>
@@ -489,6 +496,7 @@
         
         <!-- カレンダータブ (デフォルトで非表示) -->
         <div id="calendar-content" class="tab-content">
+             <!-- ... (変更なし) ... -->
              <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
                     <h2 id="calendar-title" class="text-2xl font-bold text-gray-800">時間帯別 混雑度実績</h2>
@@ -509,6 +517,7 @@
 
         <!-- 施設紹介（観光スポット）タブ (デフォルトで非表示) -->
         <div id="introduction-content" class="tab-content">
+            <!-- ... (変更なし) ... -->
             <h2 class="text-2xl font-bold text-gray-800 mb-1">観光スポット</h2>
             <p class="text-gray-500 mb-6">金沢の主要な観光スポットをご紹介します。</p>
             <div class="space-y-8">
@@ -517,6 +526,7 @@
         </div>
     </main>
 
+    <!-- ... (footer, mobile-nav, modals は変更なし) ... -->
     <!-- フッター (免責事項) -->
     <footer class="text-center mt-8 mb-24 md:mb-12 text-gray-500 text-sm">
         <p>&copy; Code for Noto. All Rights Reserved.</p>
@@ -610,6 +620,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             // --- Configuration (流用) ---
+            // ... (変更なし) ...
             const AREA1_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area1_m5.csv';
             
             const FACILITY_CSV_URLS = {
@@ -646,6 +657,7 @@
             lucide.createIcons();
 
             // --- Utility Functions (流用) ---
+            // ... (変更なし) ...
             const processNewCsvData = (data) => {
                 if (!data || data.length === 0) return [];
                 const hourlyAgg = {};
@@ -710,6 +722,7 @@
             };
 
             // --- Main Application Logic (流用) ---
+            // ... (変更なし) ...
             let facilityData = [];
             let latestDateObj = new Date();
             let mapInstance = null;
@@ -781,6 +794,7 @@
             }
             
             // --- Event Listeners (流用) ---
+            // ... (変更なし) ...
             function setupEventListeners(facilityData, latestDateObj) {
                 const tabs = document.querySelectorAll('.tab-btn');
                 const map = L.Util.getMapInstance();
@@ -841,16 +855,10 @@
                 facilityModalOverlay.addEventListener('click', (e) => { if (e.target === facilityModalOverlay) facilityModalOverlay.style.display = 'none'; });
             }
 
-            // [FIX] switchToTab (CSSの active クラスを付け替える)
             function switchToTab(tabId, map) {
-                // すべてのタブボタンから active を削除
                 document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
-                // すべてのタブコンテンツから active を削除
                 document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-
-                // クリックされたタブIDを持つボタンに active を追加
                 document.querySelectorAll(`.tab-btn[data-tab-id="${tabId}"]`).forEach(t => t.classList.add('active'));
-                // クリックされたタブIDを持つコンテンツに active を追加
                 const content = document.getElementById(tabId);
                 if (content) {
                     content.classList.add('active');
@@ -898,6 +906,7 @@
                 return 3;
             }
             
+            // ... (createCustomIcon は変更なし) ...
             function createCustomIcon(level, facilityName) {
                 const levelInfo = CONGESTION_LEVELS[level];
                 const imageUrl = IMAGE_URLS[facilityName] || placeholderImg(facilityName);
@@ -918,7 +927,7 @@
                 });
             }
 
-            // [FIX] ポップアップ内のアイコンにインラインstyleを追加
+            // [FIX] ポップアップアイコン (opacity-20 で薄く表示)
             function createPopupContent(facility, levelInfo, latestDateObj) {
                 const latestDateString = formatDateForCsv(latestDateObj);
                 const facilityMilli = facility.milli.filter(d => d.年月日 === latestDateString);
@@ -926,12 +935,12 @@
                 const latestRecord = facilityMilli.length > 0 ? facilityMilli[facilityMilli.length - 1] : null;
                 const level = latestRecord ? getCongestionLevel(latestRecord.人数, facility.criterion) : 1;
                 
-                // [FIX] アイコンに style="width: 40px; height: 40px;" を追加
+                // [FIX] CSSクラスで opacity を制御 (インライン style 削除)
                 let levelIcons = `
                     <div class="flex gap-4">
-                        <img src="./realtime_S.svg" alt="ゆっくり" class="popup-congestion-icon ${level === 1 ? 'opacity-100' : 'opacity-30'}" style="width: 40px; height: 40px;">
-                        <img src="./realtime_N.svg" alt="通常" class="popup-congestion-icon ${level === 2 ? 'opacity-100' : 'opacity-30'}" style="width: 40px; height: 40px;">
-                        <img src="./realtime_B.svg" alt="混雑" class="popup-congestion-icon ${level === 3 ? 'opacity-100' : 'opacity-30'}" style="width: 40px; height: 40px;">
+                        <img src="./realtime_S.svg" alt="ゆっくり" class="popup-congestion-icon ${level === 1 ? 'opacity-100' : 'opacity-20'}">
+                        <img src="./realtime_N.svg" alt="通常" class="popup-congestion-icon ${level === 2 ? 'opacity-100' : 'opacity-20'}">
+                        <img src="./realtime_B.svg" alt="混雑" class="popup-congestion-icon ${level === 3 ? 'opacity-100' : 'opacity-20'}">
                     </div>`;
 
                 let calHtml = '<table class="popup-calendar"><thead><tr>';
@@ -960,8 +969,9 @@
                     </button>`;
             }
 
-            // ... (updateMap, populateIntroductionTab, displayTodayAllFacilitiesCalendar, displayDailyCalendarForFacility は変更なし) ...
+
             function updateMap(facilityData, latestDateObj) {
+                // ... (変更なし) ...
                 const map = L.Util.getMapInstance('map');
                 if (!map) return;
                 
@@ -994,10 +1004,10 @@
                 });
                 
                 map.on('popupopen', function() {
-                    // ポップアップ内のSVGアイコンはLucideではないので、ここでは不要
                 });
             }
             
+            // [FIX] 施設紹介タブ (ブレークポイントを sm: -> md: に変更)
             function populateIntroductionTab(facilityData) {
                 const container = document.getElementById('introduction-content');
                 container.innerHTML = '<h2 class="text-2xl font-bold text-gray-800 mb-1">観光スポット</h2><p class="text-gray-500 mb-6">金沢の主要な観光スポットをご紹介します。</p>';
@@ -1013,11 +1023,11 @@
                                 <h3 class="text-2xl font-bold text-gray-800">${facility.地点名}</h3>
                                 <p class="text-gray-400 mb-4">${facility.英語名称 || ''}</p>
                                 <p class="text-gray-600 flex-grow mb-6">${(facility.説明 || '').substring(0, 100)}...</p>
-                                <div class="flex flex-col sm:flex-row gap-4 mt-4">
-                                    <button class="btn-outline intro-details-btn w-full sm:w-auto" data-facility-name="${facility.地点名}">
+                                <div class="flex flex-col md:flex-row gap-4 mt-4">
+                                    <button class="btn-outline intro-details-btn w-full md:w-auto" data-facility-name="${facility.地点名}">
                                         続きを読む
                                     </button>
-                                    <button class="btn-primary intro-calendar-btn w-full sm:w-auto" data-facility-name="${facility.地点名}">
+                                    <button class="btn-primary intro-calendar-btn w-full md:w-auto" data-facility-name="${facility.地点名}">
                                         <img src="./white_calendar.svg" class="icon-sm" alt="カレンダー">
                                         混雑度を確認
                                     </button>
@@ -1029,6 +1039,8 @@
                 container.appendChild(cardContainer);
             }
 
+            // --- Calendar Functions (流用) ---
+            // ... (変更なし) ...
             function displayTodayAllFacilitiesCalendar(facilityData, latestDateObj) {
                 const map = L.Util.getMapInstance();
                 const latestDateString = formatDateForCsv(latestDateObj);
@@ -1074,7 +1086,7 @@
 
             function displayDailyCalendarForFacility(facility, facilityData, latestDateObj) {
                 const map = L.Util.getMapInstance();
-                document.getElementById('calendar-title').textContent = `${facility.地点名} 雑度実績`;
+                document.getElementById('calendar-title').textContent = `${facility.地点名} 混雑度実績`;
                 document.getElementById('calendar-info').textContent = '施設別（日別） - 直近7日間';
                 const toggleBtn = document.getElementById('calendar-toggle-btn');
                 toggleBtn.textContent = '施設全体表示に戻る';
