@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金沢中心部 観光混雑度マップ (v2)</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <!-- [FIX] モーダルの閉じるボタンなどで 'x' アイコンを引き続き使用するため Lucide を読み込みます -->
+    <script src="https://unpkg.com/lucide@0.390.0/dist/umd/lucide.js"></script>
+
+    <style>
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            /* [UPDATE] ベース背景SVGを指定 */
+            background-image: url('./bk.svg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #333;
+            position: relative;
+        }
+
+        /* [NEW] PC用の上下の背景模様 */
+        @media (min-width: 768px) {
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image: url('./top_point_bk.svg');
+                background-repeat: no-repeat;
+                background-position: top right;
+                z-index: -5;
+                pointer-events: none;
+            }
+            body::after {
+                content: '';
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image: url('./down_point_bk.svg');
+                background-repeat: no-repeat;
+                background-position: bottom left;
+                z-index: -5;
+                pointer-events: none;
+            }
+        }
+        /* [NEW] モバイル用の上部背景模様 (mbl_TOP.jpg参照) */
+        @media (max-width: 767px) {
+            body::before {
+                content: '';
+                position: absolute; /* fixedだとスクロールしない */
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 300px; /* 模様の高さに応じて調整 */
+                background-image: url('./top_point_bk.svg'); /* PCと同じものを流用（sp_menubk.svg の指示はなかったため） */
+                background-repeat: no-repeat;
+                background-position: top center;
+                background-size: 150%; /* モバイル用に拡大 */
+                z-index: -5;
+                pointer-events: none;
+                opacity: 0.7;
+            }
+        }
+
+        /* [NEW] ロゴのスタイル */
+        .logo-pc {
+            height: 50px; /* PC_TOP.jpg に合わせる */
+            width: auto;
+        }
+        .logo-mobile {
+            height: 40px; /* mbl_TOP.jpg に合わせる */
+            width: auto;
+        }
+
+        /* アイコン (SVGとLucide共通) */
+        .icon {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2; /* Lucide用 */
+        }
+        .icon-sm {
+            width: 20px;
+            height: 20px;
+        }
+        /* ボタン内のSVGアイコン用 */
+        .btn-primary .icon-sm,
+        .btn-primary .icon {
+            filter: brightness(0) invert(1); /* .btn-primaryの背景色に合わせて白にする */
+        }
+
+        /* PC/モバイル共通タブボタン */
+        .tab-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            color: #888;
+            transition: all 0.2s;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* [NEW] アイコン切り替え (Active) */
+        .tab-btn .icon-active { display: none; }
+        .tab-btn.active .icon-default { display: none; }
+        .tab-btn.active .icon-active { display: block; }
+
+
+        /* PC用タブボタンスタイル */
+        .pc-tab-btn {
+            padding: 0.75rem 1.5rem;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid #e0e0e0;
+            backdrop-filter: blur(4px);
+            width: 160px; /* 幅を固定 */
+        }
+        .pc-tab-btn:hover {
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .pc-tab-btn.active {
+            color: #5A3A8A;
+            background-color: white;
+            border-color: #5A3A8A;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        /* PCタブのアクティブ時テキスト色（アイコン側で制御） */
+        .pc-tab-btn.active span {
+            color: #5A3A8A;
+        }
+
+        /* モバイル用タブボタンスタイル */
+        .mobile-tab-btn {
+            flex-grow: 1;
+            padding: 0.5rem 0;
+        }
+        .mobile-tab-btn.active {
+            color: #5A3A8A;
+        }
+
+        /* ... (既存の .tab-content, #map, .leaflet-popup-* スタイルは流用) ... */
+        /* Map Styles */
+        #map { 
+            height: 80vh; 
+            width: 100%; 
+            border-radius: 12px; 
+            background-color: #e0e0e0;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        /* 新しいポップアップスタイル (白基調) */
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .leaflet-popup-content-wrapper { padding: 4px; }
+        .leaflet-popup-content { margin: 12px 16px; }
+        .leaflet-popup-content h3 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .leaflet-popup-content p { margin: 0.5em 0; }
+        .leaflet-popup-close-button {
+            color: #888;
+            padding: 8px;
+        }
+        .leaflet-popup-close-button:hover {
+            color: #333;
+            background-color: #f0f0f0;
+            border-radius: 50%;
+        }
+
+        /* 新しいマーカーアイコン (mbl_TOP.jpg参照) */
+        .custom-div-icon .marker-pin-container {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            transform: translate(-40px, -80px); /* Anchor調整 */
+            transition: transform 0.2s ease-in-out;
+        }
+        .custom-div-icon .marker-pin-container:hover {
+            transform: translate(-40px, -80px) scale(1.1);
+        }
+        .custom-div-icon .marker-image-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            background-color: #1a1a1a;
+            border: 4px solid white;
+        }
+        /* 混雑レベルに応じた枠線 */
+        .custom-div-icon .level-1-border { border-color: #22c55e; }
+        .custom-div-icon .level-2-border { border-color: #f59e0b; }
+        .custom-div-icon .level-3-border { border-color: #ef4444; }
+        
+        .custom-div-icon img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* マーカーのピン（下部） */
+        .custom-div-icon .marker-pin {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 15px solid white; /* 枠線と同じ色 */
+            position: absolute;
+            bottom: -15px; /* .marker-image-wrapperの下にくっつく */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: -1;
+        }
+        .custom-div-icon .level-1-border .marker-pin { border-top-color: #22c55e; }
+        .custom-div-icon .level-2-border .marker-pin { border-top-color: #f59e0b; }
+        .custom-div-icon .level-3-border .marker-pin { border-top-color: #ef4444; }
+
+
+        /* Calendar Styles (PC_カレンダー.jpg参照) */
+        .calendar-container-wrapper {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+        .calendar-table {
+            border-collapse: collapse; /* collapseに変更 */
+            width: 100%;
+            table-layout: fixed;
+            min-width: 800px; /* 横スクロール用 */
+        }
+        .calendar-table th, .calendar-table td {
+            text-align: center;
+            padding: 12px 4px; /* パディング調整 */
+            border: 1px solid #eee; /* 罫線を薄く */
+            font-size: 0.9rem;
+        }
+        .calendar-table th {
+            background-color: #f9fafb; /* ヘッダー背景色 */
+            color: #333;
+            font-weight: 500;
+            height: 60px; /* 高さを調整 */
+            vertical-align: middle;
+            font-size: 0.8rem;
+        }
+        .calendar-table td.time-header {
+            background-color: #f9fafb;
+            font-weight: 500;
+            color: #333;
+            text-align: center;
+            width: 80px; /* 幅を調整 */
+            font-size: 0.9rem;
+        }
+
+        /* Today's Column Highlight (デザイン変更) */
+        .calendar-table .today-header { color: #5A3A8A; font-weight: bold; }
+        .calendar-table .today-column { background-color: #f9f8f4; }
+        .calendar-table th.today-column { border: 1px solid #5A3A8A; }
+        .calendar-table tr:not(:first-child) td.today-column { border-left: 1px solid #5A3A8A; border-right: 1px solid #5A3A8A; }
+        .calendar-table tr:last-child td.today-column { border-bottom: 1px solid #5A3A8A;}
+
+        /* Introduction Tab Styles (PC_list.jpg参照) */
+        .facility-card {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+        .facility-card:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+        }
+        @media (min-width: 768px) { .facility-card { flex-direction: row; } }
+        .facility-card img { width: 100%; height: 220px; object-fit: cover; }
+        @media (min-width: 768px) { .facility-card img { width: 340px; height: auto; flex-shrink: 0; } }
+
+        /* Modal Styles (白基調に変更) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* 黒の半透明背景 */
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+        .modal-container {
+            background: white;
+            color: #333;
+            border-radius: 12px;
+            padding: 0; /* ヘッダー/コンテンツ/フッターでpadding管理 */
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .modal-header {
+            border-bottom: 1px solid #eee;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h2 { font-size: 1.25rem; font-weight: 700; }
+        .modal-close-btn {
+            background: #f0f0f0;
+            color: #888;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .modal-close-btn:hover { background: #e0e0e0; color: #333; }
+        
+        .modal-content {
+            overflow-y: auto;
+            flex-grow: 1;
+            padding: 1.5rem;
+        }
+        .modal-footer {
+            border-top: 1px solid #eee;
+            padding: 1rem 1.5rem;
+            text-align: right;
+            background-color: #f9fafb;
+        }
+
+        /* 施設詳細モーダルの画像 */
+        .facility-modal-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        /* 凡例スタイル */
+        .legend-item { display: flex; align-items: center; }
+        .legend-color-box {
+            height: 1rem;
+            width: 1rem;
+            border-radius: 4px; /* 四角に変更 */
+            border: 1px solid #ccc;
+            margin-right: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        /* 混雑レベルの背景色（流用） */
+        .level-1-bg { background-color: #a7d0a0; } /* PC_カレンダー.jpg の緑 */
+        .level-2-bg { background-color: #f9d991; } /* PC_カレンダー.jpg の黄（通常）*/
+        .level-3-bg { background-color: #d76a6a; } /* PC_カレンダー.jpg の赤 */
+        .future-time-bg { background-color: #f0f0f0; } /* 未来時間 */
+
+        /* 混雑レベルのテキスト色（流用） */
+        .level-1-text { color: #166534; }
+        .level-2-text { color: #a16207; }
+        .level-3-text { color: #991b1b; }
+
+        /* 新しいボタン (紫) */
+        .btn-primary {
+            background-color: #5A3A8A; /* 紫系 */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            transition: all 0.2s;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary:hover {
+            background-color: #482e6e;
+            box-shadow: 0 4px 10px rgba(90, 58, 138, 0.3);
+        }
+        .btn-outline {
+            background-color: white;
+            color: #5A3A8A;
+            border: 1px solid #5A3A8A;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+        .btn-outline:hover {
+            background-color: #f5f3f9;
+        }
+
+        /* ポップアップ内の簡易カレンダー */
+        .popup-calendar {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+        .popup-calendar th {
+            font-size: 0.7rem;
+            color: #555;
+            font-weight: 500;
+            padding: 4px;
+        }
+        .popup-calendar td {
+            height: 12px;
+            border: 1px solid #fff;
+            font-size: 0.7rem;
+            text-align: center;
+        }
+
+        /* [NEW] ポップアップ内の混雑アイコン */
+        .popup-congestion-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: opacity 0.2s;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- PC Header -->
+    <header class="hidden md:block sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
+        <div class="container mx-auto px-8 py-4 flex justify-between items-center">
+            <!-- [UPDATE] ロゴ -->
+            <a href="#">
+                <img src="./logo_kanazawa.svg" alt="金沢 観光混雑度 MAP" class="logo-pc">
+            </a>
+            
+            <!-- [UPDATE] PC用タブナビゲーション -->
+            <nav class="flex space-x-4">
+                <button class="tab-btn pc-tab-btn active" data-tab-id="map-content">
+                    <img src="./map_icon.svg" alt="マップ" class="icon icon-default">
+                    <img src="./sp_hover_map_icon.svg" alt="マップ" class="icon icon-active">
+                    <span>マップ</span>
+                </button>
+                <button class="tab-btn pc-tab-btn" data-tab-id="calendar-content">
+                    <img src="./calendar_icon.svg" alt="混雑カレンダー" class="icon icon-default">
+                    <img src="./sp_hover_calendar_icon.svg" alt="混雑カレンダー" class="icon icon-active">
+                    <span>混雑カレンダー</span>
+                </button>
+                <button class="tab-btn pc-tab-btn" data-tab-id="introduction-content">
+                    <img src="./spot_icon.svg" alt="観光スポット" class="icon icon-default">
+                    <img src="./sp_hover_spot_icon.svg" alt="観光スポット" class="icon icon-active">
+                    <span>観光スポット</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Mobile Header -->
+    <header class="md:hidden sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-200 p-4">
+        <div class="flex justify-center items-center">
+            <!-- [UPDATE] ロゴ -->
+            <a href="#">
+                <img src="./logo_kanazawa.svg" alt="金沢 観光混雑度 MAP" class="logo-mobile">
+            </a>
+        </div>
+    </header>
+
+    <!-- ... (メインコンテンツとカレンダータブは変更なし) ... -->
+    <!-- メインコンテンツ -->
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <!-- マップタブ -->
+        <div id="map-content" class="tab-content active">
+            <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">リアルタイム混雑状況</h2>
+                    <p class="text-gray-500">現在の混雑状況をマップで確認できます。</p>
+                </div>
+                <!-- 凡例 -->
+                <div class="flex flex-wrap justify-start md:justify-end gap-x-4 gap-y-2 text-sm">
+                    <div class="legend-item"><span class="legend-color-box border-[#22c55e] bg-white"></span>ゆっくり</div>
+                    <div class="legend-item"><span class="legend-color-box border-[#f59e0b] bg-white"></span>通常</div>
+                    <div class="legend-item"><span class="legend-color-box border-[#ef4444] bg-white"></span>混雑</div>
+                </div>
+            </div>
+            <div id="map"></div>
+        </div>
+        
+        <!-- カレンダータブ -->
+        <div id="calendar-content" class="tab-content">
+             <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
+                <div>
+                    <h2 id="calendar-title" class="text-2xl font-bold text-gray-800">時間帯別 混雑度実績</h2>
+                    <p id="calendar-info" class="text-gray-500">施設全体（本日）</p>
+                </div>
+                <button id="calendar-toggle-btn" class="btn-primary self-start md:self-center"></button>
+            </div>
+            <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-4 text-sm">
+                <div class="legend-item"><span class="legend-color-box level-1-bg"></span>ゆっくり</div>
+                <div class="legend-item"><span class="legend-color-box level-2-bg"></span>通常</div>
+                <div class="legend-item"><span class="legend-color-box level-3-bg"></span>混雑</div>
+                <div class="legend-item"><span class="legend-color-box future-time-bg"></span>-</div>
+            </div>
+            <div class="calendar-container-wrapper">
+                <div id="calendar-container"></div>
+            </div>
+        </div>
+
+        <!-- 施設紹介（観光スポット）タブ -->
+        <div id="introduction-content" class="tab-content">
+            <h2 class="text-2xl font-bold text-gray-800 mb-1">観光スポット</h2>
+            <p class="text-gray-500 mb-6">金沢の主要な観光スポットをご紹介します。</p>
+            <div class="space-y-8">
+                <!-- 施設カードはJSでここに追加されます -->
+            </div>
+        </div>
+    </main>
+
+    <!-- フッター (免責事項) -->
+    <footer class="text-center mt-8 mb-24 md:mb-12 text-gray-500 text-sm">
+        <p>&copy; Code for Noto. All Rights Reserved.</p>
+        <a href="#" id="disclaimer-link" class="underline hover:text-purple-700 transition">免責事項</a>
+    </footer>
+
+    <!-- [UPDATE] Mobile Footer Tab Bar -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg flex justify-around">
+        <button class="tab-btn mobile-tab-btn active" data-tab-id="map-content">
+            <img src="./sp_map_icon.svg" alt="マップ" class="icon icon-default">
+            <img src="./sp_hover_map_icon.svg" alt="マップ" class="icon icon-active">
+            <span>マップ</span>
+        </button>
+        <button class="tab-btn mobile-tab-btn" data-tab-id="calendar-content">
+            <img src="./sp_calendar_icon.svg" alt="混雑カレンダー" class="icon icon-default">
+            <img src="./sp_hover_calendar_icon.svg" alt="混雑カレンダー" class="icon icon-active">
+            <span>混雑カレンダー</span>
+        </button>
+        <button class="tab-btn mobile-tab-btn" data-tab-id="introduction-content">
+            <img src="./sp_spot_icon.svg" alt="観光スポット" class="icon icon-default">
+            <img src="./sp_hover_spot_icon.svg" alt="観光スポット" class="icon icon-active">
+            <span>観光スポット</span>
+        </button>
+    </nav>
+
+    <!-- 免責事項モーダル (Lucide 'x' icon) -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="text-gray-800">免責事項</h2>
+                <button id="close-modal-btn" class="modal-close-btn">
+                    <i data-lucide="x" class="icon-sm"></i>
+                </button>
+            </div>
+            <div class="modal-content text-gray-600">
+                <p class="mb-4">本ウェブサイトで提供される混雑度情報は、Wi-Fiセンシングデータを用いた参考情報です。リアルタイムの状況を完全に保証するものではありません。</p>
+                <p class="mb-4">この情報は、提供されたデータに基づいて生成されており、実際の混雑状況とは異なる場合があります。通信状況やシステムの都合により、情報の更新が遅れることや、表示されないことがあります。</p>
+                <p class="mb-4">本ウェブサイトの利用によって生じたいかなる損害についても、運営者は一切の責任を負いません。お出かけの際の判断は、ご自身の責任でお願いいたします。</p>
+                <p>掲載されている情報は、予告なく変更または削除されることがありますので、あらかじめご了承ください。</p>
+            </div>
+            <div class="modal-footer">
+                <button id="close-modal-btn-footer" class="btn-primary">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 施設詳細モーダル (Lucide 'x' icon) -->
+    <div id="facility-modal-overlay" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="facility-modal-title" class="text-gray-800">施設詳細</h2>
+                <button id="close-facility-modal-btn" class="modal-close-btn">
+                    <i data-lucide="x" class="icon-sm"></i>
+                </button>
+            </div>
+            <div class="modal-content p-0">
+                <img id="facility-modal-image" src="https://placehold.co/600x250/cccccc/333333?text=Facility+Image" alt="施設画像" class="facility-modal-image">
+                <div class="p-6">
+                    <h3 id="facility-modal-name" class="text-2xl font-bold mb-1"></h3>
+                    <p id="facility-modal-name-en" class="text-gray-500 mb-4"></p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-bold text-sm text-gray-500 mb-1">所在地</h4>
+                            <p id="facility-modal-address" class="text-gray-700"></p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-gray-500 mb-1">アクセス</h4>
+                            <p id="facility-modal-access" class="text-gray-700"></p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-gray-500 mb-1">Web情報</h4>
+                            <a id="facility-modal-web" href="#" target="_blank" rel="noopener noreferrer" class="text-purple-700 hover:underline"></a>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-gray-500 mb-1">観光スポット情報</h4>
+                            <p id="facility-modal-description" class="text-gray-700 leading-relaxed"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <!-- [UPDATE] ボタンアイコン -->
+                <button id="facility-modal-calendar-btn" class="btn-primary">
+                    <img src="./white_calendar.svg" class="icon-sm" alt="カレンダー">
+                    混雑カレンダーを見る
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // --- Configuration (流用) ---
+            // ... (変更なし) ...
+            const AREA1_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area1_m5.csv';
+            
+            const FACILITY_CSV_URLS = {
+                "近江町市場": AREA1_CSV_URL,
+                "兼六園": AREA1_CSV_URL,
+                "ひがし茶屋街": AREA1_CSV_URL,
+                "金沢21世紀美術館": AREA1_CSV_URL,
+                "金沢駅": AREA1_CSV_URL,
+                "金沢城公園": AREA1_CSV_URL,
+            };
+
+            const DATA_PATHS = {
+                master: './data/crowded_milli_master.csv',
+                criterion: './data/crowded_milli_criterion.csv',
+            };
+
+            // 画像URL (流用しつつ、フォールバックをプレースホルダーに変更)
+            const placeholderImg = (text = 'Image') => `https://placehold.co/300x200/cccccc/333333?text=${encodeURIComponent(text)}`;
+            
+            const IMAGE_URLS = {
+                "兼六園": "./images/兼六園.jpg",
+                "近江町市場": "./images/近江町市場.jpg",
+                "ひがし茶屋街": "./images/ひがし茶屋街.jpg",
+                "金沢21世紀美術館": "./images/金沢21世紀美術館.jpg",
+                "金沢駅": "./images/金沢駅.jpg",
+                "金沢城公園": "./images/金沢城公園.jpg",
+            };
+
+            const CONGESTION_LEVELS = {
+                1: { message: "ゆっくりと観光いただけます", className: "level-1" },
+                2: { message: "通常の混み具合です", className: "level-2" },
+                3: { message: "多くの観光客で賑わっています", className: "level-3" }
+            };
+
+            // Lucideアイコンの初期化 (モーダルの 'x' ボタン用)
+            lucide.createIcons();
+
+            // --- Utility Functions (流用) ---
+            // ... (変更なし) ...
+            const processNewCsvData = (data) => {
+                if (!data || data.length === 0) return [];
+                const hourlyAgg = {};
+                data.forEach(row => {
+                    if (row.year && row.month && row.day && row.hour && row.count) {
+                        try {
+                            const dateStr = `${parseInt(row.year, 10)}/${parseInt(row.month, 10)}/${parseInt(row.day, 10)}`;
+                            const hourStr = parseInt(row.hour, 10).toString();
+                            const countVal = parseFloat(row.count);
+                            if (isNaN(countVal)) return;
+                            if (!hourlyAgg[dateStr]) hourlyAgg[dateStr] = {};
+                            if (!hourlyAgg[dateStr][hourStr]) hourlyAgg[dateStr][hourStr] = { total: 0, numRecords: 0 };
+                            hourlyAgg[dateStr][hourStr].total += countVal;
+                            hourlyAgg[dateStr][hourStr].numRecords++;
+                        } catch (e) { console.warn("Skipping bad CSV row:", row, e); }
+                    }
+                });
+                const processedData = [];
+                for (const dateStr in hourlyAgg) {
+                    for (const hourStr in hourlyAgg[dateStr]) {
+                        const agg = hourlyAgg[dateStr][hourStr];
+                        if (agg.numRecords > 0) {
+                            processedData.push({
+                                年月日: dateStr,
+                                時刻: hourStr,
+                                人数: Math.round(agg.total / agg.numRecords).toString()
+                            });
+                        }
+                    }
+                }
+                return processedData;
+            };
+
+            const loadCsvData = async (path) => {
+                const response = await fetch(path);
+                if (!response.ok) throw new Error(`Failed to load ${path}: ${response.statusText}`);
+                const csvText = await response.text();
+                const cleanCsvText = csvText.replace(/^\uFEFF/, '');
+                return new Promise((resolve, reject) => {
+                    Papa.parse(cleanCsvText, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: (results) => resolve(results.data),
+                        error: (err) => {
+                            console.error(`Error parsing ${path}:`, err);
+                            reject(new Error(`Error parsing ${path}: ${err.message}`));
+                        }
+                    });
+                });
+            };
+
+            const getLatestDateFromData = (data) => {
+                if (!data || data.length === 0) return null;
+                const dates = data.map(row => new Date(row.年月日)).filter(date => !isNaN(date.getTime()));
+                if (dates.length === 0) return null;
+                const latest = new Date(Math.max.apply(null, dates));
+                return latest;
+            };
+
+            const formatDateForCsv = (date) => {
+                return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+            };
+
+
+            // --- Main Application Logic (流用) ---
+            // ... (変更なし) ...
+            let facilityData = [];
+            let latestDateObj = new Date();
+            let mapInstance = null;
+
+            try {
+                const [masterData, criterionData] = await Promise.all([
+                    loadCsvData(DATA_PATHS.master),
+                    loadCsvData(DATA_PATHS.criterion)
+                ]);
+                
+                if (!masterData.length || !criterionData.length) {
+                    throw new Error("Master or criterion data files could not be loaded or are empty.");
+                }
+
+                const facilityDataPromises = masterData.map(async (master) => {
+                    if (!master.地点名) return null;
+                    const masterName = master.地点名.trim();
+                    const csvUrl = FACILITY_CSV_URLS[masterName];
+                    if (!csvUrl) {
+                        console.warn(`No CSV URL defined for: ${masterName}`);
+                        return null;
+                    }
+                    const criterion = criterionData.find(c => c.地点名 && c.地点名.trim() === masterName);
+                    try {
+                        const rawMilliData = await loadCsvData(csvUrl);
+                        const milli = processNewCsvData(rawMilliData);
+                        return { ...master, criterion, milli };
+                    } catch (error) {
+                        console.error(`Failed to load or process data for ${masterName}:`, error);
+                        return null;
+                    }
+                });
+
+                const facilityDataWithNulls = await Promise.all(facilityDataPromises);
+                facilityData = facilityDataWithNulls.filter(f => f && f.緯度 && f.経度 && f.milli && f.milli.length > 0);
+
+                if (facilityData.length === 0) {
+                    throw new Error("No facility data could be processed.");
+                }
+
+                const allMilliData = facilityData.reduce((acc, f) => acc.concat(f.milli), []);
+                
+                if (allMilliData.length === 0) {
+                    throw new Error("No valid congestion data (milli) found across all facilities.");
+                }
+
+                latestDateObj = getLatestDateFromData(allMilliData);
+                
+                if (!latestDateObj) {
+                    throw new Error("No valid dates (年月日) found in processed congestion data.");
+                }
+
+                // --- アプリケーション初期化 ---
+                mapInstance = L.map('map').setView([36.565, 136.658], 14);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { // 明るいマップに変更
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                }).addTo(mapInstance);
+                
+                L.Util.getMapInstance = () => mapInstance;
+
+                populateIntroductionTab(facilityData);
+                updateMap(facilityData, latestDateObj);
+                displayTodayAllFacilitiesCalendar(facilityData, latestDateObj); // デフォルトは全施設
+                setupEventListeners(facilityData, latestDateObj);
+
+            } catch (error) {
+                console.error("Application failed to initialize:", error);
+                const mainContent = document.querySelector('main');
+                mainContent.innerHTML = `<div class="text-center p-8"><h2 class="text-2xl text-red-500">エラー</h2><p class="mt-4 text-gray-500">データの読み込みに失敗しました。CSVファイルの内容やURLを確認してください。</p><p class="text-gray-400 mt-2">${error.message}</p></div>`;
+            }
+
+            // --- Event Listeners (流用・修正) ---
+            // ... (setupEventListeners, switchToTab, showFacilityModal は変更なし) ...
+            function setupEventListeners(facilityData, latestDateObj) {
+                const tabs = document.querySelectorAll('.tab-btn');
+                const map = L.Util.getMapInstance();
+
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const tabId = tab.dataset.tabId;
+                        switchToTab(tabId, map);
+                    });
+                });
+                
+                map.on('popupopen', (e) => {
+                    const btn = e.popup.getElement().querySelector('.popup-calendar-btn');
+                    if (btn) {
+                        btn.addEventListener('click', () => {
+                            const facility = facilityData.find(f => f.地点名 === btn.dataset.facilityName);
+                            if (facility) {
+                                displayDailyCalendarForFacility(facility, facilityData, latestDateObj);
+                                switchToTab('calendar-content', map);
+                            }
+                        });
+                    }
+                });
+
+                document.getElementById('introduction-content').addEventListener('click', (e) => {
+                    const calendarBtn = e.target.closest('.intro-calendar-btn');
+                    const detailsBtn = e.target.closest('.intro-details-btn');
+
+                    if (calendarBtn) {
+                        const facility = facilityData.find(f => f.地点名 === calendarBtn.dataset.facilityName);
+                        if (facility) {
+                            displayDailyCalendarForFacility(facility, facilityData, latestDateObj);
+                            switchToTab('calendar-content', map);
+                        }
+                    }
+                    
+                    if (detailsBtn) {
+                        const facility = facilityData.find(f => f.地点名 === detailsBtn.dataset.facilityName);
+                        if (facility) {
+                            showFacilityModal(facility, facilityData, latestDateObj);
+                        }
+                    }
+                });
+
+                // 免責事項モーダル
+                const disclaimerLink = document.getElementById('disclaimer-link');
+                const modalOverlay = document.getElementById('modal-overlay');
+                const closeModalBtn = document.getElementById('close-modal-btn');
+                const closeModalBtnFooter = document.getElementById('close-modal-btn-footer');
+                
+                disclaimerLink.addEventListener('click', (e) => { e.preventDefault(); modalOverlay.style.display = 'flex'; });
+                closeModalBtn.addEventListener('click', () => modalOverlay.style.display = 'none');
+                closeModalBtnFooter.addEventListener('click', () => modalOverlay.style.display = 'none');
+                modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) modalOverlay.style.display = 'none'; });
+
+                // 施設詳細モーダル
+                const facilityModalOverlay = document.getElementById('facility-modal-overlay');
+                const closeFacilityModalBtn = document.getElementById('close-facility-modal-btn');
+                closeFacilityModalBtn.addEventListener('click', () => facilityModalOverlay.style.display = 'none');
+                facilityModalOverlay.addEventListener('click', (e) => { if (e.target === facilityModalOverlay) facilityModalOverlay.style.display = 'none'; });
+            }
+
+            function switchToTab(tabId, map) {
+                // すべてのタブボタンから active を削除
+                document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+                // すべてのタブコンテンツを非表示
+                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+
+                // クリックされたタブIDを持つボタンに active を追加
+                document.querySelectorAll(`.tab-btn[data-tab-id="${tabId}"]`).forEach(t => t.classList.add('active'));
+                // クリックされたタブIDを持つコンテンツを表示
+                const content = document.getElementById(tabId);
+                if (content) {
+                    content.classList.add('active');
+                }
+                
+                if (tabId === 'map-content' && map) {
+                    setTimeout(() => map.invalidateSize(), 1);
+                }
+            }
+            
+            function showFacilityModal(facility, facilityData, latestDateObj) {
+                const overlay = document.getElementById('facility-modal-overlay');
+                const imageUrl = IMAGE_URLS[facility.地点名] || placeholderImg(facility.地点名);
+                
+                document.getElementById('facility-modal-image').src = imageUrl;
+                document.getElementById('facility-modal-image').onerror = () => { document.getElementById('facility-modal-image').src = placeholderImg(facility.地点名); };
+                document.getElementById('facility-modal-title').textContent = facility.地点名;
+                document.getElementById('facility-modal-name').textContent = facility.地点名;
+                document.getElementById('facility-modal-name-en').textContent = facility.英語名称 || '';
+                document.getElementById('facility-modal-address').textContent = facility.所在地 || '情報なし';
+                document.getElementById('facility-modal-access').textContent = facility.アクセス || '情報なし';
+                document.getElementById('facility-modal-web').textContent = facility.Web || '情報なし';
+                document.getElementById('facility-modal-web').href = facility.Web || '#';
+                document.getElementById('facility-modal-description').textContent = facility.説明 || '情報なし';
+                
+                // モーダル内のカレンダーボタン
+                const calBtn = document.getElementById('facility-modal-calendar-btn');
+                calBtn.onclick = () => {
+                    displayDailyCalendarForFacility(facility, facilityData, latestDateObj);
+                    switchToTab('calendar-content', L.Util.getMapInstance());
+                    overlay.style.display = 'none'; // モーダルを閉じる
+                };
+
+                overlay.style.display = 'flex';
+                lucide.createIcons(); // 'x' アイコンを描画
+            }
+
+
+            // --- Core Functions (流用・修正) ---
+            // ... (getCongestionLevel, createCustomIcon は変更なし) ...
+            function getCongestionLevel(count, criterion) {
+                if (!criterion) return 1;
+                const num = parseInt(count, 10);
+                if (isNaN(num)) return 1;
+                if (num <= parseInt(criterion.notcrowded, 10)) return 1;
+                if (num <= parseInt(criterion.normal, 10)) return 2;
+                return 3;
+            }
+            
+            // アイコンを新しいデザインに変更
+            function createCustomIcon(level, facilityName) {
+                const levelInfo = CONGESTION_LEVELS[level];
+                const imageUrl = IMAGE_URLS[facilityName] || placeholderImg(facilityName);
+                const borderColorClass = `${levelInfo.className}-border`;
+
+                return L.divIcon({
+                    html: `
+                        <div class="marker-pin-container">
+                            <div class="marker-image-wrapper ${borderColorClass}">
+                                <img src="${imageUrl}" alt="${facilityName}" onerror="this.onerror=null;this.src='${placeholderImg(facilityName)}';">
+                                <div class="marker-pin"></div>
+                            </div>
+                        </div>`,
+                    className: 'custom-div-icon',
+                    iconSize: [0, 0], // CSSでサイズ制御するため
+                    iconAnchor: [0, 0],
+                    popupAnchor: [0, -40] // ポップアップがマーカーの上に出るように調整
+                });
+            }
+
+            // [UPDATE] ポップアップの内容をSVGアイコンに変更
+            function createPopupContent(facility, levelInfo, latestDateObj) {
+                const latestDateString = formatDateForCsv(latestDateObj);
+                const facilityMilli = facility.milli.filter(d => d.年月日 === latestDateString);
+                
+                // 混雑レベルアイコン (mbl_modal.jpg参照)
+                const latestRecord = facilityMilli.length > 0 ? facilityMilli[facilityMilli.length - 1] : null;
+                const level = latestRecord ? getCongestionLevel(latestRecord.人数, facility.criterion) : 1;
+                
+                // [UPDATE] 混雑アイコンをSVGに変更
+                let levelIcons = `
+                    <div class="flex gap-4">
+                        <img src="./realtime_S.svg" alt="ゆっくり" class="popup-congestion-icon ${level === 1 ? 'opacity-100' : 'opacity-30'}">
+                        <img src="./realtime_N.svg" alt="通常" class="popup-congestion-icon ${level === 2 ? 'opacity-100' : 'opacity-30'}">
+                        <img src="./realtime_B.svg" alt="混雑" class="popup-congestion-icon ${level === 3 ? 'opacity-100' : 'opacity-30'}">
+                    </div>`;
+
+                // 簡易カレンダー (mbl_modal.jpg参照)
+                let calHtml = '<table class="popup-calendar"><thead><tr>';
+                for (let h = 8; h <= 20; h++) { calHtml += `<th>${h}</th>`; }
+                calHtml += '</tr></thead><tbody><tr>';
+                for (let h = 8; h <= 20; h++) {
+                    const record = facilityMilli.find(d => parseInt(d.時刻, 10) === h);
+                    const count = record ? record.人数 : 0;
+                    const cellLevel = record ? getCongestionLevel(count, facility.criterion) : 1;
+                    const bgClass = record ? `${CONGESTION_LEVELS[cellLevel].className}-bg` : 'future-time-bg';
+                    calHtml += `<td class="${bgClass}"></td>`;
+                }
+                calHtml += '</tr></tbody></table>';
+
+                // [UPDATE] ボタンアイコン
+                return `
+                    <h3 class="text-lg font-bold">${facility.地点名}</h3>
+                    <div class="flex items-center gap-4 my-2">
+                        ${levelIcons}
+                        <p class="font-bold text-base ${levelInfo.className}-text">${levelInfo.message}</p>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-2">混雑度実績 (${latestDateString})</p>
+                    ${calHtml}
+                    <button class="btn-primary popup-calendar-btn mt-4 w-full" data-facility-name="${facility.地点名}">
+                        <img src="./white_calendar.svg" class="icon-sm" alt="カレンダー">
+                        詳細カレンダー
+                    </button>`;
+            }
+
+
+            function updateMap(facilityData, latestDateObj) {
+                const map = L.Util.getMapInstance('map');
+                if (!map) return;
+                
+                // マーカーをクリア (再描画用)
+                map.eachLayer(layer => {
+                    if (layer instanceof L.Marker) {
+                        map.removeLayer(layer);
+                    }
+                });
+
+                const latestDateString = formatDateForCsv(latestDateObj);
+                const currentHour = new Date().getHours();
+
+                facilityData.forEach(facility => {
+                    const lat = parseFloat(facility.緯度);
+                    const lon = parseFloat(facility.経度);
+                    if (isNaN(lat) || isNaN(lon)) return;
+                    
+                    const latestRecord = facility.milli
+                        .filter(d => d.年月日 === latestDateString && parseInt(d.時刻, 10) <= currentHour)
+                        .sort((a, b) => parseInt(b.時刻, 10) - parseInt(a.時刻, 10))[0];
+
+                    const currentCount = latestRecord ? latestRecord.人数 : 0;
+                    const level = getCongestionLevel(currentCount, facility.criterion);
+                    const levelInfo = CONGESTION_LEVELS[level];
+
+                    const marker = L.marker([lat, lon], { icon: createCustomIcon(level, facility.地点名) }).addTo(map);
+                    
+                    const popupContent = createPopupContent(facility, levelInfo, latestDateObj);
+                    marker.bindPopup(popupContent);
+                });
+                
+                map.on('popupopen', function() {
+                    // lucide.createIcons(); // ポップアップ内にはLucideアイコンがなくなった
+                });
+            }
+            
+            // [UPDATE] 施設紹介タブのHTMLを生成 (ボタンアイコン変更)
+            function populateIntroductionTab(facilityData) {
+                const container = document.getElementById('introduction-content');
+                container.innerHTML = '<h2 class="text-2xl font-bold text-gray-800 mb-1">観光スポット</h2><p class="text-gray-500 mb-6">金沢の主要な観光スポットをご紹介します。</p>'; // タイトルを再挿入
+                const cardContainer = document.createElement('div');
+                cardContainer.className = 'space-y-8';
+                
+                facilityData.forEach(facility => {
+                    const imageUrl = IMAGE_URLS[facility.地点名] || placeholderImg(facility.地点名);
+                    const cardHtml = `
+                        <div class="facility-card">
+                            <img src="${imageUrl}" alt="${facility.地点名}" onerror="this.onerror=null;this.src='${placeholderImg(facility.地点名)}';">
+                            <div class="p-6 flex flex-col flex-grow">
+                                <h3 class="text-2xl font-bold text-gray-800">${facility.地点名}</h3>
+                                <p class="text-gray-400 mb-4">${facility.英語名称 || ''}</p>
+                                <p class="text-gray-600 flex-grow mb-6">${(facility.説明 || '').substring(0, 100)}...</p>
+                                <div class="flex flex-col sm:flex-row gap-4 mt-4">
+                                    <button class="btn-outline intro-details-btn w-full sm:w-auto" data-facility-name="${facility.地点名}">
+                                        続きを読む
+                                    </button>
+                                    <button class="btn-primary intro-calendar-btn w-full sm:w-auto" data-facility-name="${facility.地点名}">
+                                        <img src="./white_calendar.svg" class="icon-sm" alt="カレンダー">
+                                        混雑度を確認
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                    cardContainer.innerHTML += cardHtml;
+                });
+                container.appendChild(cardContainer);
+                // lucide.createIcons(); // Lucideアイコンは使わなくなった
+            }
+
+            // --- Calendar Functions (流用) ---
+            // ... (displayTodayAllFacilitiesCalendar, displayDailyCalendarForFacility は変更なし) ...
+            function displayTodayAllFacilitiesCalendar(facilityData, latestDateObj) {
+                const map = L.Util.getMapInstance();
+                const latestDateString = formatDateForCsv(latestDateObj);
+                
+                document.getElementById('calendar-title').textContent = '時間帯別 混雑度実績';
+                document.getElementById('calendar-info').textContent = `施設全体（${latestDateString}）`;
+                const toggleBtn = document.getElementById('calendar-toggle-btn');
+                toggleBtn.textContent = '観光スポット一覧から選ぶ';
+                toggleBtn.onclick = () => switchToTab('introduction-content', map);
+                
+                const realToday = new Date();
+                const isDisplayingRealToday = latestDateObj.toDateString() === realToday.toDateString();
+                const currentHour = realToday.getHours();
+
+                let headerHtml = '<tr><th>時刻</th>';
+                facilityData.forEach(facility => { headerHtml += `<th>${facility.地点名}</th>`; });
+                headerHtml += '</tr>';
+
+                const dataByFacilityAndHour = {};
+                facilityData.forEach(facility => {
+                    dataByFacilityAndHour[facility.地点名] = facility.milli
+                        .filter(d => d.年月日 === latestDateString)
+                        .reduce((acc, row) => { acc[parseInt(row.時刻, 10)] = row.人数; return acc; }, {});
+                });
+
+                let bodyHtml = '';
+                for (let hour = 8; hour <= 20; hour++) {
+                    bodyHtml += `<tr><td class="time-header">${String(hour).padStart(2, '0')}:00</td>`;
+                    facilityData.forEach(facility => {
+                        if (isDisplayingRealToday && hour > currentHour) { 
+                            bodyHtml += `<td class="future-time-bg"></td>`; 
+                            return; 
+                        }
+                        if (!facility.criterion) { bodyHtml += `<td>-</td>`; return; }
+                        const count = dataByFacilityAndHour[facility.地点名]?.[hour] || 0;
+                        const level = getCongestionLevel(count, facility.criterion);
+                        bodyHtml += `<td class="${CONGESTION_LEVELS[level].className}-bg" title="${count}人"></td>`;
+                    });
+                    bodyHtml += '</tr>';
+                }
+                document.getElementById('calendar-container').innerHTML = `<table class="calendar-table"><thead>${headerHtml}</thead><tbody>${bodyHtml}</tbody></table>`;
+            }
+
+            // カレンダー (施設別・7日間)
+            function displayDailyCalendarForFacility(facility, facilityData, latestDateObj) {
+                const map = L.Util.getMapInstance();
+                document.getElementById('calendar-title').textContent = `${facility.地点名} 混雑度実績`;
+                document.getElementById('calendar-info').textContent = '施設別（日別） - 直近7日間';
+                const toggleBtn = document.getElementById('calendar-toggle-btn');
+                toggleBtn.textContent = '施設全体表示に戻る';
+                toggleBtn.onclick = () => displayTodayAllFacilitiesCalendar(facilityData, latestDateObj);
+                
+                const realToday = new Date();
+                const currentHour = realToday.getHours();
+                const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+                let headerHtml = '<tr><th>時刻</th>';
+                
+                const datesToDisplay = [];
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date(latestDateObj);
+                    date.setDate(date.getDate() - i);
+                    datesToDisplay.push(date);
+                }
+
+                datesToDisplay.forEach(date => {
+                    const isRealToday = date.toDateString() === realToday.toDateString();
+                    const thClass = isRealToday ? 'today-header today-column' : '';
+                    headerHtml += `<th class="${thClass}">${date.getMonth() + 1}/${date.getDate()}<br>(${weekdays[date.getDay()]})</th>`;
+                });
+                headerHtml += '</tr>';
+
+                let bodyHtml = '';
+                for (let hour = 8; hour <= 20; hour++) {
+                    bodyHtml += `<tr><td class="time-header">${String(hour).padStart(2, '0')}:00</td>`;
+                    
+                    datesToDisplay.forEach(date => {
+                        const isRealToday = date.toDateString() === realToday.toDateString();
+                        const todayClass = isRealToday ? 'today-column' : '';
+                        let cellClass = todayClass;
+
+                        if (isRealToday && hour > currentHour) {
+                            cellClass += ' future-time-bg';
+                            bodyHtml += `<td class="${cellClass.trim()}"></td>`;
+                            return;
+                        }
+
+                        const dateString = formatDateForCsv(date);
+                        const record = facility.milli.find(d => d.年月日 === dateString && parseInt(d.時刻, 10) === hour);
+                        const count = record ? record.人数 : 0;
+                        const level = getCongestionLevel(count, facility.criterion);
+                        cellClass += ` ${CONGESTION_LEVELS[level].className}-bg`;
+                        bodyHtml += `<td class="${cellClass.trim()}" title="${count}人"></td>`;
+                    });
+                    bodyHtml += '</tr>';
+                }
+                document.getElementById('calendar-container').innerHTML = `<table class="calendar-table"><thead>${headerHtml}</thead><tbody>${bodyHtml}</tbody></table>`;
+            }
+
+        });
+    </script>
+</body>
+</html>
+
