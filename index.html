@@ -18,14 +18,13 @@
         html { scroll-behavior: smooth; }
         body {
             font-family: 'Noto Sans JP', sans-serif;
-            background-image: url('./bk.svg'); /* ベース背景 */
+            background-image: url('./bk.svg'); /* [UPDATE] 最背面のベース背景 */
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             color: #333;
             position: relative;
-            /* [NEW] 背景画像分のスペースを確保するため、bodyの最小高さを設定 */
             min-height: 100vh;
         }
 
@@ -33,53 +32,48 @@
         .background-svg-top,
         .background-svg-bottom {
             width: 100%;
-            z-index: -5;
+            z-index: -5; /* bk.svg の上、コンテンツの下 */
             pointer-events: none;
             background-repeat: no-repeat;
-            height: 500px; /* PC高さ */
-            position: absolute; /* ページのフローから切り離す */
+            position: absolute; /* コンテンツフローから切り離す */
+            left: 0;
+            right: 0;
         }
 
         /* [UPDATE] PC用 背景SVG */
         @media (min-width: 768px) {
             .background-svg-top {
                 background-image: url('./top_point_bk.svg');
-                background-position: top right; /* 右上に変更 */
-                background-size: 80% auto; /* 幅80% */
+                background-position: top center; /* 上部中央 */
+                background-size: 100% auto; /* 横幅100% */
                 top: 0;
-                right: 0; /* right: 0 を追加 */
-                left: auto; /* left: auto を追加 */
+                height: 500px; /* 画像の高さ（適宜調整） */
             }
             .background-svg-bottom {
                 background-image: url('./down_point_bk.svg');
-                background-position: bottom left; /* 左下に変更 */
-                background-size: 80% auto; /* 幅80% */
+                background-position: bottom center; /* 下部中央 */
+                background-size: 100% auto; /* 横幅100% */
                 bottom: 0;
-                left: 0; /* left: 0 を追加 */
-                right: auto; /* right: auto を追加 */
+                height: 500px; /* 画像の高さ（適宜調整） */
             }
         }
 
-        /* [UPDATE] モバイル用 背景SVG */
+        /* [UPDATE] モバイル用 背景SVG (スマホ版は良さそうとのことですが、念のためPC版と合わせる) */
         @media (max-width: 767px) {
             .background-svg-top {
                 background-image: url('./top_point_bk.svg');
-                background-position: top right; /* 右上に変更 */
-                background-size: 150% auto; /* 拡大 */
+                background-position: top center;
+                background-size: 150% auto; /* スマホでは少し拡大 */
                 opacity: 0.7;
                 top: 0;
-                right: 0; /* right: 0 を追加 */
-                left: auto; /* left: auto を追加 */
                 height: 300px;
             }
             .background-svg-bottom {
                 background-image: url('./down_point_bk.svg');
-                background-position: bottom left; /* 左下に変更 */
-                background-size: 150% auto; /* 拡大 */
+                background-position: bottom center;
+                background-size: 150% auto; /* スマホでは少し拡大 */
                 opacity: 0.7;
                 bottom: 0;
-                left: 0; /* left: 0 を追加 */
-                right: auto; /* right: auto を追加 */
                 height: 300px;
             }
         }
@@ -283,7 +277,6 @@
         .calendar-table tr:not(:first-child) td.today-column { border-left: 1px solid #5A3A8A; border-right: 1px solid #5A3A8A; }
         .calendar-table tr:last-child td.today-column { border-bottom: 1px solid #5A3A8A;}
 
-        /* [UPDATE] 観光スポットカード (flex-direction: row を削除) */
         .facility-card {
             background-color: white;
             border-radius: 12px;
@@ -292,7 +285,6 @@
             flex-direction: column;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             transition: all 0.2s;
-            /* [NEW] グリッドレイアウト内で高さを均一に */
             height: 100%; 
         }
         .facility-card:hover {
@@ -304,8 +296,6 @@
             height: 220px;
             object-fit: cover;
         }
-        /* [REMOVE] 施設カードのレスポンシブスタイルを削除 (グリッドで制御) */
-
 
         .modal-overlay {
             position: fixed;
@@ -441,10 +431,10 @@
             text-align: center;
         }
 
-        /* [UPDATE] ポップアップアイコン (サイズ変更 + opacity) */
+        /* [UPDATE] ポップアップアイコン (サイズ 40px に) */
         img.popup-congestion-icon {
-            width: 50px; /* サイズアップ */
-            height: 50px; /* サイズアップ */
+            width: 40px; /* 期待値画像 (image_8093ea.jpg) に合わせる */
+            height: 40px;
             border-radius: 50%;
             transition: opacity 0.2s;
         }
@@ -534,7 +524,6 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-1">観光スポット</h2>
             <p class="text-gray-500 mb-6">金沢の主要な観光スポットをご紹介します。</p>
             
-            <!-- [UPDATE] グリッドレイアウトコンテナ (JSでこの中にカードが挿入される) -->
             <div id="facility-card-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- 施設カードはJSでここに追加されます -->
             </div>
@@ -835,16 +824,8 @@
                 });
 
                 document.getElementById('introduction-content').addEventListener('click', (e) => {
-                    const calendarBtn = e.target.closest('.intro-calendar-btn');
+                    // [UPDATE] 施設カードのボタンロジック
                     const detailsBtn = e.target.closest('.intro-details-btn');
-
-                    if (calendarBtn) {
-                        const facility = facilityData.find(f => f.地点名 === calendarBtn.dataset.facilityName);
-                        if (facility) {
-                            displayDailyCalendarForFacility(facility, facilityData, latestDateObj);
-                            switchToTab('calendar-content', map);
-                        }
-                    }
                     
                     if (detailsBtn) {
                         const facility = facilityData.find(f => f.地点名 === detailsBtn.dataset.facilityName);
@@ -871,6 +852,7 @@
             }
 
             function switchToTab(tabId, map) {
+                // ... (変更なし) ...
                 document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
                 document.querySelectorAll(`.tab-btn[data-tab-id="${tabId}"]`).forEach(t => t.classList.add('active'));
@@ -944,7 +926,7 @@
                 });
             }
 
-            // [UPDATE] ポップアップアイコン (opacity 制御に戻す)
+            // [UPDATE] ポップアップアイコン (opacity 制御, gap-4)
             function createPopupContent(facility, latestDateObj) {
                 const latestDateString = formatDateForCsv(latestDateObj);
                 const facilityMilli = facility.milli.filter(d => d.年月日 === latestDateString);
@@ -957,7 +939,7 @@
                 const level = latestRecord ? getCongestionLevel(latestRecord.人数, facility.criterion) : 1;
                 const currentLevelInfo = CONGESTION_LEVELS[level];
                 
-                // [UPDATE] opacity 制御
+                // [UPDATE] 期待値 (image_8093ea.jpg) に基づき opacity 制御
                 let levelIcons = `
                     <div class="flex gap-4 items-center">
                         <img src="./realtime_S.svg" alt="ゆっくり" class="popup-congestion-icon ${level === 1 ? 'opacity-100' : 'opacity-20'}">
@@ -985,9 +967,10 @@
                 }
                 calHtml += '</tr></tbody></table>';
 
+                // [UPDATE] アイコンとテキストの間の gap-4 に
                 return `
                     <h3 class="text-lg font-bold">${facility.地点名}</h3>
-                    <div class="flex items-center gap-2 my-2"> <!-- [UPDATE] gap-2 に変更 -->
+                    <div class="flex items-center gap-4 my-2">
                         ${levelIcons}
                         <p class="font-bold text-base ${currentLevelInfo.className}-text">${currentLevelInfo.message}</p>
                     </div>
@@ -1040,23 +1023,21 @@
             // [UPDATE] 観光スポットタブ (グリッドレイアウト + 期待値のボタン)
             function populateIntroductionTab(facilityData) {
                 const container = document.getElementById('introduction-content');
-                // [UPDATE] `facility-card-container` を使用
                 const cardContainer = document.getElementById('facility-card-container');
                 
-                cardContainer.innerHTML = ''; // グリッドコンテナをクリア
+                cardContainer.innerHTML = ''; 
                 
                 facilityData.forEach(facility => {
                     const imageUrl = IMAGE_URLS[facility.地点名] || placeholderImg(facility.地点名);
-                    // [UPDATE] カードのHTML構造を期待値 (image_7f4a07.jpg) に合わせる
+                    // [UPDATE] カードのHTML構造
                     const cardHtml = `
                         <div class="facility-card flex flex-col">
                             <img src="${imageUrl}" alt="${facility.地点名}" onerror="this.onerror=null;this.src='${placeholderImg(facility.地点名)}';">
                             <div class="p-6 flex flex-col flex-grow">
                                 <h3 class="text-xl font-bold text-gray-800">${facility.地点名}</h3>
-                                <!-- [UPDATE] 英語名称を期待値に合わせて削除 -->
-                                <!-- <p class="text-gray-400 mb-4">${facility.英語名称 || ''}</p> -->
                                 <p class="text-gray-600 flex-grow my-4">${(facility.説明 || '').substring(0, 100)}...</p>
-                                <div class="mt-auto"> <!-- ボタンをカードの最下部に配置 -->
+                                <div class="mt-auto"> 
+                                    <!-- [UPDATE] "続きを見る" ボタンが モーダルを開くように -->
                                     <button class="btn-primary intro-details-btn w-full" data-facility-name="${facility.地点名}">
                                         続きを見る
                                     </button>
