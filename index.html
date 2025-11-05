@@ -140,6 +140,36 @@
         .calendar-table tr:not(:first-child) td.today-column { border-left: 1px solid #5A3A8A; border-right: 1px solid #5A3A8A; }
         .calendar-table tr:last-child td.today-column { border-bottom: 1px solid #5A3A8A;}
 
+        /* [NEW] スマートフォン用カレンダースタイル */
+        @media (max-width: 767px) {
+            .calendar-container-wrapper {
+                padding: 0.5rem; /* スマホではパディングを減らす */
+                overflow-x: hidden; /* 横スクロールを無効化 */
+            }
+            .calendar-table {
+                min-width: 100%; /* テーブルの最小幅を画面幅に合わせる */
+                font-size: 10px; /* 全体のフォントサイズを小さくする */
+                table-layout: fixed; /* テーブルレイアウトを固定 */
+            }
+            .calendar-table th, .calendar-table td {
+                padding: 8px 2px; /* セルのパディングを詰める */
+                height: 40px; /* 高さを調整 */
+            }
+            .calendar-table th {
+                font-size: 10px; /* ヘッダーのフォントサイズ */
+                height: auto; /* 高さを自動に */
+                word-break: break-all; /* 必要に応じて改行 */
+                vertical-align: middle;
+            }
+            .calendar-table td.time-header {
+                width: 50px; /* 時刻ヘッダーの幅を固定 */
+                font-size: 10px;
+                padding: 8px 0;
+                vertical-align: middle;
+            }
+        }
+
+
         .facility-card { background-color: white; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.2s; height: 100%; }
         .facility-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.1); transform: translateY(-4px); }
         .facility-card img { width: 100%; height: 220px; object-fit: cover; }
@@ -178,11 +208,10 @@
         .popup-calendar th { font-size: 0.7rem; color: #555; font-weight: 500; padding: 4px; }
         .popup-calendar td { height: 12px; border: 1px solid #fff; font-size: 0.7rem; text-align: center; }
 
-        /* [UPDATE] ポップアップアイコンのサイズ (width 100%) */
         .popup-congestion-icon {
-            width: 100%; /* 幅を100%に */
-            height: auto; /* 高さは自動 */
-            max-width: 150px; /* 最大幅を指定（大きすぎ防止） */
+            width: 100%; 
+            height: auto; 
+            max-width: 150px; 
             border-radius: 50%;
         }
         
