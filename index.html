@@ -178,10 +178,10 @@
         .popup-calendar th { font-size: 0.7rem; color: #555; font-weight: 500; padding: 4px; }
         .popup-calendar td { height: 12px; border: 1px solid #fff; font-size: 0.7rem; text-align: center; }
 
-        /* [UPDATE] ポップアップアイコンのサイズを 80px に */
+        /* [UPDATE] ポップアップアイコンのサイズを 120px に */
         .popup-congestion-icon {
-            width: 100px; 
-            height: 100px;
+            width: 120px; 
+            height: 120px;
             border-radius: 50%;
         }
         
@@ -318,7 +318,7 @@
                 <p class="mb-4">本ウェブサイトの利用によって生じたいかなる損害についても、運営者は一切の責任を負いません。お出かけの際の判断は、ご自身の責任でお願いいたします。</p>
                 <p>掲載されている情報は、予告なく変更または削除されることがありますので、あらかじめご了承ください。</p>
             </div>
-            <div class="modal-footer"> <!-- [UPDATE] CSS側で justify-center になっています -->
+            <div class="modal-footer"> 
                 <button id="close-modal-btn-footer" class="btn-primary">閉じる</button>
             </div>
         </div>
@@ -354,7 +354,7 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer"> <!-- [UPDATE] CSS側で justify-center になっています -->
+            <div class="modal-footer"> 
                 <button id="facility-modal-gmaps-btn" class="btn-primary">
                     <i data-lucide="map-pin" class="icon-sm"></i>
                     ここに行く
@@ -661,7 +661,7 @@
                 });
             }
 
-            // [UPDATE] ポップアップアイコン (該当する1つだけを表示 + レイアウト調整)
+            // [UPDATE] ポップアップアイコン (上下配置 + 120px)
             function createPopupContent(facility, latestDateObj) {
                 const latestDateString = formatDateForCsv(latestDateObj);
                 const facilityMilli = facility.milli.filter(d => d.年月日 === latestDateString);
@@ -674,7 +674,6 @@
                 const level = latestRecord ? getCongestionLevel(latestRecord.人数, facility.criterion) : 1;
                 const currentLevelInfo = CONGESTION_LEVELS[level];
                 
-                // [UPDATE] JSで表示するアイコンのHTMLを決定 (1つだけ)
                 let iconHtml = '';
                 if (level === 1) {
                     iconHtml = `<img src="./realtime_S.svg" alt="ゆっくり" class="popup-congestion-icon">`;
@@ -684,9 +683,9 @@
                     iconHtml = `<img src="./realtime_B.svg" alt="混雑" class="popup-congestion-icon">`;
                 }
 
-                // [UPDATE] アイコンのラッパー (w-1/2 を適用)
+                // [UPDATE] アイコンのラッパー (w-full)
                 let levelIconsWrapper = `
-                    <div class="w-1/2 flex justify-center items-center">
+                    <div class="w-full flex justify-center items-center">
                         ${iconHtml}
                     </div>`;
 
@@ -710,12 +709,12 @@
                 }
                 calHtml += '</tr></tbody></table>';
 
-                // [UPDATE] 全体のHTML構造 (w-1/2 を適用)
+                // [UPDATE] 全体のHTML構造 (flex-col)
                 return `
-                    <h3 class="text-lg font-bold">${facility.地点名}</h3>
-                    <div class="flex items-center gap-2 my-2"> <!-- gap-4からgap-2に -->
+                    <h3 class="text-lg font-bold text-center">${facility.地点名}</h3>
+                    <div class="flex flex-col items-center gap-2 my-2">
                         ${levelIconsWrapper}
-                        <div class="w-1/2">
+                        <div class="w-full text-center">
                             <p class="font-bold text-base ${currentLevelInfo.className}-text">${currentLevelInfo.message}</p>
                         </div>
                     </div>
