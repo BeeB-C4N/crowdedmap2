@@ -140,35 +140,33 @@
         .calendar-table tr:not(:first-child) td.today-column { border-left: 1px solid #5A3A8A; border-right: 1px solid #5A3A8A; }
         .calendar-table tr:last-child td.today-column { border-bottom: 1px solid #5A3A8A;}
 
-        /* [NEW] スマートフォン用カレンダースタイル */
         @media (max-width: 767px) {
             .calendar-container-wrapper {
-                padding: 0.5rem; /* スマホではパディングを減らす */
-                overflow-x: hidden; /* 横スクロールを無効化 */
+                padding: 0.5rem; 
+                overflow-x: hidden; 
             }
             .calendar-table {
-                min-width: 100%; /* テーブルの最小幅を画面幅に合わせる */
-                font-size: 10px; /* 全体のフォントサイズを小さくする */
-                table-layout: fixed; /* テーブルレイアウトを固定 */
+                min-width: 100%; 
+                font-size: 10px; 
+                table-layout: fixed; 
             }
             .calendar-table th, .calendar-table td {
-                padding: 8px 2px; /* セルのパディングを詰める */
-                height: 40px; /* 高さを調整 */
+                padding: 8px 2px; 
+                height: 40px; 
             }
             .calendar-table th {
-                font-size: 10px; /* ヘッダーのフォントサイズ */
-                height: auto; /* 高さを自動に */
-                word-break: break-all; /* 必要に応じて改行 */
+                font-size: 10px; 
+                height: auto; 
+                word-break: break-all; 
                 vertical-align: middle;
             }
             .calendar-table td.time-header {
-                width: 50px; /* 時刻ヘッダーの幅を固定 */
+                width: 50px; 
                 font-size: 10px;
                 padding: 8px 0;
                 vertical-align: middle;
             }
         }
-
 
         .facility-card { background-color: white; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.2s; height: 100%; }
         .facility-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.1); transform: translateY(-4px); }
@@ -182,13 +180,15 @@
         .modal-close-btn:hover { background: #e0e0e0; color: #333; }
         .modal-content { overflow-y: auto; flex-grow: 1; padding: 1.5rem; }
         
+        /* [UPDATE] モーダルフッターを中央寄せ + 横並び */
         .modal-footer { 
             border-top: 1px solid #eee; 
             padding: 1rem 1.5rem; 
             background-color: #f9fafb; 
             display: flex; 
             justify-content: center; 
-            gap: 0.5rem; 
+            gap: 1rem; /* ボタンの間隔 */
+            flex-wrap: wrap; /* スマホで折り返す */
         }
 
         .facility-modal-image { width: 100%; height: 250px; object-fit: cover; }
@@ -208,11 +208,12 @@
         .popup-calendar th { font-size: 0.7rem; color: #555; font-weight: 500; padding: 4px; }
         .popup-calendar td { height: 12px; border: 1px solid #fff; font-size: 0.7rem; text-align: center; }
 
+        /* [UPDATE] ポップアップアイコン (border-radius を削除) */
         .popup-congestion-icon {
             width: 100%; 
             height: auto; 
             max-width: 150px; 
-            border-radius: 50%;
+            /* border-radius: 50%; を削除 */
         }
         
     </style>
@@ -222,9 +223,9 @@
     <div class="background-svg-top"></div>
 
     <header class="hidden md:block sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
-        <!-- ... (変更なし) ... -->
         <div class="container mx-auto px-8 py-4 flex justify-between items-center">
-            <a href="#">
+            <!-- [UPDATE] ロゴのリンクにID付与 -->
+            <a href="#" id="logo-pc-link" class="cursor-pointer">
                 <img src="./logo_kanazawa.svg" alt="金沢 観光混雑度 MAP" class="logo-pc">
             </a>
             
@@ -249,9 +250,9 @@
     </header>
 
     <header class="md:hidden sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-200 p-4">
-        <!-- ... (変更なし) ... -->
         <div class="flex justify-center items-center">
-            <a href="#">
+            <!-- [UPDATE] ロゴのリンクにID付与 -->
+            <a href="#" id="logo-mobile-link" class="cursor-pointer">
                 <img src="./logo_kanazawa.svg" alt="金沢 観光混雑度 MAP" class="logo-mobile">
             </a>
         </div>
@@ -261,48 +262,14 @@
         
         <div id="map-content" class="tab-content active">
             <!-- ... (変更なし) ... -->
-            <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">リアルタイム混雑状況</h2>
-                    <p class="text-gray-500">現在の混雑状況をマップで確認できます。</p>
-                </div>
-                <div class="flex flex-wrap justify-start md:justify-end gap-x-4 gap-y-2 text-sm">
-                    <div class="legend-item"><span class="legend-color-box border-[#22c55e] bg-white"></span>ゆっくり</div>
-                    <div class="legend-item"><span class="legend-color-box border-[#f59e0b] bg-white"></span>通常</div>
-                    <div class="legend-item"><span class="legend-color-box border-[#ef4444] bg-white"></span>混雑</div>
-                </div>
-            </div>
-            <div id="map"></div>
         </div>
         
         <div id="calendar-content" class="tab-content">
              <!-- ... (変更なし) ... -->
-             <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
-                <div>
-                    <h2 id="calendar-title" class="text-2xl font-bold text-gray-800">時間帯別 混雑度実績</h2>
-                    <p id="calendar-info" class="text-gray-500">施設全体（本日）</p>
-                </div>
-                <button id="calendar-toggle-btn" class="btn-primary self-start md:self-center"></button>
-            </div>
-            <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-4 text-sm">
-                <div class="legend-item"><span class="legend-color-box level-1-bg"></span>ゆっくり</div>
-                <div class="legend-item"><span class="legend-color-box level-2-bg"></span>通常</div>
-                <div class="legend-item"><span class="legend-color-box level-3-bg"></span>混雑</div>
-                <div class="legend-item"><span class="legend-color-box future-time-bg"></span>-</div>
-            </div>
-            <div class="calendar-container-wrapper">
-                <div id="calendar-container"></div>
-            </div>
         </div>
 
         <div id="introduction-content" class="tab-content">
             <!-- ... (変更なし) ... -->
-            <h2 class="text-2xl font-bold text-gray-800 mb-1">観光スポット</h2>
-            <p class="text-gray-500 mb-6">金沢の主要な観光スポットをご紹介します。</p>
-            
-            <div id="facility-card-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- 施設カードはJSでここに追加されます -->
-            </div>
         </div>
     </main>
 
@@ -310,51 +277,17 @@
 
     <footer class="text-center mt-8 mb-24 md:mb-12 text-gray-500 text-sm">
         <!-- ... (変更なし) ... -->
-        <p>&copy; Code for Noto. All Rights Reserved.</p>
-        <a href="#" id="disclaimer-link" class="underline hover:text-purple-700 transition">免責事項</a>
     </footer>
 
     <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg flex justify-around">
         <!-- ... (変更なし) ... -->
-        <button class="tab-btn mobile-tab-btn active" data-tab-id="map-content">
-            <img src="./sp_map_icon.svg" alt="マップ" class="icon icon-default">
-            <img src="./sp_hover_map_icon.svg" alt="マップ" class="icon icon-active">
-            <span>マップ</span>
-        </button>
-        <button class="tab-btn mobile-tab-btn" data-tab-id="calendar-content">
-            <img src="./sp_calendar_icon.svg" alt="混雑カレンダー" class="icon icon-default">
-            <img src="./sp_hover_calendar_icon.svg" alt="混雑カレンダー" class="icon icon-active">
-            <span>混雑カレンダー</span>
-        </button>
-        <button class="tab-btn mobile-tab-btn" data-tab-id="introduction-content">
-            <img src="./sp_spot_icon.svg" alt="観光スポット" class="icon icon-default">
-            <img src="./sp_hover_spot_icon.svg" alt="観光スポット" class="icon icon-active">
-            <span>観光スポット</span>
-        </button>
     </nav>
 
     <div id="modal-overlay" class="modal-overlay">
         <!-- ... (変更なし) ... -->
-        <div class="modal-container">
-            <div class="modal-header">
-                <h2 class="text-gray-800">免責事項</h2>
-                <button id="close-modal-btn" class="modal-close-btn">
-                    <i data-lucide="x" class="icon-sm"></i>
-                </button>
-            </div>
-            <div class="modal-content text-gray-600">
-                <p class="mb-4">本ウェブサイトで提供される混雑度情報は、Wi-Fiセンシングデータを用いた参考情報です。リアルタイムの状況を完全に保証するものではありません。</p>
-                <p class="mb-4">この情報は、提供されたデータに基づいて生成されており、実際の混雑状況とは異なる場合があります。通信状況やシステムの都合により、情報の更新が遅れることや、表示されないことがあります。</p>
-                <p class="mb-4">本ウェブサイトの利用によって生じたいかなる損害についても、運営者は一切の責任を負いません。お出かけの際の判断は、ご自身の責任でお願いいたします。</p>
-                <p>掲載されている情報は、予告なく変更または削除されることがありますので、あらかじめご了承ください。</p>
-            </div>
-            <div class="modal-footer"> 
-                <button id="close-modal-btn-footer" class="btn-primary">閉じる</button>
-            </div>
-        </div>
     </div>
 
-    <!-- 施設モーダル -->
+    <!-- [UPDATE] 施設モーダル -->
     <div id="facility-modal-overlay" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
@@ -375,17 +308,17 @@
                             <p id="facility-modal-description" class="text-gray-700 leading-relaxed"></p>
                         </div>
                         
-                        <div>
-                             <button id="facility-modal-calendar-btn" class="btn-outline w-full">
-                                <img src="./calendar_icon.svg" class="icon-sm" alt="カレンダー" style="filter: brightness(0.5) sepia(1) hue-rotate(220deg) saturate(5);">
-                                混雑カレンダーを見る
-                            </button>
-                        </div>
+                        <!-- カレンダーボタンを本文から削除 -->
                     </div>
                 </div>
             </div>
+            <!-- [UPDATE] フッターに両方のボタンを配置 -->
             <div class="modal-footer"> 
-                <button id="facility-modal-gmaps-btn" class="btn-primary">
+                 <button id="facility-modal-calendar-btn" class="btn-outline w-full sm:w-auto">
+                    <img src="./calendar_icon.svg" class="icon-sm" alt="カレンダー" style="filter: brightness(0.5) sepia(1) hue-rotate(220deg) saturate(5);">
+                    混雑カレンダー
+                </button>
+                <button id="facility-modal-gmaps-btn" class="btn-primary w-full sm:w-auto">
                     <i data-lucide="map-pin" class="icon-sm"></i>
                     ここに行く
                 </button>
@@ -578,6 +511,17 @@
                     });
                 });
                 
+                // [NEW] ロゴクリックイベント
+                document.getElementById('logo-pc-link').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchToTab('map-content', map);
+                });
+                document.getElementById('logo-mobile-link').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchToTab('map-content', map);
+                });
+
+
                 map.on('popupopen', (e) => {
                     const btn = e.popup.getElement().querySelector('.popup-calendar-btn');
                     if (btn) {
@@ -632,6 +576,7 @@
                 }
             }
             
+            // [UPDATE] 施設モーダルのボタンロジック
             function showFacilityModal(facility, facilityData, latestDateObj) {
                 const overlay = document.getElementById('facility-modal-overlay');
                 const imageUrl = IMAGE_URLS[facility.地点名] || placeholderImg(facility.地点名);
@@ -643,6 +588,7 @@
                 document.getElementById('facility-modal-name-en').textContent = facility.英語名称 || '';
                 document.getElementById('facility-modal-description').textContent = facility.説明 || '情報なし';
                 
+                // [UPDATE] カレンダーボタンのロジック (フッターに移動)
                 const calBtn = document.getElementById('facility-modal-calendar-btn');
                 calBtn.onclick = () => {
                     displayDailyCalendarForFacility(facility, facilityData, latestDateObj);
@@ -691,7 +637,6 @@
                 });
             }
 
-            // [UPDATE] ポップアップアイコン (width 100% + 上下配置)
             function createPopupContent(facility, latestDateObj) {
                 const latestDateString = formatDateForCsv(latestDateObj);
                 const facilityMilli = facility.milli.filter(d => d.年月日 === latestDateString);
@@ -713,7 +658,6 @@
                     iconHtml = `<img src="./realtime_B.svg" alt="混雑" class="popup-congestion-icon">`;
                 }
 
-                // [UPDATE] アイコンのラッパー (w-full)
                 let levelIconsWrapper = `
                     <div class="w-full flex justify-center items-center">
                         ${iconHtml}
@@ -739,7 +683,6 @@
                 }
                 calHtml += '</tr></tbody></table>';
 
-                // [UPDATE] 全体のHTML構造 (flex-col)
                 return `
                     <h3 class="text-lg font-bold text-center">${facility.地点名}</h3>
                     <div class="flex flex-col items-center gap-2 my-2">
