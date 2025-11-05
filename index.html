@@ -178,10 +178,11 @@
         .popup-calendar th { font-size: 0.7rem; color: #555; font-weight: 500; padding: 4px; }
         .popup-calendar td { height: 12px; border: 1px solid #fff; font-size: 0.7rem; text-align: center; }
 
-        /* [UPDATE] ポップアップアイコンのサイズを 120px に */
+        /* [UPDATE] ポップアップアイコンのサイズ (width 100%) */
         .popup-congestion-icon {
-            width: 120px; 
-            height: 120px;
+            width: 100%; /* 幅を100%に */
+            height: auto; /* 高さは自動 */
+            max-width: 150px; /* 最大幅を指定（大きすぎ防止） */
             border-radius: 50%;
         }
         
@@ -661,7 +662,7 @@
                 });
             }
 
-            // [UPDATE] ポップアップアイコン (上下配置 + 120px)
+            // [UPDATE] ポップアップアイコン (width 100% + 上下配置)
             function createPopupContent(facility, latestDateObj) {
                 const latestDateString = formatDateForCsv(latestDateObj);
                 const facilityMilli = facility.milli.filter(d => d.年月日 === latestDateString);
