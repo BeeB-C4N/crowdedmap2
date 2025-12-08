@@ -131,9 +131,10 @@
 
         .calendar-container-wrapper { background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 1.5rem; overflow-x: auto; }
         .calendar-table { border-collapse: collapse; width: 100%; table-layout: fixed; min-width: 800px; }
-        .calendar-table th, .calendar-table td { text-align: center; padding: 12px 4px; border: 1px solid #eee; font-size: 0.9rem; }
-        .calendar-table th { background-color: #f9fafb; color: #333; font-weight: 500; height: 60px; vertical-align: middle; font-size: 0.8rem; }
-        .calendar-table td.time-header { background-color: #f9fafb; font-weight: 500; color: #333; text-align: center; width: 80px; font-size: 0.9rem; }
+        /* 30分刻みに対応するためにpaddingを調整 */
+        .calendar-table th, .calendar-table td { text-align: center; padding: 6px 2px; border: 1px solid #eee; font-size: 0.9rem; height: 32px; }
+        .calendar-table th { background-color: #f9fafb; color: #333; font-weight: 500; height: 50px; vertical-align: middle; font-size: 0.8rem; }
+        .calendar-table td.time-header { background-color: #f9fafb; font-weight: 500; color: #333; text-align: center; width: 80px; font-size: 0.85rem; }
         .calendar-table .today-header { color: #5A3A8A; font-weight: bold; }
         .calendar-table .today-column { background-color: #f9f8f4; }
         .calendar-table th.today-column { border: 1px solid #5A3A8A; }
@@ -151,8 +152,8 @@
                 table-layout: fixed; 
             }
             .calendar-table th, .calendar-table td {
-                padding: 8px 2px; 
-                height: 40px; 
+                padding: 4px 2px; 
+                height: 30px; 
             }
             .calendar-table th {
                 font-size: 10px; 
@@ -163,7 +164,7 @@
             .calendar-table td.time-header {
                 width: 50px; 
                 font-size: 10px;
-                padding: 8px 0;
+                padding: 4px 0;
                 vertical-align: middle;
             }
         }
@@ -552,7 +553,7 @@
                 if (allMilliData.length > 0) {
                      latestDateObj = getLatestDateFromData(allMilliData);
                 }
-               
+                
                 if (!latestDateObj) {
                     console.warn("No valid dates found in data, using current date.");
                     latestDateObj = new Date(); // フォールバック
@@ -829,7 +830,7 @@
                 });
             }
 
-            // --- Calendar Functions (流用) ---
+            // --- Calendar Functions (30分刻みに修正) ---
             function displayTodayAllFacilitiesCalendar(facilityData, latestDateObj) {
                 const map = L.Util.getMapInstance();
                 const latestDateString = formatDateForCsv(latestDateObj);
@@ -843,6 +844,7 @@
                 const realToday = new Date();
                 const isDisplayingRealToday = latestDateObj.toDateString() === realToday.toDateString();
                 const currentHour = realToday.getHours();
+                const currentMin = realToday.getMinutes(); // 30分判定用
 
                 let headerHtml = '<tr><th>時刻</th>';
                 facilityData.forEach(facility => { headerHtml += `<th>${facility.地点名}</th>`; });
@@ -856,19 +858,38 @@
                 });
 
                 let bodyHtml = '';
+                // 30分刻みループ
                 for (let hour = 8; hour <= 20; hour++) {
-                    bodyHtml += `<tr><td class="time-header">${String(hour).padStart(2, '0')}:00</td>`;
-                    facilityData.forEach(facility => {
-                        if (isDisplayingRealToday && hour > currentHour) { 
-                            bodyHtml += `<td class="future-time-bg"></td>`; 
-                            return; 
-                        }
-                        if (!facility.criterion) { bodyHtml += `<td>-</td>`; return; }
-                        const count = dataByFacilityAndHour[facility.地点名]?.[hour] || 0;
-                        const level = getCongestionLevel(count, facility.criterion);
-                        bodyHtml += `<td class="${CONGESTION_LEVELS[level].className}-bg" title="${count}人"></td>`;
+                    const minutes = [0, 30];
+                    minutes.forEach(minute => {
+                        const timeLabel = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+                        bodyHtml += `<tr><td class="time-header">${timeLabel}</td>`;
+                        
+                        facilityData.forEach(facility => {
+                            // 未来判定 (30分刻み)
+                            // 時が現在より大きい、または、時が同じで分が現在より大きい場合は未来
+                            let isFuture = false;
+                            if (isDisplayingRealToday) {
+                                if (hour > currentHour) {
+                                    isFuture = true;
+                                } else if (hour === currentHour && minute > currentMin) {
+                                    isFuture = true;
+                                }
+                            }
+
+                            if (isFuture) { 
+                                bodyHtml += `<td class="future-time-bg"></td>`; 
+                                return; 
+                            }
+                            if (!facility.criterion) { bodyHtml += `<td>-</td>`; return; }
+                            
+                            // データは1時間単位なので、hourを使って取得
+                            const count = dataByFacilityAndHour[facility.地点名]?.[hour] || 0;
+                            const level = getCongestionLevel(count, facility.criterion);
+                            bodyHtml += `<td class="${CONGESTION_LEVELS[level].className}-bg" title="${count}人"></td>`;
+                        });
+                        bodyHtml += '</tr>';
                     });
-                    bodyHtml += '</tr>';
                 }
                 document.getElementById('calendar-container').innerHTML = `<table class="calendar-table"><thead>${headerHtml}</thead><tbody>${bodyHtml}</tbody></table>`;
             }
@@ -883,6 +904,7 @@
                 
                 const realToday = new Date();
                 const currentHour = realToday.getHours();
+                const currentMin = realToday.getMinutes();
                 const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
                 let headerHtml = '<tr><th>時刻</th>';
                 
@@ -902,27 +924,42 @@
 
                 let bodyHtml = '';
                 for (let hour = 8; hour <= 20; hour++) {
-                    bodyHtml += `<tr><td class="time-header">${String(hour).padStart(2, '0')}:00</td>`;
-                    
-                    datesToDisplay.forEach(date => {
-                        const isRealToday = date.toDateString() === realToday.toDateString();
-                        const todayClass = isRealToday ? 'today-column' : '';
-                        let cellClass = todayClass;
+                    const minutes = [0, 30];
+                    minutes.forEach(minute => {
+                        const timeLabel = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+                        bodyHtml += `<tr><td class="time-header">${timeLabel}</td>`;
+                        
+                        datesToDisplay.forEach(date => {
+                            const isRealToday = date.toDateString() === realToday.toDateString();
+                            const todayClass = isRealToday ? 'today-column' : '';
+                            let cellClass = todayClass;
 
-                        if (isRealToday && hour > currentHour) {
-                            cellClass += ' future-time-bg';
-                            bodyHtml += `<td class="${cellClass.trim()}"></td>`;
-                            return;
-                        }
+                            // 未来判定
+                            let isFuture = false;
+                            if (isRealToday) {
+                                if (hour > currentHour) {
+                                    isFuture = true;
+                                } else if (hour === currentHour && minute > currentMin) {
+                                    isFuture = true;
+                                }
+                            }
 
-                        const dateString = formatDateForCsv(date);
-                        const record = facility.milli.find(d => d.年月日 === dateString && parseInt(d.時刻, 10) === hour);
-                        const count = record ? record.人数 : 0;
-                        const level = getCongestionLevel(count, facility.criterion);
-                        cellClass += ` ${CONGESTION_LEVELS[level].className}-bg`;
-                        bodyHtml += `<td class="${cellClass.trim()}" title="${count}人"></td>`;
+                            if (isFuture) {
+                                cellClass += ' future-time-bg';
+                                bodyHtml += `<td class="${cellClass.trim()}"></td>`;
+                                return;
+                            }
+
+                            const dateString = formatDateForCsv(date);
+                            // データは1時間単位なので、hourを使って取得
+                            const record = facility.milli.find(d => d.年月日 === dateString && parseInt(d.時刻, 10) === hour);
+                            const count = record ? record.人数 : 0;
+                            const level = getCongestionLevel(count, facility.criterion);
+                            cellClass += ` ${CONGESTION_LEVELS[level].className}-bg`;
+                            bodyHtml += `<td class="${cellClass.trim()}" title="${count}人"></td>`;
+                        });
+                        bodyHtml += '</tr>';
                     });
-                    bodyHtml += '</tr>';
                 }
                 document.getElementById('calendar-container').innerHTML = `<table class="calendar-table"><thead>${headerHtml}</thead><tbody>${bodyHtml}</tbody></table>`;
             }
