@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>金沢中心部 観光混雑度マップ (v2)</title>
+    <title>いしかわ観光地リアルタイムナビ</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -224,7 +224,7 @@
     <header class="hidden md:block sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
         <div class="container mx-auto px-8 py-4 flex justify-between items-center">
             <a href="#" id="logo-pc-link" class="cursor-pointer">
-                <img src="./logo_kanazawa.svg" alt="金沢 観光混雑度 MAP" class="logo-pc">
+                <img src="./logo_kanazawa.svg" alt="いしかわ観光地リアルタイムナビ" class="logo-pc">
             </a>
             
             <nav class="flex space-x-4">
@@ -234,9 +234,9 @@
                     <span>マップ</span>
                 </button>
                 <button class="tab-btn pc-tab-btn" data-tab-id="calendar-content">
-                    <img src="./calendar_icon.svg" alt="混雑カレンダー" class="icon icon-default">
-                    <img src="./sp_hover_calendar_icon.svg" alt="混雑カレンダー" class="icon icon-active">
-                    <span>混雑カレンダー</span>
+                    <img src="./calendar_icon.svg" alt="入込カレンダー" class="icon icon-default">
+                    <img src="./sp_hover_calendar_icon.svg" alt="入込カレンダー" class="icon icon-active">
+                    <span>入込カレンダー</span>
                 </button>
                 <button class="tab-btn pc-tab-btn" data-tab-id="introduction-content">
                     <img src="./spot_icon.svg" alt="観光スポット" class="icon icon-default">
@@ -260,8 +260,8 @@
         <div id="map-content" class="tab-content active">
             <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">リアルタイム混雑状況</h2>
-                    <p class="text-gray-500">現在の混雑状況をマップで確認できます。</p>
+                    <h2 class="text-2xl font-bold text-gray-800">リアルタイム入込状況</h2>
+                    <p class="text-gray-500">現在の入込状況をマップで確認できます。</p>
                 </div>
                 <div class="flex flex-wrap justify-start md:justify-end gap-x-4 gap-y-2 text-sm">
                     <div class="legend-item"><span class="legend-color-box border-[#22c55e] bg-white"></span>ゆっくり</div>
@@ -293,7 +293,7 @@
 
         <div id="introduction-content" class="tab-content">
             <h2 class="text-2xl font-bold text-gray-800 mb-1">観光スポット</h2>
-            <p class="text-gray-500 mb-6">金沢の主要な観光スポットをご紹介します。</p>
+            <p class="text-gray-500 mb-6">石川県の主要な観光スポットをご紹介します。</p>
             
             <div id="facility-card-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- 施設カードはJSでここに追加されます -->
@@ -315,9 +315,9 @@
             <span>マップ</span>
         </button>
         <button class="tab-btn mobile-tab-btn" data-tab-id="calendar-content">
-            <img src="./sp_calendar_icon.svg" alt="混雑カレンダー" class="icon icon-default">
-            <img src="./sp_hover_calendar_icon.svg" alt="混雑カレンダー" class="icon icon-active">
-            <span>混雑カレンダー</span>
+            <img src="./sp_calendar_icon.svg" alt="入込カレンダー" class="icon icon-default">
+            <img src="./sp_hover_calendar_icon.svg" alt="入込カレンダー" class="icon icon-active">
+            <span>入込カレンダー</span>
         </button>
         <button class="tab-btn mobile-tab-btn" data-tab-id="introduction-content">
             <img src="./sp_spot_icon.svg" alt="観光スポット" class="icon icon-default">
@@ -372,7 +372,7 @@
             <div class="modal-footer"> 
                  <button id="facility-modal-calendar-btn" class="btn-outline w-full sm:w-auto">
                     <img src="./calendar_icon.svg" class="icon-sm" alt="カレンダー" style="filter: brightness(0.5) sepia(1) hue-rotate(220deg) saturate(5);">
-                    混雑カレンダー
+                    入込カレンダー
                 </button>
                 <button id="facility-modal-gmaps-btn" class="btn-primary w-full sm:w-auto">
                     <i data-lucide="map-pin" class="icon-sm"></i>
@@ -760,7 +760,7 @@
                             <p class="font-bold text-base ${currentLevelInfo.className}-text">${currentLevelInfo.message}</p>
                         </div>
                     </div>
-                    <p class="text-xs text-gray-500 mb-2">混雑度実績 (${latestDateString})</p>
+                    <p class="text-xs text-gray-500 mb-2">入込実績 (${latestDateString})</p>
                     ${calHtml}
                     <button class="btn-primary popup-calendar-btn mt-4 w-full" data-facility-name="${facility.地点名}">
                         <img src="./white_calendar.svg" class="icon-sm" alt="カレンダー">
@@ -835,8 +835,8 @@
                 const map = L.Util.getMapInstance();
                 const latestDateString = formatDateForCsv(latestDateObj);
                 
-                document.getElementById('calendar-title').textContent = '時間帯別 混雑度実績';
-                document.getElementById('calendar-info').textContent = `施設全体（${latestDateString}）`;
+                document.getElementById('calendar-title').textContent = '時間帯別 入込実績';
+                document.getElementById('calendar-info').textContent = `全スポット（${latestDateString}）`;
                 const toggleBtn = document.getElementById('calendar-toggle-btn');
                 toggleBtn.textContent = '観光スポット一覧から選ぶ';
                 toggleBtn.onclick = () => switchToTab('introduction-content', map);
@@ -896,10 +896,10 @@
 
             function displayDailyCalendarForFacility(facility, facilityData, latestDateObj) {
                 const map = L.Util.getMapInstance();
-                document.getElementById('calendar-title').textContent = `${facility.地点名} 混雑度実績`;
-                document.getElementById('calendar-info').textContent = '施設別（日別） - 直近7日間';
+                document.getElementById('calendar-title').textContent = `${facility.地点名} 入込実績`;
+                document.getElementById('calendar-info').textContent = '観光スポット別（日別） - 直近7日間';
                 const toggleBtn = document.getElementById('calendar-toggle-btn');
-                toggleBtn.textContent = '施設全体表示に戻る';
+                toggleBtn.textContent = '観光スポット全体表示に戻る';
                 toggleBtn.onclick = () => displayTodayAllFacilitiesCalendar(facilityData, latestDateObj);
                 
                 const realToday = new Date();
