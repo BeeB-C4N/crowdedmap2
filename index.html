@@ -216,34 +216,64 @@
                 <h1 class="header-title font-mincho">いしかわ観光地リアルタイムナビ</h1>
             </div>
             
-            <nav class="flex space-x-4">
-                <button class="tab-btn pc-tab-btn active" data-tab-id="map-content">
-                    <img src="./map_icon.svg" alt="マップ" class="icon icon-default">
-                    <img src="./sp_hover_map_icon.svg" alt="マップ" class="icon icon-active">
-                    <span>マップ</span>
-                </button>
-                <button class="tab-btn pc-tab-btn" data-tab-id="calendar-content">
-                    <img src="./calendar_icon.svg" alt="入込カレンダー" class="icon icon-default">
-                    <img src="./sp_hover_calendar_icon.svg" alt="入込カレンダー" class="icon icon-active">
-                    <span>入込カレンダー</span>
-                </button>
-                <button class="tab-btn pc-tab-btn" data-tab-id="introduction-content">
-                    <img src="./spot_icon.svg" alt="観光スポット" class="icon icon-default">
-                    <img src="./sp_hover_spot_icon.svg" alt="観光スポット" class="icon icon-active">
-                    <span>観光スポット</span>
-                </button>
-            </nav>
+            <div class="flex items-center space-x-6">
+                <nav class="flex space-x-4">
+                    <button class="tab-btn pc-tab-btn active" data-tab-id="map-content">
+                        <img src="./map_icon.svg" alt="マップ" class="icon icon-default">
+                        <img src="./sp_hover_map_icon.svg" alt="マップ" class="icon icon-active">
+                        <span>マップ</span>
+                    </button>
+                    <button class="tab-btn pc-tab-btn" data-tab-id="calendar-content">
+                        <img src="./calendar_icon.svg" alt="入込カレンダー" class="icon icon-default">
+                        <img src="./sp_hover_calendar_icon.svg" alt="入込カレンダー" class="icon icon-active">
+                        <span>入込カレンダー</span>
+                    </button>
+                    <button class="tab-btn pc-tab-btn" data-tab-id="introduction-content">
+                        <img src="./spot_icon.svg" alt="観光スポット" class="icon icon-default">
+                        <img src="./sp_hover_spot_icon.svg" alt="観光スポット" class="icon icon-active">
+                        <span>観光スポット</span>
+                    </button>
+                </nav>
+
+                <!-- PC用 ハンバーガーメニュー (言語切り替え等) -->
+                <div class="relative">
+                    <button id="hamburger-btn-pc" class="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition focus:outline-none">
+                        <i data-lucide="menu" class="icon"></i>
+                    </button>
+                    <div id="pc-menu-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
+                        <div class="px-4 py-1 text-xs font-bold text-gray-400 mb-1">言語 / Language</div>
+                        <a href="#" class="block px-4 py-2 text-sm text-purple-700 bg-purple-50 font-bold">日本語</a>
+                        <a href="/en/index.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">English</a>
+                        <!-- 将来の拡張用 -->
+                        <!-- <a href="/zh/index.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">中文</a> -->
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
     <header class="md:hidden sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-200 p-4">
-        <div class="flex flex-col items-center">
-            <div class="flex items-center mb-2">
+        <div class="flex justify-between items-center relative">
+            <div class="flex items-center justify-center flex-grow">
                 <a href="#" id="logo-mobile-link" class="cursor-pointer">
                     <img src="./logo_kanazawa_notext.svg" alt="logo" class="logo-mobile">
                 </a>
                 <h1 class="header-title font-mincho">いしかわ観光地リアルタイムナビ</h1>
             </div>
+            
+            <!-- モバイル用 ハンバーガーメニュー -->
+            <button id="hamburger-btn-mobile" class="absolute right-0 p-2 text-gray-600 hover:bg-gray-100 rounded-full transition focus:outline-none">
+                <i data-lucide="menu" class="icon"></i>
+            </button>
+        </div>
+
+        <!-- モバイル用 ドロップダウンメニュー -->
+        <div id="mobile-menu-dropdown" class="hidden mt-3 border-t border-gray-200 pt-2">
+            <div class="px-2 py-1 text-xs font-bold text-gray-400">言語 / Language</div>
+            <a href="#" class="block px-4 py-3 text-sm text-purple-700 bg-purple-50 font-bold rounded-lg mb-1">日本語</a>
+            <a href="/en/index.html" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition">English</a>
+            <!-- 将来の拡張用 -->
+            <!-- <a href="/zh/index.html" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition">中文</a> -->
         </div>
     </header>
 
@@ -765,6 +795,29 @@
                 };
 
                 document.getElementById('close-facility-modal-btn').onclick = () => document.getElementById('facility-modal-overlay').style.display = 'none';
+
+                // ハンバーガーメニューの制御
+                const btnPc = document.getElementById('hamburger-btn-pc');
+                const menuPc = document.getElementById('pc-menu-dropdown');
+                if(btnPc && menuPc) {
+                    btnPc.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        menuPc.classList.toggle('hidden');
+                    });
+                    document.addEventListener('click', (e) => {
+                        if (!menuPc.contains(e.target) && !btnPc.contains(e.target)) {
+                            menuPc.classList.add('hidden');
+                        }
+                    });
+                }
+
+                const btnMobile = document.getElementById('hamburger-btn-mobile');
+                const menuMobile = document.getElementById('mobile-menu-dropdown');
+                if(btnMobile && menuMobile) {
+                    btnMobile.addEventListener('click', () => {
+                        menuMobile.classList.toggle('hidden');
+                    });
+                }
             }
 
             function switchToTab(tabId) {
