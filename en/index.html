@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ishikawa Sightseeing Real-time Navigator</title>
+    <title>Ishikawa Real-Time Tourist Spot Navigation</title>
     <link rel="icon" href="../favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -205,7 +205,7 @@
                 <a href="#" id="logo-pc-link" class="cursor-pointer">
                     <img src="../logo_kanazawa_notext.svg" alt="logo" class="logo-pc">
                 </a>
-                <h1 class="header-title">Ishikawa Sightseeing Real-time Navigator</h1>
+                <h1 class="header-title">Ishikawa Real-Time Tourist Spot Navigation</h1>
             </div>
             
             <div class="flex items-center space-x-6">
@@ -247,7 +247,7 @@
                 <a href="#" id="logo-mobile-link" class="cursor-pointer">
                     <img src="../logo_kanazawa_notext.svg" alt="logo" class="logo-mobile">
                 </a>
-                <h1 class="header-title">Ishikawa Real-time Navigator</h1>
+                <h1 class="header-title">Ishikawa Real-Time Tourist Spot Navigation</h1>
             </div>
             
             <button id="hamburger-btn-mobile" class="absolute right-0 p-2 text-gray-600 hover:bg-gray-100 rounded-full transition focus:outline-none">
@@ -267,8 +267,8 @@
         <div id="map-content" class="tab-content active">
             <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Real-time Congestion</h2>
-                    <p class="text-gray-500">Check current congestion levels on the map.</p>
+                    <h2 class="text-2xl font-bold text-gray-800">Real-time visitor volume status</h2>
+                    <p class="text-gray-500">Check the current visitor volume status on the map.</p>
                 </div>
                 <div class="barometer-container">
                     <div class="barometer-colors">
@@ -281,7 +281,7 @@
                     <div class="barometer-labels">
                         <span>Comfortable</span>
                         <span class="bar-label-center">Normal</span>
-                        <span>Crowded</span>
+                        <span>Bustling</span>
                     </div>
                 </div>
             </div>
@@ -291,8 +291,8 @@
         <div id="calendar-content" class="tab-content">
              <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
-                    <h2 id="calendar-title" class="text-2xl font-bold text-gray-800">Congestion History</h2>
-                    <p id="calendar-info" class="text-gray-500">All Tourist Spots (Today)</p>
+                    <h2 id="calendar-title" class="text-2xl font-bold text-gray-800">Hourly visitor volume</h2>
+                    <p id="calendar-info" class="text-gray-500">All Tourist Spots calendar</p>
                 </div>
                 <button id="calendar-toggle-btn" class="btn-primary self-start md:self-center"></button>
             </div>
@@ -308,7 +308,7 @@
                     <div class="barometer-labels">
                         <span>Comfortable</span>
                         <span class="bar-label-center">Normal</span>
-                        <span>Crowded</span>
+                        <span>CBustling</span>
                     </div>
                 </div>
             </div>
@@ -319,7 +319,7 @@
 
         <div id="introduction-content" class="tab-content">
             <h2 class="text-2xl font-bold text-gray-800 mb-1">Tourist Spots</h2>
-            <p class="text-gray-500 mb-6">Introducing major tourist spots in Ishikawa Prefecture.</p>
+            <p class="text-gray-500 mb-6">Introducing Isikawa's major tourist spots</p>
             <div id="facility-card-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
     </main>
