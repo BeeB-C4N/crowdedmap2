@@ -308,7 +308,7 @@
                     <div class="barometer-labels">
                         <span>Comfortable</span>
                         <span class="bar-label-center">Normal</span>
-                        <span>CBustling</span>
+                        <span>Bustling</span>
                     </div>
                 </div>
             </div>
@@ -340,7 +340,7 @@
         <button class="tab-btn mobile-tab-btn" data-tab-id="calendar-content">
             <img src="../sp_calendar_icon.svg" alt="History" class="icon icon-default">
             <img src="../sp_hover_calendar_icon.svg" alt="History" class="icon icon-active">
-            <span>History</span>
+            <span>Calendar</span>
         </button>
         <button class="tab-btn mobile-tab-btn" data-tab-id="introduction-content">
             <img src="../sp_spot_icon.svg" alt="Spots" class="icon icon-default">
@@ -392,11 +392,11 @@
             <div class="modal-footer"> 
                  <button id="facility-modal-calendar-btn" class="btn-outline w-full sm:w-auto flex gap-2">
                     <img src="../calendar_icon.svg" class="icon-sm" alt="Calendar" style="filter: brightness(0.5) sepia(1) hue-rotate(220deg) saturate(5);">
-                    History
+                    Calendar
                 </button>
                 <button id="facility-modal-gmaps-btn" class="btn-primary w-full sm:w-auto">
                     <i data-lucide="map-pin" class="icon-sm"></i>
-                    Get Directions
+                    View on Map
                 </button>
             </div>
         </div>
@@ -650,7 +650,7 @@
                             ${createMiniCalendarHtml(facility, todayString, currentHour)}
                             <button class="btn-primary popup-calendar-btn mt-4 w-full" data-facility-name="${facility.地点名}">
                                 <img src="../calendar_icon.svg" class="icon-sm" style="filter:invert(1)">
-                                Full History
+                                Calendar
                             </button>
                         `;
                     });
@@ -820,8 +820,8 @@
 
             function displayDailyCalendarForFacility(facility, facilityData, latestDateObj) {
                 const displayName = facility.英語名称 || facility.地点名;
-                document.getElementById('calendar-title').textContent = `${displayName} History`;
-                document.getElementById('calendar-info').textContent = 'Hourly status for the past 7 days';
+                document.getElementById('calendar-title').textContent = `${displayName} Hourly visitor volume`;
+                document.getElementById('calendar-info').textContent = 'Data by tourist spot - Last 7 days -';
                 const toggleBtn = document.getElementById('calendar-toggle-btn');
                 toggleBtn.textContent = 'Back to All Spots';
                 toggleBtn.onclick = () => displayTodayAllFacilitiesCalendar(facilityData, latestDateObj);
