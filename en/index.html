@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>いしかわ観光地リアルタイムナビ</title>
-    <link rel="icon" href="./favicon.ico">
+    <title>Ishikawa Sightseeing Real-time Navigator</title>
+    <link rel="icon" href="../favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Noto Sans JP と 題名用の Noto Serif JP (明朝体) を読み込み -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+    <!-- Noto Sans for English UI -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@0.390.0/dist/umd/lucide.js"></script>
 
     <style>
@@ -21,8 +21,8 @@
             height: 100%; 
         }
         body {
-            font-family: 'Noto Sans JP', sans-serif;
-            background-image: url('./bk.svg'); 
+            font-family: 'Noto Sans', sans-serif;
+            background-image: url('../bk.svg'); 
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
@@ -34,11 +34,6 @@
             flex-direction: column; 
         }
         
-        /* 明朝体クラス */
-        .font-mincho {
-            font-family: 'Noto Serif JP', serif;
-        }
-
         main {
             flex-grow: 1;
         }
@@ -56,14 +51,14 @@
 
         @media (min-width: 768px) {
             .background-svg-top {
-                background-image: url('./top_point_bk.svg');
+                background-image: url('../top_point_bk.svg');
                 background-position: top center; 
                 background-size: 100% auto; 
                 top: 0;
                 height: 500px; 
             }
             .background-svg-bottom {
-                background-image: url('./down_point_bk.svg');
+                background-image: url('../down_point_bk.svg');
                 background-position: bottom center; 
                 background-size: 100% auto; 
                 bottom: 0; 
@@ -73,7 +68,7 @@
 
         @media (max-width: 767px) {
             .background-svg-top {
-                background-image: url('./top_point_bk.svg');
+                background-image: url('../top_point_bk.svg');
                 background-position: top center;
                 background-size: 150% auto; 
                 opacity: 0.7;
@@ -81,7 +76,7 @@
                 height: 300px;
             }
             .background-svg-bottom {
-                background-image: url('./down_point_bk.svg');
+                background-image: url('../down_point_bk.svg');
                 background-position: bottom center;
                 background-size: 150% auto; 
                 opacity: 0.7;
@@ -99,24 +94,25 @@
         .logo-mobile { height: 40px; width: auto; }
         
         .header-title {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 700;
             color: #482e6e;
             margin-left: 1rem;
             white-space: nowrap;
         }
 
         @media (max-width: 640px) {
-            .header-title { font-size: 1.1rem; margin-left: 0.5rem; }
+            .header-title { font-size: 0.9rem; margin-left: 0.5rem; }
         }
 
         .icon { width: 24px; height: 24px; stroke-width: 2; }
         .icon-sm { width: 20px; height: 20px; }
         .btn-primary .icon-sm, .btn-primary .icon { filter: brightness(0) invert(1); }
-        .tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; color: #888; transition: all 0.2s; border-radius: 8px; font-size: 0.8rem; font-weight: 500; }
+        .tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; color: #888; transition: all 0.2s; border-radius: 8px; font-size: 0.75rem; font-weight: 600; }
         .tab-btn .icon-active { display: none; }
         .tab-btn.active .icon-default { display: none; }
         .tab-btn.active .icon-active { display: block; }
-        .pc-tab-btn { padding: 0.75rem 1.5rem; background-color: rgba(255, 255, 255, 0.8); border: 1px solid #e0e0e0; backdrop-filter: blur(4px); width: 160px; }
+        .pc-tab-btn { padding: 0.75rem 0.5rem; background-color: rgba(255, 255, 255, 0.8); border: 1px solid #e0e0e0; backdrop-filter: blur(4px); width: 160px; }
         .pc-tab-btn:hover { background-color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .pc-tab-btn.active { color: #5A3A8A; background-color: white; border-color: #5A3A8A; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .pc-tab-btn.active span { color: #5A3A8A; }
@@ -130,13 +126,12 @@
         .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: white; color: #333; border: 1px solid #ddd; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .leaflet-popup-content-wrapper { padding: 4px; }
         .leaflet-popup-content { margin: 12px 16px; }
-        .leaflet-popup-content h3 { font-size: 1.25rem; font-weight: bold; color: #333; margin-bottom: 8px; }
+        .leaflet-popup-content h3 { font-size: 1.1rem; font-weight: bold; color: #333; margin-bottom: 8px; }
 
         .custom-div-icon .marker-pin-container { width: 80px; height: 80px; position: relative; transform: translate(-40px, -80px); transition: transform 0.2s ease-in-out; }
         .custom-div-icon .marker-pin-container:hover { transform: translate(-40px, -80px) scale(1.1); }
         .custom-div-icon .marker-image-wrapper { width: 80px; height: 80px; border-radius: 50%; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.2); background-color: #1a1a1a; border: 4px solid white; }
         
-        /* 5段階ボーダー色 */
         .custom-div-icon .level-1-border { border-color: #64a0af; }
         .custom-div-icon .level-2-border { border-color: #96B464; }
         .custom-div-icon .level-3-border { border-color: #D2AF50; }
@@ -154,9 +149,9 @@
 
         .calendar-container-wrapper { background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 1.5rem; overflow-x: auto; }
         .calendar-table { border-collapse: collapse; width: 100%; table-layout: fixed; min-width: 800px; }
-        .calendar-table th, .calendar-table td { text-align: center; padding: 6px 2px; border: 1px solid #eee; font-size: 0.9rem; height: 32px; }
-        .calendar-table th { background-color: #f9fafb; color: #333; font-weight: 500; height: 50px; vertical-align: middle; font-size: 0.8rem; }
-        .calendar-table td.time-header { background-color: #f9fafb; font-weight: 500; color: #333; text-align: center; width: 80px; font-size: 0.85rem; }
+        .calendar-table th, .calendar-table td { text-align: center; padding: 6px 2px; border: 1px solid #eee; font-size: 0.8rem; height: 32px; }
+        .calendar-table th { background-color: #f9fafb; color: #333; font-weight: 600; height: 50px; vertical-align: middle; }
+        .calendar-table td.time-header { background-color: #f9fafb; font-weight: 600; color: #333; text-align: center; width: 80px; font-size: 0.85rem; }
 
         .facility-card { background-color: white; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.2s; height: 100%; }
         .facility-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.1); transform: translateY(-4px); }
@@ -174,10 +169,9 @@
         .barometer-container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 320px; }
         .barometer-colors { display: flex; width: 100%; height: 12px; border-radius: 6px; overflow: hidden; margin-bottom: 4px; border: 1px solid #eee; }
         .bar-color { flex: 1; }
-        .barometer-labels { display: flex; justify-content: space-between; width: 100%; font-size: 0.75rem; color: #666; position: relative; }
+        .barometer-labels { display: flex; justify-content: space-between; width: 100%; font-size: 0.75rem; color: #666; position: relative; font-weight: 600; }
         .bar-label-center { position: absolute; left: 50%; transform: translateX(-50%); }
 
-        /* 5段階背景色 */
         .level-1-bg { background-color: #64a0af; }
         .level-2-bg { background-color: #96B464; }
         .level-3-bg { background-color: #D2AF50; }
@@ -185,7 +179,6 @@
         .level-5-bg { background-color: #B43C46; }
         .future-time-bg { background-color: #f0f0f0; }
 
-        /* 5段階テキスト色 */
         .level-1-text { color: #64a0af; }
         .level-2-text { color: #96B464; }
         .level-3-text { color: #D2AF50; }
@@ -196,10 +189,9 @@
         .btn-primary:hover { background-color: #482e6e; box-shadow: 0 4px 10px rgba(90, 58, 138, 0.3); }
         .btn-outline { background-color: white; color: #5A3A8A; border: 1px solid #5A3A8A; padding: 10px 20px; border-radius: 8px; transition: all 0.2s; font-weight: 600; cursor: pointer; }
         .popup-calendar { width: 100%; border-collapse: collapse; margin-top: 12px; }
-        .popup-calendar th { font-size: 0.7rem; color: #555; font-weight: 500; padding: 4px; }
+        .popup-calendar th { font-size: 0.65rem; color: #555; font-weight: 600; padding: 4px; }
         .popup-calendar td { height: 12px; border: 1px solid #fff; }
 
-        /* ポップアップ内のダルマアイコンサイズを1/3程度に調整 */
         .popup-congestion-icon { width: 100%; height: auto; max-width: 50px; }
     </style>
 </head>
@@ -211,39 +203,62 @@
         <div class="container mx-auto px-8 py-4 flex justify-between items-center">
             <div class="flex items-center">
                 <a href="#" id="logo-pc-link" class="cursor-pointer">
-                    <img src="./logo_kanazawa_notext.svg" alt="logo" class="logo-pc">
+                    <img src="../logo_kanazawa_notext.svg" alt="logo" class="logo-pc">
                 </a>
-                <h1 class="header-title font-mincho">いしかわ観光地リアルタイムナビ</h1>
+                <h1 class="header-title">Ishikawa Sightseeing Real-time Navigator</h1>
             </div>
             
-            <nav class="flex space-x-4">
-                <button class="tab-btn pc-tab-btn active" data-tab-id="map-content">
-                    <img src="./map_icon.svg" alt="マップ" class="icon icon-default">
-                    <img src="./sp_hover_map_icon.svg" alt="マップ" class="icon icon-active">
-                    <span>マップ</span>
-                </button>
-                <button class="tab-btn pc-tab-btn" data-tab-id="calendar-content">
-                    <img src="./calendar_icon.svg" alt="入込カレンダー" class="icon icon-default">
-                    <img src="./sp_hover_calendar_icon.svg" alt="入込カレンダー" class="icon icon-active">
-                    <span>入込カレンダー</span>
-                </button>
-                <button class="tab-btn pc-tab-btn" data-tab-id="introduction-content">
-                    <img src="./spot_icon.svg" alt="観光スポット" class="icon icon-default">
-                    <img src="./sp_hover_spot_icon.svg" alt="観光スポット" class="icon icon-active">
-                    <span>観光スポット</span>
-                </button>
-            </nav>
+            <div class="flex items-center space-x-6">
+                <nav class="flex space-x-4">
+                    <button class="tab-btn pc-tab-btn active" data-tab-id="map-content">
+                        <img src="../map_icon.svg" alt="Map" class="icon icon-default">
+                        <img src="../sp_hover_map_icon.svg" alt="Map" class="icon icon-active">
+                        <span>Map</span>
+                    </button>
+                    <button class="tab-btn pc-tab-btn" data-tab-id="calendar-content">
+                        <img src="../calendar_icon.svg" alt="Calendar" class="icon icon-default">
+                        <img src="../sp_hover_calendar_icon.svg" alt="Calendar" class="icon icon-active">
+                        <span>Calendar</span>
+                    </button>
+                    <button class="tab-btn pc-tab-btn" data-tab-id="introduction-content">
+                        <img src="../spot_icon.svg" alt="Spots" class="icon icon-default">
+                        <img src="../sp_hover_spot_icon.svg" alt="Spots" class="icon icon-active">
+                        <span>Spots</span>
+                    </button>
+                </nav>
+
+                <div class="relative">
+                    <button id="hamburger-btn-pc" class="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition focus:outline-none">
+                        <i data-lucide="menu" class="icon"></i>
+                    </button>
+                    <div id="pc-menu-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
+                        <div class="px-4 py-1 text-xs font-bold text-gray-400 mb-1">Language</div>
+                        <a href="../index.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">日本語</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-purple-700 bg-purple-50 font-bold">English</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
     <header class="md:hidden sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-200 p-4">
-        <div class="flex flex-col items-center">
-            <div class="flex items-center mb-2">
+        <div class="flex justify-between items-center relative">
+            <div class="flex items-center justify-center flex-grow">
                 <a href="#" id="logo-mobile-link" class="cursor-pointer">
-                    <img src="./logo_kanazawa_notext.svg" alt="logo" class="logo-mobile">
+                    <img src="../logo_kanazawa_notext.svg" alt="logo" class="logo-mobile">
                 </a>
-                <h1 class="header-title font-mincho">いしかわ観光地リアルタイムナビ</h1>
+                <h1 class="header-title">Ishikawa Real-time Navigator</h1>
             </div>
+            
+            <button id="hamburger-btn-mobile" class="absolute right-0 p-2 text-gray-600 hover:bg-gray-100 rounded-full transition focus:outline-none">
+                <i data-lucide="menu" class="icon"></i>
+            </button>
+        </div>
+
+        <div id="mobile-menu-dropdown" class="hidden mt-3 border-t border-gray-200 pt-2">
+            <div class="px-2 py-1 text-xs font-bold text-gray-400">Language</div>
+            <a href="../index.html" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition">日本語</a>
+            <a href="#" class="block px-4 py-3 text-sm text-purple-700 bg-purple-50 font-bold rounded-lg mb-1">English</a>
         </div>
     </header>
 
@@ -252,8 +267,8 @@
         <div id="map-content" class="tab-content active">
             <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">リアルタイム入込状況</h2>
-                    <p class="text-gray-500">現在の入込状況をマップで確認できます。</p>
+                    <h2 class="text-2xl font-bold text-gray-800">Real-time Congestion</h2>
+                    <p class="text-gray-500">Check current congestion levels on the map.</p>
                 </div>
                 <div class="barometer-container">
                     <div class="barometer-colors">
@@ -264,9 +279,9 @@
                         <div class="bar-color" style="background-color: #B43C46;"></div>
                     </div>
                     <div class="barometer-labels">
-                        <span>快適</span>
-                        <span class="bar-label-center">通常</span>
-                        <span>賑やか</span>
+                        <span>Comfortable</span>
+                        <span class="bar-label-center">Normal</span>
+                        <span>Crowded</span>
                     </div>
                 </div>
             </div>
@@ -276,8 +291,8 @@
         <div id="calendar-content" class="tab-content">
              <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
-                    <h2 id="calendar-title" class="text-2xl font-bold text-gray-800">時間帯別 入込実績</h2>
-                    <p id="calendar-info" class="text-gray-500">観光スポット全体（本日）</p>
+                    <h2 id="calendar-title" class="text-2xl font-bold text-gray-800">Congestion History</h2>
+                    <p id="calendar-info" class="text-gray-500">All Tourist Spots (Today)</p>
                 </div>
                 <button id="calendar-toggle-btn" class="btn-primary self-start md:self-center"></button>
             </div>
@@ -291,9 +306,9 @@
                         <div class="bar-color" style="background-color: #B43C46;"></div>
                     </div>
                     <div class="barometer-labels">
-                        <span>快適</span>
-                        <span class="bar-label-center">通常</span>
-                        <span>賑やか</span>
+                        <span>Comfortable</span>
+                        <span class="bar-label-center">Normal</span>
+                        <span>Crowded</span>
                     </div>
                 </div>
             </div>
@@ -303,8 +318,8 @@
         </div>
 
         <div id="introduction-content" class="tab-content">
-            <h2 class="text-2xl font-bold text-gray-800 mb-1">観光スポット</h2>
-            <p class="text-gray-500 mb-6">石川県の主要な観光スポットをご紹介します。</p>
+            <h2 class="text-2xl font-bold text-gray-800 mb-1">Tourist Spots</h2>
+            <p class="text-gray-500 mb-6">Introducing major tourist spots in Ishikawa Prefecture.</p>
             <div id="facility-card-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
     </main>
@@ -312,76 +327,76 @@
     <div class="background-svg-bottom"></div>
 
     <footer class="text-center mt-8 mb-24 md:mb-12 text-gray-500 text-sm">
-        <p> お問い合わせ：石川県文化観光スポーツ部国際観光課 TEL:076-225-1124.</p>
-        <a href="#" id="disclaimer-link" class="underline hover:text-purple-700 transition">免責事項</a>
+        <p>Contact: Ishikawa Prefectural Gov. International Tourism Div. TEL: 076-225-1124</p>
+        <a href="#" id="disclaimer-link" class="underline hover:text-purple-700 transition">Disclaimer</a>
     </footer>
 
     <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg flex justify-around">
         <button class="tab-btn mobile-tab-btn active" data-tab-id="map-content">
-            <img src="./sp_map_icon.svg" alt="マップ" class="icon icon-default">
-            <img src="./sp_hover_map_icon.svg" alt="マップ" class="icon icon-active">
-            <span>マップ</span>
+            <img src="../sp_map_icon.svg" alt="Map" class="icon icon-default">
+            <img src="../sp_hover_map_icon.svg" alt="Map" class="icon icon-active">
+            <span>Map</span>
         </button>
         <button class="tab-btn mobile-tab-btn" data-tab-id="calendar-content">
-            <img src="./sp_calendar_icon.svg" alt="入込カレンダー" class="icon icon-default">
-            <img src="./sp_hover_calendar_icon.svg" alt="入込カレンダー" class="icon icon-active">
-            <span>入込カレンダー</span>
+            <img src="../sp_calendar_icon.svg" alt="History" class="icon icon-default">
+            <img src="../sp_hover_calendar_icon.svg" alt="History" class="icon icon-active">
+            <span>History</span>
         </button>
         <button class="tab-btn mobile-tab-btn" data-tab-id="introduction-content">
-            <img src="./sp_spot_icon.svg" alt="観光スポット" class="icon icon-default">
-            <img src="./sp_hover_spot_icon.svg" alt="観光スポット" class="icon icon-active">
-            <span>観光スポット</span>
+            <img src="../sp_spot_icon.svg" alt="Spots" class="icon icon-default">
+            <img src="../sp_hover_spot_icon.svg" alt="Spots" class="icon icon-active">
+            <span>Spots</span>
         </button>
     </nav>
 
-    <!-- 起動時・免責事項モーダル -->
+    <!-- Startup / Disclaimer Modal -->
     <div id="modal-overlay" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
-                <h2 id="modal-header-title" class="text-gray-800">免責事項</h2>
+                <h2 id="modal-header-title" class="text-gray-800">Disclaimer</h2>
                 <button id="close-modal-btn" class="modal-close-btn">
                     <i data-lucide="x" class="icon-sm"></i>
                 </button>
             </div>
             <div id="modal-body-content" class="modal-content text-gray-600">
-                <!-- 内容は動的に書き換え -->
+                <!-- Dynamic Content -->
             </div>
             <div class="modal-footer"> 
-                <button id="close-modal-btn-footer" class="btn-primary">閉じる</button>
+                <button id="close-modal-btn-footer" class="btn-primary">Close</button>
             </div>
         </div>
     </div>
 
-    <!-- 施設詳細モーダル -->
+    <!-- Facility Detail Modal -->
     <div id="facility-modal-overlay" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
-                <h2 id="facility-modal-title" class="text-gray-800">施設詳細</h2>
+                <h2 id="facility-modal-title" class="text-gray-800">Spot Details</h2>
                 <button id="close-facility-modal-btn" class="modal-close-btn">
                     <i data-lucide="x" class="icon-sm"></i>
                 </button>
             </div>
             <div class="modal-content p-0">
-                <img id="facility-modal-image" src="" alt="施設画像" class="facility-modal-image">
+                <img id="facility-modal-image" src="" alt="Spot Image" class="facility-modal-image w-full h-48 object-cover">
                 <div class="p-6">
                     <h3 id="facility-modal-name" class="text-2xl font-bold mb-1"></h3>
-                    <p id="facility-modal-name-en" class="text-gray-500 mb-4"></p>
+                    <p id="facility-modal-name-jp" class="text-gray-400 mb-4 italic"></p>
                     <div class="space-y-4">
                         <div>
-                            <h4 class="font-bold text-sm text-gray-500 mb-1">観光スポット情報</h4>
+                            <h4 class="font-bold text-sm text-gray-500 mb-1">Information</h4>
                             <p id="facility-modal-description" class="text-gray-700 leading-relaxed"></p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer"> 
-                 <button id="facility-modal-calendar-btn" class="btn-outline w-full sm:w-auto">
-                    <img src="./calendar_icon.svg" class="icon-sm" alt="カレンダー" style="filter: brightness(0.5) sepia(1) hue-rotate(220deg) saturate(5);">
-                    入込カレンダー
+                 <button id="facility-modal-calendar-btn" class="btn-outline w-full sm:w-auto flex gap-2">
+                    <img src="../calendar_icon.svg" class="icon-sm" alt="Calendar" style="filter: brightness(0.5) sepia(1) hue-rotate(220deg) saturate(5);">
+                    History
                 </button>
                 <button id="facility-modal-gmaps-btn" class="btn-primary w-full sm:w-auto">
                     <i data-lucide="map-pin" class="icon-sm"></i>
-                    ここに行く
+                    Get Directions
                 </button>
             </div>
         </div>
@@ -398,7 +413,7 @@
             const AREA3_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area3_m5.csv';
             const AREA4_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area4_m5.csv';
             const AREA5_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area5_m5.csv';
-            const AREA6_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area6_m5.csv'; // コロンからセミコロンに修正
+            const AREA6_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area6_m5.csv';
             
             const FACILITY_CSV_URLS = {
                 "近江町市場": AREA1_CSV_URL,
@@ -410,36 +425,32 @@
             };
 
             const DATA_PATHS = {
-                master: './data/crowded_milli_master.csv',
-                criterion: './data/crowded_milli_criterion.csv',
+                master: '../data/crowded_milli_master.csv',
+                criterion: '../data/crowded_milli_criterion.csv',
             };
 
             const IMAGE_URLS = {
-                "兼六園（桂坂口）": "./images/兼六園（桂坂口）.jpg",
-                "近江町市場": "./images/近江町市場.jpg",
-                "ひがし茶屋街": "./images/ひがし茶屋街.jpg",
-                "金沢21世紀美術館": "./images/金沢21世紀美術館.jpg",
-                "金沢駅（東口バス乗り場）": "./images/金沢駅（東口バス乗り場）.jpg",
-                "長町武家屋敷跡（野村家）": "./images/長町武家屋敷跡（野村家）.jpg",
-                "金沢城公園": "./images/金沢城公園.jpg"
+                "兼六園（桂坂口）": "../images/兼六園（桂坂口）.jpg",
+                "近江町市場": "../images/近江町市場.jpg",
+                "ひがし茶屋街": "../images/ひがし茶屋街.jpg",
+                "金沢21世紀美術館": "../images/金沢21世紀美術館.jpg",
+                "金沢駅（東口バス乗り場）": "../images/金沢駅（東口バス乗り場）.jpg",
+                "長町武家屋敷跡（野村家）": "../images/長町武家屋敷跡（野村家）.jpg",
+                "金沢城公園": "../images/金沢城公園.jpg"
             };
 
-            // 5段階の混雑度定義
             const CONGESTION_LEVELS = {
-                1: { message: "非常に快適に観光いただけます", className: "level-1", svg: "only_daruma_blue.svg" },
-                2: { message: "快適に観光いただけます", className: "level-2", svg: "only_daruma_olive.svg" },
-                3: { message: "通常の混み具合です", className: "level-3", svg: "only_daruma_turmeric.svg" },
-                4: { message: "やや混み合っています", className: "level-4", svg: "only_daruma_rawsienna.svg" },
-                5: { message: "非常に賑わっています", className: "level-5", svg: "only_daruma_mediumcarmine.svg" },
-                0: { message: "データがありません", className: "level-off", svg: "only_daruma_off.svg" }
+                1: { message: "Very Comfortable", className: "level-1", svg: "only_daruma_blue.svg" },
+                2: { message: "Comfortable", className: "level-2", svg: "only_daruma_olive.svg" },
+                3: { message: "Moderately Busy", className: "level-3", svg: "only_daruma_turmeric.svg" },
+                4: { message: "Busy", className: "level-4", svg: "only_daruma_rawsienna.svg" },
+                5: { message: "Very Busy", className: "level-5", svg: "only_daruma_mediumcarmine.svg" },
+                0: { message: "No Data", className: "level-off", svg: "only_daruma_off.svg" }
             };
 
             lucide.createIcons();
-
-            // 起動時モーダルを表示
             showStartupModal();
 
-            // --- Utility Functions ---
             const placeholderImg = (text = 'Image') => `https://placehold.co/300x200/cccccc/333333?text=${encodeURIComponent(text)}`;
 
             const processNewCsvData = (data) => {
@@ -502,18 +513,14 @@
 
             const formatDateForCsv = (date) => `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
 
-            // 混雑度判定ロジックを5段階に更新
             function getCongestionLevel(count, criterion) {
                 if (!criterion || count === null || count === undefined) return 0;
                 const num = parseInt(count, 10);
                 if (isNaN(num)) return 0;
-
                 const c1 = parseInt(criterion.comfortable, 10);
                 const c2 = parseInt(criterion.notcrowded, 10);
                 const c3 = parseInt(criterion.normal, 10);
                 const c4 = parseInt(criterion.crowded, 10);
-                const c5 = parseInt(criterion.Bustling, 10);
-
                 if (num <= c1) return 1;
                 if (num <= c2) return 2;
                 if (num <= c3) return 3;
@@ -521,17 +528,15 @@
                 return 5;
             }
 
-            // --- モーダル制御 ---
             function showStartupModal() {
                 const modal = document.getElementById('modal-overlay');
                 const header = document.getElementById('modal-header-title');
                 const content = document.getElementById('modal-body-content');
                 const footerBtn = document.getElementById('close-modal-btn-footer');
 
-                header.textContent = "実証実験中です";
-                content.innerHTML = `<p class="text-center font-bold text-lg mb-4">このアプリは実証実験中のため、実際の入込状況と異なる場合がございますが、ご了承ください。</p>`;
-                footerBtn.textContent = "確認しました";
-                
+                header.textContent = "Experimental App";
+                content.innerHTML = `<p class="text-center font-bold text-lg mb-4">Please note that this application is currently under demonstration testing, and the actual congestion status may differ from the displayed data.</p>`;
+                footerBtn.textContent = "I Understand";
                 modal.style.display = 'flex';
             }
 
@@ -541,17 +546,16 @@
                 const content = document.getElementById('modal-body-content');
                 const footerBtn = document.getElementById('close-modal-btn-footer');
 
-                header.textContent = "免責事項";
+                header.textContent = "Disclaimer";
                 content.innerHTML = `
-                    <p class="mb-4">本ウェブサイトで提供される入込実績は、Wi-Fiセンシングデータを用いた参考情報です。リアルタイムの状況を完全に保証するものではありません。</p>
-                    <p class="mb-4">この情報は、提供されたデータに基づいて生成されており、実際の入込状況とは異なる場合があります。通信状況やシステムの都合により、情報の更新が遅れることや、表示されないことがあります。</p>
-                    <p class="mb-4">本ウェブサイトの利用によって生じたいかなる損害についても、運営者は一切の責任を負いません。お出かけの際の判断は、ご自身の責任でお願いいたします。</p>
+                    <p class="mb-4">The congestion history provided on this website is reference information based on Wi-Fi sensing data. We do not fully guarantee the real-time accuracy.</p>
+                    <p class="mb-4">This information is generated based on provided datasets and may differ from the actual status. Information may be delayed or unavailable due to communication conditions or system maintenance.</p>
+                    <p class="mb-4">The operator shall not be liable for any damages resulting from the use of this website. Please make travel decisions at your own discretion.</p>
                 `;
-                footerBtn.textContent = "閉じる";
+                footerBtn.textContent = "Close";
                 modal.style.display = 'flex';
             }
 
-            // --- Main Execution ---
             let facilityData = [];
             let latestDateObj = new Date();
             let mapInstance = null;
@@ -573,7 +577,6 @@
                 });
 
                 facilityData = (await Promise.all(facilityDataPromises)).filter(f => f && f.緯度);
-                
                 const allMilliData = facilityData.reduce((acc, f) => acc.concat(f.milli), []);
                 latestDateObj = getLatestDateFromData(allMilliData) || new Date();
 
@@ -593,9 +596,7 @@
                 console.error("Initialization failed:", error);
             }
 
-            // --- Marker & Popup ---
             function createCustomIcon(level, facilityName) {
-                const levelInfo = CONGESTION_LEVELS[level];
                 const imageUrl = IMAGE_URLS[facilityName] || placeholderImg(facilityName);
                 return L.divIcon({
                     html: `
@@ -612,11 +613,8 @@
                 });
             }
 
-            // 【修正箇所】直近1時間以内のデータがない場合は「データなし（レベル0）」と判定する
             function updateMap(facilityData, latestDateObj) {
                 const map = L.Util.getMapInstance();
-                
-                // 常に実行日（今日）を基準にする
                 const todayString = formatDateForCsv(new Date()); 
                 const currentHour = new Date().getHours();
 
@@ -625,7 +623,6 @@
                     const lon = parseFloat(facility.経度);
                     if (isNaN(lat) || isNaN(lon)) return;
                     
-                    // 今日の「現在時刻」または「1時間前」のデータのみに絞り込む
                     const latestRecord = facility.milli
                         .filter(d => d.年月日 === todayString && (parseInt(d.時刻, 10) === currentHour || parseInt(d.時刻, 10) === currentHour - 1))
                         .sort((a, b) => parseInt(b.時刻, 10) - parseInt(a.時刻, 10))[0];
@@ -633,12 +630,14 @@
                     const level = latestRecord ? getCongestionLevel(latestRecord.人数, facility.criterion) : 0;
                     const marker = L.marker([lat, lon], { icon: createCustomIcon(level, facility.地点名) }).addTo(map);
                     
+                    const displayName = facility.英語名称 || facility.地点名;
+
                     marker.bindPopup(() => {
                         const levelInfo = CONGESTION_LEVELS[level];
-                        const svgPath = `./${levelInfo.svg}`;
+                        const svgPath = `../${levelInfo.svg}`;
                         
                         return `
-                            <h3 class="text-lg font-bold text-center">${facility.地点名}</h3>
+                            <h3 class="text-lg font-bold text-center">${displayName}</h3>
                             <div class="flex flex-col items-center gap-2 my-2">
                                 <div class="w-full flex justify-center items-center">
                                     <img src="${svgPath}" alt="congestion" class="popup-congestion-icon">
@@ -647,11 +646,11 @@
                                     <p class="font-bold text-base level-${level}-text">${levelInfo.message}</p>
                                 </div>
                             </div>
-                            <p class="text-xs text-gray-500 mb-2">本日の実績推移</p>
+                            <p class="text-xs text-gray-500 mb-2">Today's trend</p>
                             ${createMiniCalendarHtml(facility, todayString, currentHour)}
                             <button class="btn-primary popup-calendar-btn mt-4 w-full" data-facility-name="${facility.地点名}">
-                                <img src="./calendar_icon.svg" class="icon-sm" style="filter:invert(1)">
-                                詳細カレンダー
+                                <img src="../calendar_icon.svg" class="icon-sm" style="filter:invert(1)">
+                                Full History
                             </button>
                         `;
                     });
@@ -675,40 +674,42 @@
                 return html + '</tr></tbody></table>';
             }
 
-            // --- Tabs & List ---
             function populateIntroductionTab(facilityData) {
                 const container = document.getElementById('facility-card-container');
                 container.innerHTML = '';
                 facilityData.forEach(facility => {
                     const imageUrl = IMAGE_URLS[facility.地点名] || placeholderImg(facility.地点名);
+                    const displayName = facility.英語名称 || facility.地点名;
+                    const desc = facility.説明 || '';
                     container.innerHTML += `
                         <div class="facility-card">
                             <img src="${imageUrl}" onerror="this.src='${placeholderImg(facility.地点名)}';">
                             <div class="p-6 flex flex-col flex-grow">
-                                <h3 class="text-xl font-bold text-gray-800">${facility.地点名}</h3>
-                                <p class="text-gray-600 flex-grow my-4 text-sm">${(facility.説明 || '').substring(0, 60)}...</p>
+                                <h3 class="text-xl font-bold text-gray-800">${displayName}</h3>
+                                <p class="text-gray-600 flex-grow my-4 text-sm">${desc.substring(0, 80)}...</p>
                                 <button class="btn-primary intro-details-btn w-full mt-auto" data-facility-name="${facility.地点名}">
-                                    詳細を見る
+                                    View Details
                                 </button>
                             </div>
                         </div>`;
                 });
             }
 
-            // --- Calendar View ---
             function displayTodayAllFacilitiesCalendar(facilityData, latestDateObj) {
                 const latestDateString = formatDateForCsv(latestDateObj);
-                document.getElementById('calendar-title').textContent = '時間帯別 入込実績';
-                document.getElementById('calendar-info').textContent = `全スポット（${latestDateString}）`;
+                document.getElementById('calendar-title').textContent = 'Hourly History';
+                document.getElementById('calendar-info').textContent = `All Spots (${latestDateString})`;
                 const toggleBtn = document.getElementById('calendar-toggle-btn');
-                toggleBtn.textContent = '観光スポット一覧から選ぶ';
+                toggleBtn.textContent = 'Browse Spot List';
                 toggleBtn.onclick = () => switchToTab('introduction-content');
 
                 const currentHour = new Date().getHours();
                 const currentMin = new Date().getMinutes();
 
-                let headerHtml = '<tr><th>時刻</th>';
-                facilityData.forEach(f => { headerHtml += `<th>${f.地点名}</th>`; });
+                let headerHtml = '<tr><th>Time</th>';
+                facilityData.forEach(f => { 
+                    headerHtml += `<th>${f.英語名称 || f.地点名}</th>`; 
+                });
                 headerHtml += '</tr>';
 
                 let bodyHtml = '';
@@ -765,6 +766,29 @@
                 };
 
                 document.getElementById('close-facility-modal-btn').onclick = () => document.getElementById('facility-modal-overlay').style.display = 'none';
+
+                // Dropdown menu controls
+                const btnPc = document.getElementById('hamburger-btn-pc');
+                const menuPc = document.getElementById('pc-menu-dropdown');
+                if(btnPc && menuPc) {
+                    btnPc.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        menuPc.classList.toggle('hidden');
+                    });
+                    document.addEventListener('click', (e) => {
+                        if (!menuPc.contains(e.target) && !btnPc.contains(e.target)) {
+                            menuPc.classList.add('hidden');
+                        }
+                    });
+                }
+
+                const btnMobile = document.getElementById('hamburger-btn-mobile');
+                const menuMobile = document.getElementById('mobile-menu-dropdown');
+                if(btnMobile && menuMobile) {
+                    btnMobile.addEventListener('click', () => {
+                        menuMobile.classList.toggle('hidden');
+                    });
+                }
             }
 
             function switchToTab(tabId) {
@@ -778,9 +802,9 @@
             function showFacilityModal(f) {
                 const modal = document.getElementById('facility-modal-overlay');
                 document.getElementById('facility-modal-image').src = IMAGE_URLS[f.地点名] || placeholderImg(f.地点名);
-                document.getElementById('facility-modal-name').textContent = f.地点名;
-                document.getElementById('facility-modal-name-en').textContent = f.英語名称 || '';
-                document.getElementById('facility-modal-description').textContent = f.説明 || '情報なし';
+                document.getElementById('facility-modal-name').textContent = f.英語名称 || f.地点名;
+                document.getElementById('facility-modal-name-jp').textContent = f.地点名;
+                document.getElementById('facility-modal-description').textContent = f.説明 || 'No information available.';
                 
                 document.getElementById('facility-modal-calendar-btn').onclick = () => {
                     displayDailyCalendarForFacility(f, facilityData, latestDateObj);
@@ -795,10 +819,11 @@
             }
 
             function displayDailyCalendarForFacility(facility, facilityData, latestDateObj) {
-                document.getElementById('calendar-title').textContent = `${facility.地点名} 実績推移`;
-                document.getElementById('calendar-info').textContent = '直近7日間の時間帯別入込状況';
+                const displayName = facility.英語名称 || facility.地点名;
+                document.getElementById('calendar-title').textContent = `${displayName} History`;
+                document.getElementById('calendar-info').textContent = 'Hourly status for the past 7 days';
                 const toggleBtn = document.getElementById('calendar-toggle-btn');
-                toggleBtn.textContent = '全体表示に戻る';
+                toggleBtn.textContent = 'Back to All Spots';
                 toggleBtn.onclick = () => displayTodayAllFacilitiesCalendar(facilityData, latestDateObj);
 
                 const currentHour = new Date().getHours();
@@ -812,7 +837,7 @@
                     dates.push(d);
                 }
 
-                let headerHtml = '<tr><th>時刻</th>';
+                let headerHtml = '<tr><th>Time</th>';
                 dates.forEach(d => {
                     headerHtml += `<th>${d.getMonth()+1}/${d.getDate()}</th>`;
                 });
