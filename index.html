@@ -398,7 +398,7 @@
             const AREA3_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area3_m5.csv';
             const AREA4_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area4_m5.csv';
             const AREA5_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area5_m5.csv';
-            const AREA6_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area6_m5.csv';
+            const AREA6_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area6_m5.csv'; // コロンからセミコロンに修正
             
             const FACILITY_CSV_URLS = {
                 "近江町市場": AREA1_CSV_URL,
@@ -612,9 +612,12 @@
                 });
             }
 
+            // 【修正箇所】直近1時間以内のデータがない場合は「データなし（レベル0）」と判定する
             function updateMap(facilityData, latestDateObj) {
                 const map = L.Util.getMapInstance();
-                const latestDateString = formatDateForCsv(latestDateObj);
+                
+                // 常に実行日（今日）を基準にする
+                const todayString = formatDateForCsv(new Date()); 
                 const currentHour = new Date().getHours();
 
                 facilityData.forEach(facility => {
@@ -622,8 +625,9 @@
                     const lon = parseFloat(facility.経度);
                     if (isNaN(lat) || isNaN(lon)) return;
                     
+                    // 今日の「現在時刻」または「1時間前」のデータのみに絞り込む
                     const latestRecord = facility.milli
-                        .filter(d => d.年月日 === latestDateString && parseInt(d.時刻, 10) <= currentHour)
+                        .filter(d => d.年月日 === todayString && (parseInt(d.時刻, 10) === currentHour || parseInt(d.時刻, 10) === currentHour - 1))
                         .sort((a, b) => parseInt(b.時刻, 10) - parseInt(a.時刻, 10))[0];
 
                     const level = latestRecord ? getCongestionLevel(latestRecord.人数, facility.criterion) : 0;
@@ -644,7 +648,7 @@
                                 </div>
                             </div>
                             <p class="text-xs text-gray-500 mb-2">本日の実績推移</p>
-                            ${createMiniCalendarHtml(facility, latestDateString, currentHour)}
+                            ${createMiniCalendarHtml(facility, todayString, currentHour)}
                             <button class="btn-primary popup-calendar-btn mt-4 w-full" data-facility-name="${facility.地点名}">
                                 <img src="./calendar_icon.svg" class="icon-sm" style="filter:invert(1)">
                                 詳細カレンダー
