@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>いしかわ観光地リアルタイムナビ</title>
+    <link rel="icon" href="./favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Noto Sans JP と 題名用の Noto Serif JP (明朝体) を読み込み -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@0.390.0/dist/umd/lucide.js"></script>
+
+    <style>
+        html { 
+            scroll-behavior: smooth;
+            height: 100%; 
+        }
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-image: url('./bk.svg'); 
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #333;
+            position: relative;
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
+        /* 明朝体クラス */
+        .font-mincho {
+            font-family: 'Noto Serif JP', serif;
+        }
+
+        main {
+            flex-grow: 1;
+        }
+
+        .background-svg-top,
+        .background-svg-bottom {
+            width: 100%;
+            z-index: -5; 
+            pointer-events: none;
+            background-repeat: no-repeat;
+            position: absolute; 
+            left: 0;
+            right: 0;
+        }
+
+        @media (min-width: 768px) {
+            .background-svg-top {
+                background-image: url('./top_point_bk.svg');
+                background-position: top center; 
+                background-size: 100% auto; 
+                top: 0;
+                height: 500px; 
+            }
+            .background-svg-bottom {
+                background-image: url('./down_point_bk.svg');
+                background-position: bottom center; 
+                background-size: 100% auto; 
+                bottom: 0; 
+                height: 500px; 
+            }
+        }
+
+        @media (max-width: 767px) {
+            .background-svg-top {
+                background-image: url('./top_point_bk.svg');
+                background-position: top center;
+                background-size: 150% auto; 
+                opacity: 0.7;
+                top: 0;
+                height: 300px;
+            }
+            .background-svg-bottom {
+                background-image: url('./down_point_bk.svg');
+                background-position: bottom center;
+                background-size: 150% auto; 
+                opacity: 0.7;
+                bottom: 0; 
+                height: 300px;
+            }
+        }
+
+        main, footer, header, nav {
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo-pc { height: 50px; width: auto; }
+        .logo-mobile { height: 40px; width: auto; }
+        
+        .header-title {
+            font-size: 1.5rem;
+            color: #482e6e;
+            margin-left: 1rem;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 640px) {
+            .header-title { font-size: 1.1rem; margin-left: 0.5rem; }
+        }
+
+        .icon { width: 24px; height: 24px; stroke-width: 2; }
+        .icon-sm { width: 20px; height: 20px; }
+        .btn-primary .icon-sm, .btn-primary .icon { filter: brightness(0) invert(1); }
+        .tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; color: #888; transition: all 0.2s; border-radius: 8px; font-size: 0.8rem; font-weight: 500; }
+        .tab-btn .icon-active { display: none; }
+        .tab-btn.active .icon-default { display: none; }
+        .tab-btn.active .icon-active { display: block; }
+        .pc-tab-btn { padding: 0.75rem 1.5rem; background-color: rgba(255, 255, 255, 0.8); border: 1px solid #e0e0e0; backdrop-filter: blur(4px); width: 160px; }
+        .pc-tab-btn:hover { background-color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .pc-tab-btn.active { color: #5A3A8A; background-color: white; border-color: #5A3A8A; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .pc-tab-btn.active span { color: #5A3A8A; }
+        .mobile-tab-btn { flex-grow: 1; padding: 0.5rem 0; }
+        .mobile-tab-btn.active { color: #5A3A8A; }
+        main .tab-content { display: none; }
+        main .tab-content.active { display: block; }
+
+        #map { height: 80vh; width: 100%; border-radius: 12px; background-color: #e0e0e0; border: 1px solid #ccc; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: white; color: #333; border: 1px solid #ddd; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .leaflet-popup-content-wrapper { padding: 4px; }
+        .leaflet-popup-content { margin: 12px 16px; }
+        .leaflet-popup-content h3 { font-size: 1.25rem; font-weight: bold; color: #333; margin-bottom: 8px; }
+
+        .custom-div-icon .marker-pin-container { width: 80px; height: 80px; position: relative; transform: translate(-40px, -80px); transition: transform 0.2s ease-in-out; }
+        .custom-div-icon .marker-pin-container:hover { transform: translate(-40px, -80px) scale(1.1); }
+        .custom-div-icon .marker-image-wrapper { width: 80px; height: 80px; border-radius: 50%; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.2); background-color: #1a1a1a; border: 4px solid white; }
+        
+        /* 5段階ボーダー色 */
+        .custom-div-icon .level-1-border { border-color: #64a0af; }
+        .custom-div-icon .level-2-border { border-color: #96B464; }
+        .custom-div-icon .level-3-border { border-color: #D2AF50; }
+        .custom-div-icon .level-4-border { border-color: #D27341; }
+        .custom-div-icon .level-5-border { border-color: #B43C46; }
+
+        .custom-div-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .custom-div-icon .marker-pin { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 15px solid white; position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); z-index: -1; }
+        
+        .custom-div-icon .level-1-border .marker-pin { border-top-color: #64a0af; }
+        .custom-div-icon .level-2-border .marker-pin { border-top-color: #96B464; }
+        .custom-div-icon .level-3-border .marker-pin { border-top-color: #D2AF50; }
+        .custom-div-icon .level-4-border .marker-pin { border-top-color: #D27341; }
+        .custom-div-icon .level-5-border .marker-pin { border-top-color: #B43C46; }
+
+        .calendar-container-wrapper { background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 1.5rem; overflow-x: auto; }
+        .calendar-table { border-collapse: collapse; width: 100%; table-layout: fixed; min-width: 800px; }
+        .calendar-table th, .calendar-table td { text-align: center; padding: 6px 2px; border: 1px solid #eee; font-size: 0.9rem; height: 32px; }
+        .calendar-table th { background-color: #f9fafb; color: #333; font-weight: 500; height: 50px; vertical-align: middle; font-size: 0.8rem; }
+        .calendar-table td.time-header { background-color: #f9fafb; font-weight: 500; color: #333; text-align: center; width: 80px; font-size: 0.85rem; }
+
+        .facility-card { background-color: white; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.2s; height: 100%; }
+        .facility-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.1); transform: translateY(-4px); }
+        .facility-card img { width: 100%; height: 220px; object-fit: cover; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+        .modal-container { background: white; color: #333; border-radius: 12px; padding: 0; width: 100%; max-width: 600px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        .modal-header { border-bottom: 1px solid #eee; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { font-size: 1.25rem; font-weight: 700; }
+        .modal-close-btn { background: #f0f0f0; color: #888; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+        .modal-close-btn:hover { background: #e0e0e0; color: #333; }
+        .modal-content { overflow-y: auto; flex-grow: 1; padding: 1.5rem; }
+        .modal-footer { border-top: 1px solid #eee; padding: 1rem 1.5rem; background-color: #f9fafb; display: flex; justify-content: center; gap: 1rem; }
+
+        .barometer-container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 320px; }
+        .barometer-colors { display: flex; width: 100%; height: 12px; border-radius: 6px; overflow: hidden; margin-bottom: 4px; border: 1px solid #eee; }
+        .bar-color { flex: 1; }
+        .barometer-labels { display: flex; justify-content: space-between; width: 100%; font-size: 0.75rem; color: #666; position: relative; }
+        .bar-label-center { position: absolute; left: 50%; transform: translateX(-50%); }
+
+        /* 5段階背景色 */
+        .level-1-bg { background-color: #64a0af; }
+        .level-2-bg { background-color: #96B464; }
+        .level-3-bg { background-color: #D2AF50; }
+        .level-4-bg { background-color: #D27341; }
+        .level-5-bg { background-color: #B43C46; }
+        .future-time-bg { background-color: #f0f0f0; }
+
+        /* 5段階テキスト色 */
+        .level-1-text { color: #64a0af; }
+        .level-2-text { color: #96B464; }
+        .level-3-text { color: #D2AF50; }
+        .level-4-text { color: #D27341; }
+        .level-5-text { color: #B43C46; }
+
+        .btn-primary { background-color: #5A3A8A; color: white; padding: 10px 20px; border-radius: 8px; border: none; transition: all 0.2s; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+        .btn-primary:hover { background-color: #482e6e; box-shadow: 0 4px 10px rgba(90, 58, 138, 0.3); }
+        .btn-outline { background-color: white; color: #5A3A8A; border: 1px solid #5A3A8A; padding: 10px 20px; border-radius: 8px; transition: all 0.2s; font-weight: 600; cursor: pointer; }
+        .popup-calendar { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        .popup-calendar th { font-size: 0.7rem; color: #555; font-weight: 500; padding: 4px; }
+        .popup-calendar td { height: 12px; border: 1px solid #fff; }
+
+        /* ポップアップ内のダルマアイコンサイズを1/3程度に調整 */
+        .popup-congestion-icon { width: 100%; height: auto; max-width: 50px; }
+    </style>
+</head>
+<body>
+
+    <div class="background-svg-top"></div>
+
+    <header class="hidden md:block sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
+        <div class="container mx-auto px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <a href="#" id="logo-pc-link" class="cursor-pointer">
+                    <img src="./logo_kanazawa_notext.svg" alt="logo" class="logo-pc">
+                </a>
+                <h1 class="header-title font-mincho">いしかわ観光地リアルタイムナビ</h1>
+            </div>
+            
+            <nav class="flex space-x-4">
+                <button class="tab-btn pc-tab-btn active" data-tab-id="map-content">
+                    <img src="./map_icon.svg" alt="マップ" class="icon icon-default">
+                    <img src="./sp_hover_map_icon.svg" alt="マップ" class="icon icon-active">
+                    <span>マップ</span>
+                </button>
+                <button class="tab-btn pc-tab-btn" data-tab-id="calendar-content">
+                    <img src="./calendar_icon.svg" alt="入込カレンダー" class="icon icon-default">
+                    <img src="./sp_hover_calendar_icon.svg" alt="入込カレンダー" class="icon icon-active">
+                    <span>入込カレンダー</span>
+                </button>
+                <button class="tab-btn pc-tab-btn" data-tab-id="introduction-content">
+                    <img src="./spot_icon.svg" alt="観光スポット" class="icon icon-default">
+                    <img src="./sp_hover_spot_icon.svg" alt="観光スポット" class="icon icon-active">
+                    <span>観光スポット</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <header class="md:hidden sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-200 p-4">
+        <div class="flex flex-col items-center">
+            <div class="flex items-center mb-2">
+                <a href="#" id="logo-mobile-link" class="cursor-pointer">
+                    <img src="./logo_kanazawa_notext.svg" alt="logo" class="logo-mobile">
+                </a>
+                <h1 class="header-title font-mincho">いしかわ観光地リアルタイムナビ</h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <div id="map-content" class="tab-content active">
+            <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">リアルタイム入込状況</h2>
+                    <p class="text-gray-500">現在の入込状況をマップで確認できます。</p>
+                </div>
+                <div class="barometer-container">
+                    <div class="barometer-colors">
+                        <div class="bar-color" style="background-color: #64a0af;"></div>
+                        <div class="bar-color" style="background-color: #96B464;"></div>
+                        <div class="bar-color" style="background-color: #D2AF50;"></div>
+                        <div class="bar-color" style="background-color: #D27341;"></div>
+                        <div class="bar-color" style="background-color: #B43C46;"></div>
+                    </div>
+                    <div class="barometer-labels">
+                        <span>快適</span>
+                        <span class="bar-label-center">通常</span>
+                        <span>賑やか</span>
+                    </div>
+                </div>
+            </div>
+            <div id="map"></div>
+        </div>
+        
+        <div id="calendar-content" class="tab-content">
+             <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
+                <div>
+                    <h2 id="calendar-title" class="text-2xl font-bold text-gray-800">時間帯別 入込実績</h2>
+                    <p id="calendar-info" class="text-gray-500">観光スポット全体（本日）</p>
+                </div>
+                <button id="calendar-toggle-btn" class="btn-primary self-start md:self-center"></button>
+            </div>
+            <div class="flex flex-col items-center mb-6">
+                <div class="barometer-container">
+                    <div class="barometer-colors">
+                        <div class="bar-color" style="background-color: #64a0af;"></div>
+                        <div class="bar-color" style="background-color: #96B464;"></div>
+                        <div class="bar-color" style="background-color: #D2AF50;"></div>
+                        <div class="bar-color" style="background-color: #D27341;"></div>
+                        <div class="bar-color" style="background-color: #B43C46;"></div>
+                    </div>
+                    <div class="barometer-labels">
+                        <span>快適</span>
+                        <span class="bar-label-center">通常</span>
+                        <span>賑やか</span>
+                    </div>
+                </div>
+            </div>
+            <div class="calendar-container-wrapper">
+                <div id="calendar-container"></div>
+            </div>
+        </div>
+
+        <div id="introduction-content" class="tab-content">
+            <h2 class="text-2xl font-bold text-gray-800 mb-1">観光スポット</h2>
+            <p class="text-gray-500 mb-6">石川県の主要な観光スポットをご紹介します。</p>
+            <div id="facility-card-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+    </main>
+
+    <div class="background-svg-bottom"></div>
+
+    <footer class="text-center mt-8 mb-24 md:mb-12 text-gray-500 text-sm">
+        <p> お問い合わせ：石川県文化観光スポーツ部国際観光課 TEL:076-225-1124.</p>
+        <a href="#" id="disclaimer-link" class="underline hover:text-purple-700 transition">免責事項</a>
+    </footer>
+
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg flex justify-around">
+        <button class="tab-btn mobile-tab-btn active" data-tab-id="map-content">
+            <img src="./sp_map_icon.svg" alt="マップ" class="icon icon-default">
+            <img src="./sp_hover_map_icon.svg" alt="マップ" class="icon icon-active">
+            <span>マップ</span>
+        </button>
+        <button class="tab-btn mobile-tab-btn" data-tab-id="calendar-content">
+            <img src="./sp_calendar_icon.svg" alt="入込カレンダー" class="icon icon-default">
+            <img src="./sp_hover_calendar_icon.svg" alt="入込カレンダー" class="icon icon-active">
+            <span>入込カレンダー</span>
+        </button>
+        <button class="tab-btn mobile-tab-btn" data-tab-id="introduction-content">
+            <img src="./sp_spot_icon.svg" alt="観光スポット" class="icon icon-default">
+            <img src="./sp_hover_spot_icon.svg" alt="観光スポット" class="icon icon-active">
+            <span>観光スポット</span>
+        </button>
+    </nav>
+
+    <!-- 起動時・免責事項モーダル -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="modal-header-title" class="text-gray-800">免責事項</h2>
+                <button id="close-modal-btn" class="modal-close-btn">
+                    <i data-lucide="x" class="icon-sm"></i>
+                </button>
+            </div>
+            <div id="modal-body-content" class="modal-content text-gray-600">
+                <!-- 内容は動的に書き換え -->
+            </div>
+            <div class="modal-footer"> 
+                <button id="close-modal-btn-footer" class="btn-primary">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 施設詳細モーダル -->
+    <div id="facility-modal-overlay" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="facility-modal-title" class="text-gray-800">施設詳細</h2>
+                <button id="close-facility-modal-btn" class="modal-close-btn">
+                    <i data-lucide="x" class="icon-sm"></i>
+                </button>
+            </div>
+            <div class="modal-content p-0">
+                <img id="facility-modal-image" src="" alt="施設画像" class="facility-modal-image">
+                <div class="p-6">
+                    <h3 id="facility-modal-name" class="text-2xl font-bold mb-1"></h3>
+                    <p id="facility-modal-name-en" class="text-gray-500 mb-4"></p>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-bold text-sm text-gray-500 mb-1">観光スポット情報</h4>
+                            <p id="facility-modal-description" class="text-gray-700 leading-relaxed"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"> 
+                 <button id="facility-modal-calendar-btn" class="btn-outline w-full sm:w-auto">
+                    <img src="./calendar_icon.svg" class="icon-sm" alt="カレンダー" style="filter: brightness(0.5) sepia(1) hue-rotate(220deg) saturate(5);">
+                    入込カレンダー
+                </button>
+                <button id="facility-modal-gmaps-btn" class="btn-primary w-full sm:w-auto">
+                    <i data-lucide="map-pin" class="icon-sm"></i>
+                    ここに行く
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(initializeApp, 0);
+        });
+
+        async function initializeApp() {
+            const AREA1_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area1_m5.csv';
+            const AREA2_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area2_m5.csv';
+            const AREA3_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area3_m5.csv';
+            const AREA4_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area4_m5.csv';
+            const AREA5_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area5_m5.csv';
+            const AREA6_CSV_URL = 'https://raw.githubusercontent.com/hokuriku-inbound-kanko/m5/main/kaiteki/area6_m5.csv'; // コロンからセミコロンに修正
+            
+            const FACILITY_CSV_URLS = {
+                "近江町市場": AREA1_CSV_URL,
+                "兼六園（桂坂口）": AREA2_CSV_URL,
+                "ひがし茶屋街": AREA3_CSV_URL,
+                "金沢21世紀美術館": AREA4_CSV_URL,
+                "金沢駅（東口バス乗り場）": AREA5_CSV_URL,
+                "長町武家屋敷跡（野村家）": AREA6_CSV_URL
+            };
+
+            const DATA_PATHS = {
+                master: './data/crowded_milli_master.csv',
+                criterion: './data/crowded_milli_criterion.csv',
+            };
+
+            const IMAGE_URLS = {
+                "兼六園（桂坂口）": "./images/兼六園（桂坂口）.jpg",
+                "近江町市場": "./images/近江町市場.jpg",
+                "ひがし茶屋街": "./images/ひがし茶屋街.jpg",
+                "金沢21世紀美術館": "./images/金沢21世紀美術館.jpg",
+                "金沢駅（東口バス乗り場）": "./images/金沢駅（東口バス乗り場）.jpg",
+                "長町武家屋敷跡（野村家）": "./images/長町武家屋敷跡（野村家）.jpg",
+                "金沢城公園": "./images/金沢城公園.jpg"
+            };
+
+            // 5段階の混雑度定義
+            const CONGESTION_LEVELS = {
+                1: { message: "非常に快適に観光いただけます", className: "level-1", svg: "only_daruma_blue.svg" },
+                2: { message: "快適に観光いただけます", className: "level-2", svg: "only_daruma_olive.svg" },
+                3: { message: "通常の混み具合です", className: "level-3", svg: "only_daruma_turmeric.svg" },
+                4: { message: "やや混み合っています", className: "level-4", svg: "only_daruma_rawsienna.svg" },
+                5: { message: "非常に賑わっています", className: "level-5", svg: "only_daruma_mediumcarmine.svg" },
+                0: { message: "データがありません", className: "level-off", svg: "only_daruma_off.svg" }
+            };
+
+            lucide.createIcons();
+
+            // 起動時モーダルを表示
+            showStartupModal();
+
+            // --- Utility Functions ---
+            const placeholderImg = (text = 'Image') => `https://placehold.co/300x200/cccccc/333333?text=${encodeURIComponent(text)}`;
+
+            const processNewCsvData = (data) => {
+                if (!data || data.length === 0) return [];
+                const hourlyAgg = {};
+                data.forEach(row => {
+                    if (row.year && row.month && row.day && row.hour && row.count) {
+                        try {
+                            const dateStr = `${parseInt(row.year, 10)}/${parseInt(row.month, 10)}/${parseInt(row.day, 10)}`;
+                            const hourStr = parseInt(row.hour, 10).toString();
+                            const countVal = parseFloat(row.count);
+                            if (isNaN(countVal)) return;
+                            if (!hourlyAgg[dateStr]) hourlyAgg[dateStr] = {};
+                            if (!hourlyAgg[dateStr][hourStr]) hourlyAgg[dateStr][hourStr] = { total: 0, numRecords: 0 };
+                            hourlyAgg[dateStr][hourStr].total += countVal;
+                            hourlyAgg[dateStr][hourStr].numRecords++;
+                        } catch (e) { console.warn("Skipping bad CSV row:", row, e); }
+                    }
+                });
+                const processedData = [];
+                for (const dateStr in hourlyAgg) {
+                    for (const hourStr in hourlyAgg[dateStr]) {
+                        const agg = hourlyAgg[dateStr][hourStr];
+                        if (agg.numRecords > 0) {
+                            processedData.push({
+                                年月日: dateStr,
+                                時刻: hourStr,
+                                人数: Math.round(agg.total / agg.numRecords).toString()
+                            });
+                        }
+                    }
+                }
+                return processedData;
+            };
+
+            const loadCsvData = async (path) => {
+                try {
+                    const response = await fetch(path);
+                    if (!response.ok) throw new Error(`Failed to load ${path}`);
+                    const csvText = await response.text();
+                    const cleanCsvText = csvText.replace(/^\uFEFF/, '');
+                    return new Promise((resolve) => {
+                        Papa.parse(cleanCsvText, {
+                            header: true,
+                            skipEmptyLines: true,
+                            complete: (results) => resolve(results.data)
+                        });
+                    });
+                } catch (e) {
+                    console.error(e);
+                    return [];
+                }
+            };
+
+            const getLatestDateFromData = (data) => {
+                if (!data || data.length === 0) return null;
+                const dates = data.map(row => new Date(row.年月日)).filter(date => !isNaN(date.getTime()));
+                return dates.length === 0 ? null : new Date(Math.max.apply(null, dates));
+            };
+
+            const formatDateForCsv = (date) => `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+
+            // 混雑度判定ロジックを5段階に更新
+            function getCongestionLevel(count, criterion) {
+                if (!criterion || count === null || count === undefined) return 0;
+                const num = parseInt(count, 10);
+                if (isNaN(num)) return 0;
+
+                const c1 = parseInt(criterion.comfortable, 10);
+                const c2 = parseInt(criterion.notcrowded, 10);
+                const c3 = parseInt(criterion.normal, 10);
+                const c4 = parseInt(criterion.crowded, 10);
+                const c5 = parseInt(criterion.Bustling, 10);
+
+                if (num <= c1) return 1;
+                if (num <= c2) return 2;
+                if (num <= c3) return 3;
+                if (num <= c4) return 4;
+                return 5;
+            }
+
+            // --- モーダル制御 ---
+            function showStartupModal() {
+                const modal = document.getElementById('modal-overlay');
+                const header = document.getElementById('modal-header-title');
+                const content = document.getElementById('modal-body-content');
+                const footerBtn = document.getElementById('close-modal-btn-footer');
+
+                header.textContent = "実証実験中です";
+                content.innerHTML = `<p class="text-center font-bold text-lg mb-4">このアプリは実証実験中のため、実際の入込状況と異なる場合がございますが、ご了承ください。</p>`;
+                footerBtn.textContent = "確認しました";
+                
+                modal.style.display = 'flex';
+            }
+
+            function showDisclaimerModal() {
+                const modal = document.getElementById('modal-overlay');
+                const header = document.getElementById('modal-header-title');
+                const content = document.getElementById('modal-body-content');
+                const footerBtn = document.getElementById('close-modal-btn-footer');
+
+                header.textContent = "免責事項";
+                content.innerHTML = `
+                    <p class="mb-4">本ウェブサイトで提供される入込実績は、Wi-Fiセンシングデータを用いた参考情報です。リアルタイムの状況を完全に保証するものではありません。</p>
+                    <p class="mb-4">この情報は、提供されたデータに基づいて生成されており、実際の入込状況とは異なる場合があります。通信状況やシステムの都合により、情報の更新が遅れることや、表示されないことがあります。</p>
+                    <p class="mb-4">本ウェブサイトの利用によって生じたいかなる損害についても、運営者は一切の責任を負いません。お出かけの際の判断は、ご自身の責任でお願いいたします。</p>
+                `;
+                footerBtn.textContent = "閉じる";
+                modal.style.display = 'flex';
+            }
+
+            // --- Main Execution ---
+            let facilityData = [];
+            let latestDateObj = new Date();
+            let mapInstance = null;
+
+            try {
+                const [masterData, criterionData] = await Promise.all([
+                    loadCsvData(DATA_PATHS.master),
+                    loadCsvData(DATA_PATHS.criterion)
+                ]);
+
+                const facilityDataPromises = masterData.map(async (master) => {
+                    const name = master.地点名.trim();
+                    const csvUrl = FACILITY_CSV_URLS[name];
+                    if (!csvUrl) return null;
+                    const criterion = criterionData.find(c => c.地点名 && c.地点名.trim() === name);
+                    const rawMilliData = await loadCsvData(csvUrl);
+                    const milli = processNewCsvData(rawMilliData);
+                    return { ...master, criterion, milli };
+                });
+
+                facilityData = (await Promise.all(facilityDataPromises)).filter(f => f && f.緯度);
+                
+                const allMilliData = facilityData.reduce((acc, f) => acc.concat(f.milli), []);
+                latestDateObj = getLatestDateFromData(allMilliData) || new Date();
+
+                const mapElement = document.getElementById('map');
+                mapInstance = L.map(mapElement).setView([36.565, 136.658], 14);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                }).addTo(mapInstance);
+                L.Util.getMapInstance = () => mapInstance;
+
+                populateIntroductionTab(facilityData);
+                updateMap(facilityData, latestDateObj);
+                displayTodayAllFacilitiesCalendar(facilityData, latestDateObj);
+                setupEventListeners(facilityData, latestDateObj);
+
+            } catch (error) {
+                console.error("Initialization failed:", error);
+            }
+
+            // --- Marker & Popup ---
+            function createCustomIcon(level, facilityName) {
+                const levelInfo = CONGESTION_LEVELS[level];
+                const imageUrl = IMAGE_URLS[facilityName] || placeholderImg(facilityName);
+                return L.divIcon({
+                    html: `
+                        <div class="marker-pin-container">
+                            <div class="marker-image-wrapper level-${level}-border">
+                                <img src="${imageUrl}" onerror="this.src='${placeholderImg(facilityName)}';">
+                                <div class="marker-pin"></div>
+                            </div>
+                        </div>`,
+                    className: 'custom-div-icon',
+                    iconSize: [0, 0],
+                    iconAnchor: [0, 0],
+                    popupAnchor: [0, -40]
+                });
+            }
+
+            // 【修正箇所】直近1時間以内のデータがない場合は「データなし（レベル0）」と判定する
+            function updateMap(facilityData, latestDateObj) {
+                const map = L.Util.getMapInstance();
+                
+                // 常に実行日（今日）を基準にする
+                const todayString = formatDateForCsv(new Date()); 
+                const currentHour = new Date().getHours();
+
+                facilityData.forEach(facility => {
+                    const lat = parseFloat(facility.緯度);
+                    const lon = parseFloat(facility.経度);
+                    if (isNaN(lat) || isNaN(lon)) return;
+                    
+                    // 今日の「現在時刻」または「1時間前」のデータのみに絞り込む
+                    const latestRecord = facility.milli
+                        .filter(d => d.年月日 === todayString && (parseInt(d.時刻, 10) === currentHour || parseInt(d.時刻, 10) === currentHour - 1))
+                        .sort((a, b) => parseInt(b.時刻, 10) - parseInt(a.時刻, 10))[0];
+
+                    const level = latestRecord ? getCongestionLevel(latestRecord.人数, facility.criterion) : 0;
+                    const marker = L.marker([lat, lon], { icon: createCustomIcon(level, facility.地点名) }).addTo(map);
+                    
+                    marker.bindPopup(() => {
+                        const levelInfo = CONGESTION_LEVELS[level];
+                        const svgPath = `./${levelInfo.svg}`;
+                        
+                        return `
+                            <h3 class="text-lg font-bold text-center">${facility.地点名}</h3>
+                            <div class="flex flex-col items-center gap-2 my-2">
+                                <div class="w-full flex justify-center items-center">
+                                    <img src="${svgPath}" alt="congestion" class="popup-congestion-icon">
+                                </div>
+                                <div class="w-full text-center">
+                                    <p class="font-bold text-base level-${level}-text">${levelInfo.message}</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 mb-2">本日の実績推移</p>
+                            ${createMiniCalendarHtml(facility, todayString, currentHour)}
+                            <button class="btn-primary popup-calendar-btn mt-4 w-full" data-facility-name="${facility.地点名}">
+                                <img src="./calendar_icon.svg" class="icon-sm" style="filter:invert(1)">
+                                詳細カレンダー
+                            </button>
+                        `;
+                    });
+                });
+            }
+
+            function createMiniCalendarHtml(facility, dateStr, currentHour) {
+                let html = '<table class="popup-calendar"><thead><tr>';
+                for (let h = 8; h <= 20; h++) html += `<th>${h}</th>`;
+                html += '</tr></thead><tbody><tr>';
+                for (let h = 8; h <= 20; h++) {
+                    const record = facility.milli.find(d => d.年月日 === dateStr && parseInt(d.時刻, 10) === h);
+                    const isFuture = h > currentHour;
+                    let bgClass = 'future-time-bg';
+                    if (!isFuture && record) {
+                        const level = getCongestionLevel(record.人数, facility.criterion);
+                        bgClass = `level-${level}-bg`;
+                    }
+                    html += `<td class="${bgClass}"></td>`;
+                }
+                return html + '</tr></tbody></table>';
+            }
+
+            // --- Tabs & List ---
+            function populateIntroductionTab(facilityData) {
+                const container = document.getElementById('facility-card-container');
+                container.innerHTML = '';
+                facilityData.forEach(facility => {
+                    const imageUrl = IMAGE_URLS[facility.地点名] || placeholderImg(facility.地点名);
+                    container.innerHTML += `
+                        <div class="facility-card">
+                            <img src="${imageUrl}" onerror="this.src='${placeholderImg(facility.地点名)}';">
+                            <div class="p-6 flex flex-col flex-grow">
+                                <h3 class="text-xl font-bold text-gray-800">${facility.地点名}</h3>
+                                <p class="text-gray-600 flex-grow my-4 text-sm">${(facility.説明 || '').substring(0, 60)}...</p>
+                                <button class="btn-primary intro-details-btn w-full mt-auto" data-facility-name="${facility.地点名}">
+                                    詳細を見る
+                                </button>
+                            </div>
+                        </div>`;
+                });
+            }
+
+            // --- Calendar View ---
+            function displayTodayAllFacilitiesCalendar(facilityData, latestDateObj) {
+                const latestDateString = formatDateForCsv(latestDateObj);
+                document.getElementById('calendar-title').textContent = '時間帯別 入込実績';
+                document.getElementById('calendar-info').textContent = `全スポット（${latestDateString}）`;
+                const toggleBtn = document.getElementById('calendar-toggle-btn');
+                toggleBtn.textContent = '観光スポット一覧から選ぶ';
+                toggleBtn.onclick = () => switchToTab('introduction-content');
+
+                const currentHour = new Date().getHours();
+                const currentMin = new Date().getMinutes();
+
+                let headerHtml = '<tr><th>時刻</th>';
+                facilityData.forEach(f => { headerHtml += `<th>${f.地点名}</th>`; });
+                headerHtml += '</tr>';
+
+                let bodyHtml = '';
+                for (let h = 8; h <= 20; h++) {
+                    [0, 30].forEach(m => {
+                        const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+                        bodyHtml += `<tr><td class="time-header">${timeStr}</td>`;
+                        facilityData.forEach(f => {
+                            let isFuture = (h > currentHour) || (h === currentHour && m > currentMin);
+                            if (isFuture) {
+                                bodyHtml += `<td class="future-time-bg"></td>`;
+                            } else {
+                                const record = f.milli.find(d => d.年月日 === latestDateString && parseInt(d.時刻, 10) === h);
+                                const level = record ? getCongestionLevel(record.人数, f.criterion) : 0;
+                                bodyHtml += `<td class="${level > 0 ? 'level-'+level+'-bg' : 'future-time-bg'}"></td>`;
+                            }
+                        });
+                        bodyHtml += '</tr>';
+                    });
+                }
+                document.getElementById('calendar-container').innerHTML = `<table class="calendar-table"><thead>${headerHtml}</thead><tbody>${bodyHtml}</tbody></table>`;
+            }
+
+            function setupEventListeners(facilityData, latestDateObj) {
+                const map = L.Util.getMapInstance();
+
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.addEventListener('click', () => switchToTab(btn.dataset.tabId));
+                });
+
+                document.getElementById('disclaimer-link').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showDisclaimerModal();
+                });
+
+                document.getElementById('close-modal-btn').onclick = () => document.getElementById('modal-overlay').style.display = 'none';
+                document.getElementById('close-modal-btn-footer').onclick = () => document.getElementById('modal-overlay').style.display = 'none';
+
+                map.on('popupopen', (e) => {
+                    const btn = e.popup.getElement().querySelector('.popup-calendar-btn');
+                    if (btn) btn.onclick = () => {
+                        const f = facilityData.find(fac => fac.地点名 === btn.dataset.facilityName);
+                        if (f) displayDailyCalendarForFacility(f, facilityData, latestDateObj);
+                        switchToTab('calendar-content');
+                    };
+                });
+
+                document.getElementById('facility-card-container').onclick = (e) => {
+                    const btn = e.target.closest('.intro-details-btn');
+                    if (btn) {
+                        const f = facilityData.find(fac => fac.地点名 === btn.dataset.facilityName);
+                        if (f) showFacilityModal(f);
+                    }
+                };
+
+                document.getElementById('close-facility-modal-btn').onclick = () => document.getElementById('facility-modal-overlay').style.display = 'none';
+            }
+
+            function switchToTab(tabId) {
+                document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+                document.querySelectorAll(`[data-tab-id="${tabId}"]`).forEach(t => t.classList.add('active'));
+                document.getElementById(tabId).classList.add('active');
+                if (tabId === 'map-content' && mapInstance) setTimeout(() => mapInstance.invalidateSize(), 100);
+            }
+
+            function showFacilityModal(f) {
+                const modal = document.getElementById('facility-modal-overlay');
+                document.getElementById('facility-modal-image').src = IMAGE_URLS[f.地点名] || placeholderImg(f.地点名);
+                document.getElementById('facility-modal-name').textContent = f.地点名;
+                document.getElementById('facility-modal-name-en').textContent = f.英語名称 || '';
+                document.getElementById('facility-modal-description').textContent = f.説明 || '情報なし';
+                
+                document.getElementById('facility-modal-calendar-btn').onclick = () => {
+                    displayDailyCalendarForFacility(f, facilityData, latestDateObj);
+                    switchToTab('calendar-content');
+                    modal.style.display = 'none';
+                };
+                
+                document.getElementById('facility-modal-gmaps-btn').onclick = () => {
+                    window.open(`https://www.google.com/maps/search/?api=1&query=${f.緯度},${f.経度}`, '_blank');
+                };
+                modal.style.display = 'flex';
+            }
+
+            function displayDailyCalendarForFacility(facility, facilityData, latestDateObj) {
+                document.getElementById('calendar-title').textContent = `${facility.地点名} 実績推移`;
+                document.getElementById('calendar-info').textContent = '直近7日間の時間帯別入込状況';
+                const toggleBtn = document.getElementById('calendar-toggle-btn');
+                toggleBtn.textContent = '全体表示に戻る';
+                toggleBtn.onclick = () => displayTodayAllFacilitiesCalendar(facilityData, latestDateObj);
+
+                const currentHour = new Date().getHours();
+                const currentMin = new Date().getMinutes();
+                const realToday = new Date();
+
+                const dates = [];
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date(latestDateObj);
+                    d.setDate(d.getDate() - i);
+                    dates.push(d);
+                }
+
+                let headerHtml = '<tr><th>時刻</th>';
+                dates.forEach(d => {
+                    headerHtml += `<th>${d.getMonth()+1}/${d.getDate()}</th>`;
+                });
+                headerHtml += '</tr>';
+
+                let bodyHtml = '';
+                for (let h = 8; h <= 20; h++) {
+                    [0, 30].forEach(m => {
+                        bodyHtml += `<tr><td class="time-header">${h}:${m===0?'00':'30'}</td>`;
+                        dates.forEach(d => {
+                            const isToday = d.toDateString() === realToday.toDateString();
+                            const isFuture = isToday && (h > currentHour || (h === currentHour && m > currentMin));
+                            
+                            if (isFuture) {
+                                bodyHtml += '<td class="future-time-bg"></td>';
+                            } else {
+                                const record = facility.milli.find(r => r.年月日 === formatDateForCsv(d) && parseInt(r.時刻, 10) === h);
+                                const level = record ? getCongestionLevel(record.人数, facility.criterion) : 0;
+                                bodyHtml += `<td class="${level > 0 ? 'level-'+level+'-bg' : 'future-time-bg'}"></td>`;
+                            }
+                        });
+                        bodyHtml += '</tr>';
+                    });
+                }
+                document.getElementById('calendar-container').innerHTML = `<table class="calendar-table"><thead>${headerHtml}</thead><tbody>${bodyHtml}</tbody></table>`;
+            }
+        }
+    </script>
+</body>
+</html>
