@@ -99,14 +99,15 @@
         .logo-mobile { height: 40px; width: auto; }
         
         .header-title {
-            font-size: 1.5rem;
+            font-size: 1.25rem; /* 少し縮小 (元1.5rem) */
             color: #482e6e;
             margin-left: 1rem;
             white-space: nowrap;
         }
 
         @media (max-width: 640px) {
-            .header-title { font-size: 1.1rem; margin-left: 0.5rem; }
+            /* モバイルでハンバーガーメニューと被らないように縮小 */
+            .header-title { font-size: 0.9rem; margin-left: 0.5rem; } 
         }
 
         .icon { width: 24px; height: 24px; stroke-width: 2; }
@@ -263,7 +264,7 @@
 
     <header class="md:hidden sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-200 p-4">
         <div class="flex justify-between items-center relative">
-            <div class="flex items-center justify-center flex-grow">
+            <div class="flex items-center justify-center flex-grow mr-10"> <!-- 右側のハンバーガーメニュー用の余白を確保 -->
                 <a href="#" id="logo-mobile-link" class="cursor-pointer">
                     <img src="./logo_kanazawa_notext.svg" alt="logo" class="logo-mobile">
                 </a>
@@ -280,7 +281,7 @@
         <div id="mobile-menu-dropdown" class="hidden mt-3 border-t border-gray-200 pt-2">
             <div class="px-2 py-1 text-xs font-bold text-gray-400">言語 / Language</div>
             <a href="#" class="block px-4 py-3 text-sm text-purple-700 bg-purple-50 font-bold rounded-lg mb-1">日本語</a>
-            <a href="/en/index.html" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition">English</a>
+            <a href="https://beeb-c4n.github.io/crowdedmap2/en/index.html" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition">English</a>
             <!-- 将来の拡張用 -->
             <!-- <a href="/zh/index.html" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition">中文</a> -->
         </div>
