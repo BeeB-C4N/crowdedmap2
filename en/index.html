@@ -680,7 +680,9 @@
                 facilityData.forEach(facility => {
                     const imageUrl = IMAGE_URLS[facility.地点名] || placeholderImg(facility.地点名);
                     const displayName = facility.英語名称 || facility.地点名;
-                    const desc = facility.説明 || '';
+                    // 説明文を「英語説明」カラムから取得するように変更（空の場合はフォールバックとして空文字）
+                    const desc = facility.英語説明 || ''; 
+                    
                     container.innerHTML += `
                         <div class="facility-card">
                             <img src="${imageUrl}" onerror="this.src='${placeholderImg(facility.地点名)}';">
@@ -804,7 +806,9 @@
                 document.getElementById('facility-modal-image').src = IMAGE_URLS[f.地点名] || placeholderImg(f.地点名);
                 document.getElementById('facility-modal-name').textContent = f.英語名称 || f.地点名;
                 document.getElementById('facility-modal-name-jp').textContent = f.地点名;
-                document.getElementById('facility-modal-description').textContent = f.説明 || 'No information available.';
+                
+                // モーダル内の説明も「英語説明」カラムから取得するように変更
+                document.getElementById('facility-modal-description').textContent = f.英語説明 || 'No information available.';
                 
                 document.getElementById('facility-modal-calendar-btn').onclick = () => {
                     displayDailyCalendarForFacility(f, facilityData, latestDateObj);
