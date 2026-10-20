@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Version 2.0.2 | 2026-10-20 -->
+    <!-- Version 2.0.3 | 2026-10-20 -->
     <title>いしかわ観光地リアルタイムナビ</title>
     <link rel="icon" href="./favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -220,7 +220,7 @@
         .comfort-trigger[aria-pressed="true"]{background:#5A3A8A;color:white}
         .mode-note{font-size:12px;color:#5A3A8A;margin:5px 0}
         .six-labels{display:grid;grid-template-columns:repeat(6,1fr);width:100%;font-size:10px;text-align:center;color:#555}
-        .no-data-key{font-size:10px;color:#666;align-self:flex-end;margin-top:6px;display:flex;align-items:center;gap:5px}.no-data-key span{width:12px;height:10px;background:#9ca3af}
+        .no-data-key{font-size:10px;color:#666;align-self:flex-end;margin-top:6px;display:flex;align-items:center;gap:5px}.no-data-key span{width:12px;height:10px;background:#e5e7eb}
         .drawer-backdrop{position:fixed;inset:0;background:#0006;z-index:1500;display:none;justify-content:flex-end}
         .drawer-backdrop.open{display:flex}.side-drawer{width:min(320px,88vw);height:100%;background:white;padding:24px;overflow-y:auto;box-shadow:-8px 0 30px #0002}
         .drawer-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;font-weight:bold}.drawer-link{display:flex;align-items:center;gap:10px;width:100%;padding:16px 8px;border-bottom:1px solid #eee;text-align:left}
@@ -231,7 +231,7 @@
         .comfort-arrow{height:48px;border:1px solid #ddd;border-radius:12px;font-size:24px;background:white}.comfort-arrow:disabled{opacity:.3}
         .comfort-status{text-align:center;font-size:12px;min-height:22px;margin:8px 0}.comfort-actions{display:flex;justify-content:center;margin-top:12px}
         .about-copy{font-size:14px;line-height:1.8}.about-copy h3{font-weight:bold;margin:18px 0 5px}.about-copy code{display:block;white-space:normal;background:#f5f3f8;padding:10px;border-radius:8px;margin:8px 0}
-        .popup-congestion-icon.tone-normal{filter:saturate(.65) brightness(1.2);opacity:1}.popup-congestion-icon.tone-off{filter:grayscale(1) brightness(.5)}
+        .popup-congestion-icon.tone-normal{filter:saturate(.65) brightness(1.2);opacity:1}.popup-congestion-icon.tone-off{filter:grayscale(1) brightness(1.15);opacity:.65}
         @media(max-width:480px){.realtime-heading h2{font-size:18px}.realtime-heading{gap:6px}.comfort-trigger{padding:7px 9px;font-size:12px}.modal-content{padding:14px}.modal-header,.modal-footer{padding:12px 14px}.comfort-question{font-size:14px}.comfort-scene{grid-template-columns:36px minmax(0,1fr) 36px}.header-title{white-space:normal}}
 .level-1-bg{background-color:#64a0af}.level-1-text{color:#64a0af}.custom-div-icon .level-1-border{border-color:#64a0af}.custom-div-icon .level-1-border .marker-pin{border-top-color:#64a0af}
 .level-2-bg{background-color:#96B464}.level-2-text{color:#96B464}.custom-div-icon .level-2-border{border-color:#96B464}.custom-div-icon .level-2-border .marker-pin{border-top-color:#96B464}
@@ -239,7 +239,7 @@
 .level-4-bg{background-color:#D2AF50}.level-4-text{color:#D2AF50}.custom-div-icon .level-4-border{border-color:#D2AF50}.custom-div-icon .level-4-border .marker-pin{border-top-color:#D2AF50}
 .level-5-bg{background-color:#D27341}.level-5-text{color:#D27341}.custom-div-icon .level-5-border{border-color:#D27341}.custom-div-icon .level-5-border .marker-pin{border-top-color:#D27341}
 .level-6-bg{background-color:#B43C46}.level-6-text{color:#B43C46}.custom-div-icon .level-6-border{border-color:#B43C46}.custom-div-icon .level-6-border .marker-pin{border-top-color:#B43C46}
-.level-0-bg,.future-time-bg{background-color:#9ca3af}.level-0-text{color:#555}.custom-div-icon .level-0-border{border-color:#9ca3af}.custom-div-icon .level-0-border .marker-pin{border-top-color:#9ca3af}
+.level-0-bg,.future-time-bg{background-color:#e5e7eb}.level-0-text{color:#555}.custom-div-icon .level-0-border{border-color:#e5e7eb}.custom-div-icon .level-0-border .marker-pin{border-top-color:#e5e7eb}
 .comfort-reset{border:0;background:transparent;color:#6b7280;font-size:12px;padding:10px 8px;text-decoration:underline;min-height:44px;cursor:pointer}.comfort-confirm{min-width:180px;min-height:46px}.comfort-modal #close-modal-btn-footer{background:transparent;color:#666;border:1px solid #d1d5db;box-shadow:none;font-weight:400;font-size:13px;padding:8px 20px}.comfort-status:empty{display:none}
     </style>
 </head>
@@ -888,7 +888,7 @@
                     <p>A′：A_obs ≥ T₁<br>B′：T₂ ≤ A_obs &lt; T₁<br>C′：T₃ ≤ A_obs &lt; T₂<br>D′：T₄ ≤ A_obs &lt; T₃<br>E′：T₅ ≤ A_obs &lt; T₄<br>F′：A_obs &lt; T₅</p>
                     <p>A′〜F′を順に①快適〜⑥賑やかに対応させます。観測値が0で有効面積が設定済みの場合はA′とします。選択画像より1人あたり面積が小さくなるとB′以下になります。Fruin本来の歩行サービス水準を観光の快適さに応用した試行モデルであり、快適さそのものの実測ではありません。</p>
                     <h3>身体コアとパーソナルスペース</h3><code>a = √(0.3 / π) ≈ 0.309 m<br>A = π(a + r)²<br>r = √(A / π) − a</code><p>aは身体コア半径、0.3㎡は身体コア面積、rは身体の外側の余裕です。面積Aが0.3㎡未満なら非負のrは算出できず、面積による判定は参考値です。この関係式によって面積に身体コアを二重加算することはありません。</p>
-                    <h3>表示と保存</h3><p>通常は淡い黄緑（ひゃくまんさんも淡い黄緑）、データなし・判定不可は灰色（ひゃくまんさんは濃い灰色）です。未来の時間帯も未観測として灰色です。ゆとり設定は「決定」を押すとこのブラウザに保存され、マップ・ポップアップ・カレンダーに適用されます。「初期設定に戻す」で標準設定に戻せます。</p></div>`;
+                    <h3>表示と保存</h3><p>通常は淡い黄緑（ひゃくまんさんも淡い黄緑）、データなし・判定不可は薄い灰色（ひゃくまんさんも薄い灰色）です。未来の時間帯も未観測として灰色です。ゆとり設定は「決定」を押すとこのブラウザに保存され、マップ・ポップアップ・カレンダーに適用されます。「初期設定に戻す」で標準設定に戻せます。</p></div>`;
                 document.getElementById('close-modal-btn-footer').textContent = '閉じる';
                 openOverlay('modal-overlay');
             }
