@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Version 2.0.1 | 2026-10-20 -->
     <title>いしかわ観光地リアルタイムナビ</title>
     <link rel="icon" href="./favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -137,7 +138,7 @@
         .custom-div-icon .marker-pin-container:hover { transform: translate(-40px, -80px) scale(1.1); }
         .custom-div-icon .marker-image-wrapper { width: 80px; height: 80px; border-radius: 50%; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.2); background-color: #1a1a1a; border: 4px solid white; }
         
-        /* 5段階ボーダー色 */
+        /* 6段階ボーダー色 */
         .custom-div-icon .level-1-border { border-color: #64a0af; }
         .custom-div-icon .level-2-border { border-color: #96B464; }
         .custom-div-icon .level-3-border { border-color: #D2AF50; }
@@ -187,7 +188,7 @@
         .barometer-labels { display: flex; justify-content: space-between; width: 100%; font-size: 0.75rem; color: #666; position: relative; }
         .bar-label-center { position: absolute; left: 50%; transform: translateX(-50%); }
 
-        /* 5段階背景色 */
+        /* 6段階背景色 */
         .level-1-bg { background-color: #64a0af; }
         .level-2-bg { background-color: #96B464; }
         .level-3-bg { background-color: #D2AF50; }
@@ -195,7 +196,7 @@
         .level-5-bg { background-color: #B43C46; }
         .future-time-bg { background-color: #f0f0f0; }
 
-        /* 5段階テキスト色 */
+        /* 6段階テキスト色 */
         .level-1-text { color: #64a0af; }
         .level-2-text { color: #96B464; }
         .level-3-text { color: #D2AF50; }
@@ -211,7 +212,35 @@
 
         /* ポップアップ内のダルマアイコンサイズを1/3程度に調整 */
         .popup-congestion-icon { width: 100%; height: auto; max-width: 50px; }
-    </style>
+    
+        /* v2: six levels, fixed drawer and compact personal settings */
+        [hidden]{display:none!important}
+        .realtime-heading{display:flex;align-items:center;gap:12px;justify-content:space-between}
+        .comfort-trigger{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;background:white;border:1px solid #5A3A8A;color:#5A3A8A;border-radius:20px;padding:8px 12px;font-size:13px;min-height:44px}
+        .comfort-trigger[aria-pressed="true"]{background:#5A3A8A;color:white}
+        .mode-note{font-size:12px;color:#5A3A8A;margin:5px 0}
+        .six-labels{display:grid;grid-template-columns:repeat(6,1fr);width:100%;font-size:10px;text-align:center;color:#555}
+        .no-data-key{font-size:10px;color:#666;align-self:flex-end;margin-top:6px;display:flex;align-items:center;gap:5px}.no-data-key span{width:12px;height:10px;background:#9ca3af}
+        .drawer-backdrop{position:fixed;inset:0;background:#0006;z-index:1500;display:none;justify-content:flex-end}
+        .drawer-backdrop.open{display:flex}.side-drawer{width:min(320px,88vw);height:100%;background:white;padding:24px;overflow-y:auto;box-shadow:-8px 0 30px #0002}
+        .drawer-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;font-weight:bold}.drawer-link{display:flex;align-items:center;gap:10px;width:100%;padding:16px 8px;border-bottom:1px solid #eee;text-align:left}
+        .modal-overlay{z-index:2000}.modal-content{min-height:0;overscroll-behavior:contain}.modal-container{max-height:92dvh}
+        .comfort-question{font-size:15px;font-weight:bold;line-height:1.6;margin:0 0 6px}.comfort-help{font-size:12px;line-height:1.6;margin-bottom:10px}
+        .comfort-scene{display:grid;grid-template-columns:40px minmax(0,1fr) 40px;align-items:center;gap:4px}
+        .comfort-scene img{width:100%;height:min(42dvh,340px);object-fit:contain;background:#fafaf6;border-radius:8px}
+        .comfort-arrow{height:48px;border:1px solid #ddd;border-radius:12px;font-size:24px;background:white}.comfort-arrow:disabled{opacity:.3}
+        .comfort-status{text-align:center;font-size:12px;min-height:22px;margin:8px 0}.comfort-actions{display:flex;justify-content:center;margin-top:12px}
+        .about-copy{font-size:14px;line-height:1.8}.about-copy h3{font-weight:bold;margin:18px 0 5px}.about-copy code{display:block;white-space:normal;background:#f5f3f8;padding:10px;border-radius:8px;margin:8px 0}
+        .popup-congestion-icon.tone-normal{filter:grayscale(1) brightness(1.7);opacity:.65}.popup-congestion-icon.tone-off{filter:grayscale(1) brightness(.5)}
+        @media(max-width:480px){.realtime-heading h2{font-size:18px}.realtime-heading{gap:6px}.comfort-trigger{padding:7px 9px;font-size:12px}.modal-content{padding:14px}.modal-header,.modal-footer{padding:12px 14px}.comfort-question{font-size:14px}.comfort-scene{grid-template-columns:36px minmax(0,1fr) 36px}.header-title{white-space:normal}}
+.level-1-bg{background-color:#64a0af}.level-1-text{color:#64a0af}.custom-div-icon .level-1-border{border-color:#64a0af}.custom-div-icon .level-1-border .marker-pin{border-top-color:#64a0af}
+.level-2-bg{background-color:#96B464}.level-2-text{color:#96B464}.custom-div-icon .level-2-border{border-color:#96B464}.custom-div-icon .level-2-border .marker-pin{border-top-color:#96B464}
+.level-3-bg{background-color:#ffffff}.level-3-text{color:#555}.custom-div-icon .level-3-border{border-color:#ffffff}.custom-div-icon .level-3-border .marker-pin{border-top-color:#ffffff}
+.level-4-bg{background-color:#D2AF50}.level-4-text{color:#D2AF50}.custom-div-icon .level-4-border{border-color:#D2AF50}.custom-div-icon .level-4-border .marker-pin{border-top-color:#D2AF50}
+.level-5-bg{background-color:#D27341}.level-5-text{color:#D27341}.custom-div-icon .level-5-border{border-color:#D27341}.custom-div-icon .level-5-border .marker-pin{border-top-color:#D27341}
+.level-6-bg{background-color:#B43C46}.level-6-text{color:#B43C46}.custom-div-icon .level-6-border{border-color:#B43C46}.custom-div-icon .level-6-border .marker-pin{border-top-color:#B43C46}
+.level-0-bg,.future-time-bg{background-color:#9ca3af}.level-0-text{color:#555}.custom-div-icon .level-0-border{border-color:#9ca3af}.custom-div-icon .level-0-border .marker-pin{border-top-color:#9ca3af}
+</style>
 </head>
 <body>
 
@@ -250,13 +279,6 @@
                     <button id="hamburger-btn-pc" class="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition focus:outline-none">
                         <i data-lucide="menu" class="icon"></i>
                     </button>
-                    <div id="pc-menu-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
-                        <div class="px-4 py-1 text-xs font-bold text-gray-400 mb-1">言語 / Language</div>
-                        <a href="#" class="block px-4 py-2 text-sm text-purple-700 bg-purple-50 font-bold">日本語</a>
-                        <a href="https://beeb-c4n.github.io/crowdedmap2/en/index.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">English</a>
-                        <!-- 将来の拡張用 -->
-                        <!-- <a href="/zh/index.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">中文</a> -->
-                    </div>
                 </div>
             </div>
         </div>
@@ -276,15 +298,6 @@
                 <i data-lucide="menu" class="icon"></i>
             </button>
         </div>
-
-        <!-- モバイル用 ドロップダウンメニュー -->
-        <div id="mobile-menu-dropdown" class="hidden mt-3 border-t border-gray-200 pt-2">
-            <div class="px-2 py-1 text-xs font-bold text-gray-400">言語 / Language</div>
-            <a href="#" class="block px-4 py-3 text-sm text-purple-700 bg-purple-50 font-bold rounded-lg mb-1">日本語</a>
-            <a href="https://beeb-c4n.github.io/crowdedmap2/en/index.html" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition">English</a>
-            <!-- 将来の拡張用 -->
-            <!-- <a href="/zh/index.html" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition">中文</a> -->
-        </div>
     </header>
 
     <main class="container mx-auto p-4 md:p-8">
@@ -292,22 +305,11 @@
         <div id="map-content" class="tab-content active">
             <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">リアルタイム入込状況</h2>
+                    <div class="realtime-heading"><h2 class="text-2xl font-bold text-gray-800">リアルタイム入込状況</h2><button id="comfort-open" class="comfort-trigger"><i data-lucide="user-round" class="icon-sm"></i><span>ゆとり設定</span></button></div><p class="mode-note" style="font-weight:bold">ゆとり設定対応版 v2.0.1</p><p id="comfort-mode" class="mode-note">標準設定</p>
                     <p class="text-gray-500">現在の入込状況をマップで確認できます。</p>
                 </div>
                 <div class="barometer-container">
-                    <div class="barometer-colors">
-                        <div class="bar-color" style="background-color: #64a0af;"></div>
-                        <div class="bar-color" style="background-color: #96B464;"></div>
-                        <div class="bar-color" style="background-color: #D2AF50;"></div>
-                        <div class="bar-color" style="background-color: #D27341;"></div>
-                        <div class="bar-color" style="background-color: #B43C46;"></div>
-                    </div>
-                    <div class="barometer-labels">
-                        <span>快適</span>
-                        <span class="bar-label-center">通常</span>
-                        <span>賑やか</span>
-                    </div>
+                    <div class="barometer-colors"><div class="bar-color" style="background-color:#64a0af" title="快適"></div><div class="bar-color" style="background-color:#96B464" title="ゆとりあり"></div><div class="bar-color" style="background-color:#ffffff" title="通常"></div><div class="bar-color" style="background-color:#D2AF50" title="やや混雑"></div><div class="bar-color" style="background-color:#D27341" title="混雑"></div><div class="bar-color" style="background-color:#B43C46" title="賑やか"></div></div><div class="six-labels"><span>快適</span><span>ゆとりあり</span><span>通常</span><span>やや混雑</span><span>混雑</span><span>賑やか</span></div><div class="no-data-key"><span></span>データなし／判定不可</div>
                 </div>
             </div>
             <div id="map"></div>
@@ -323,18 +325,7 @@
             </div>
             <div class="flex flex-col items-center mb-6">
                 <div class="barometer-container">
-                    <div class="barometer-colors">
-                        <div class="bar-color" style="background-color: #64a0af;"></div>
-                        <div class="bar-color" style="background-color: #96B464;"></div>
-                        <div class="bar-color" style="background-color: #D2AF50;"></div>
-                        <div class="bar-color" style="background-color: #D27341;"></div>
-                        <div class="bar-color" style="background-color: #B43C46;"></div>
-                    </div>
-                    <div class="barometer-labels">
-                        <span>快適</span>
-                        <span class="bar-label-center">通常</span>
-                        <span>賑やか</span>
-                    </div>
+                    <div class="barometer-colors"><div class="bar-color" style="background-color:#64a0af" title="快適"></div><div class="bar-color" style="background-color:#96B464" title="ゆとりあり"></div><div class="bar-color" style="background-color:#ffffff" title="通常"></div><div class="bar-color" style="background-color:#D2AF50" title="やや混雑"></div><div class="bar-color" style="background-color:#D27341" title="混雑"></div><div class="bar-color" style="background-color:#B43C46" title="賑やか"></div></div><div class="six-labels"><span>快適</span><span>ゆとりあり</span><span>通常</span><span>やや混雑</span><span>混雑</span><span>賑やか</span></div><div class="no-data-key"><span></span>データなし／判定不可</div>
                 </div>
             </div>
             <div class="calendar-container-wrapper">
@@ -374,8 +365,9 @@
         </button>
     </nav>
 
+<div id="settings-drawer" class="drawer-backdrop" role="dialog" aria-modal="true" aria-label="設定" tabindex="-1"><aside class="side-drawer"><div class="drawer-heading">設定<button id="drawer-close" class="modal-close-btn" aria-label="設定を閉じる">×</button></div><button id="drawer-comfort" class="drawer-link"><i data-lucide="user-round" class="icon-sm"></i>ゆとり設定</button><button id="drawer-about" class="drawer-link"><i data-lucide="info" class="icon-sm"></i>このアプリについて</button><p class="text-xs text-gray-500 mt-6">言語 / Language</p><a href="#" id="drawer-ja" class="drawer-link">日本語</a><a href="https://beeb-c4n.github.io/crowdedmap2/en/index.html" class="drawer-link">English</a><p class="text-xs text-gray-400 mt-6">Version 2.0.1</p></aside></div>
     <!-- 起動時・免責事項モーダル -->
-    <div id="modal-overlay" class="modal-overlay">
+    <div id="modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-header-title" tabindex="-1">
         <div class="modal-container">
             <div class="modal-header">
                 <h2 id="modal-header-title" class="text-gray-800">免責事項</h2>
@@ -464,15 +456,25 @@
                 "金沢城公園": "./images/金沢城公園.jpg"
             };
 
-            // 5段階の混雑度定義
             const CONGESTION_LEVELS = {
-                1: { message: "非常に快適に観光いただけます", className: "level-1", svg: "only_daruma_blue.svg" },
-                2: { message: "快適に観光いただけます", className: "level-2", svg: "only_daruma_olive.svg" },
-                3: { message: "通常の混み具合です", className: "level-3", svg: "only_daruma_turmeric.svg" },
-                4: { message: "やや混み合っています", className: "level-4", svg: "only_daruma_rawsienna.svg" },
-                5: { message: "非常に賑わっています", className: "level-5", svg: "only_daruma_mediumcarmine.svg" },
-                0: { message: "データがありません", className: "level-off", svg: "only_daruma_off.svg" }
+                1: { message: "快適に観光いただけます", svg: "only_daruma_blue.svg" },
+                2: { message: "ゆとりをもって観光いただけます", svg: "only_daruma_olive.svg" },
+                3: { message: "通常の混み具合です", svg: "only_daruma_off.svg" },
+                4: { message: "やや混み合っています", svg: "only_daruma_turmeric.svg" },
+                5: { message: "混み合っています", svg: "only_daruma_rawsienna.svg" },
+                6: { message: "非常に賑わっています", svg: "only_daruma_mediumcarmine.svg" },
+                0: { message: "データなし／判定できません", svg: "only_daruma_off.svg" }
             };
+            // Restored simulator model: common estimated floor 4.4 m × 3.3 m.
+            const LOS_COUNTS = [1, 2, 3, 4, 15, 35];
+            const IMAGE_AREA = 14.52, FT2_TO_M2 = 0.09290304;
+            const FRUIN = [35, 25, 15, 10, 5];
+            const STORAGE_KEY = 'ishikawa-crowded-comfort-v2';
+            let personalIndex = null;
+            try { const v = JSON.parse(localStorage.getItem(STORAGE_KEY)); if (Number.isInteger(v) && v >= 0 && v < 6) personalIndex = v; } catch (_) {}
+            let selectedImage = personalIndex ?? 3;
+            let calendarFacility = null;
+            const mapMarkers = [];
 
             lucide.createIcons();
 
@@ -486,12 +488,12 @@
                 if (!data || data.length === 0) return [];
                 const hourlyAgg = {};
                 data.forEach(row => {
-                    if (row.year && row.month && row.day && row.hour && row.count) {
+                    if ([row.year,row.month,row.day,row.hour,row.count].every(v => v !== undefined && v !== null && String(v).trim() !== '')) {
                         try {
                             const dateStr = `${parseInt(row.year, 10)}/${parseInt(row.month, 10)}/${parseInt(row.day, 10)}`;
                             const hourStr = parseInt(row.hour, 10).toString();
                             const countVal = parseFloat(row.count);
-                            if (isNaN(countVal)) return;
+                            if (!Number.isFinite(countVal) || countVal < 0) return;
                             if (!hourlyAgg[dateStr]) hourlyAgg[dateStr] = {};
                             if (!hourlyAgg[dateStr][hourStr]) hourlyAgg[dateStr][hourStr] = { total: 0, numRecords: 0 };
                             hourlyAgg[dateStr][hourStr].total += countVal;
@@ -542,23 +544,32 @@
 
             const formatDateForCsv = (date) => `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
 
-            // 混雑度判定ロジックを5段階に更新
+            // Standard intervals include their upper boundary; personal A includes its limit.
             function getCongestionLevel(count, criterion) {
-                if (!criterion || count === null || count === undefined) return 0;
-                const num = parseInt(count, 10);
-                if (isNaN(num)) return 0;
-
-                const c1 = parseInt(criterion.comfortable, 10);
-                const c2 = parseInt(criterion.notcrowded, 10);
-                const c3 = parseInt(criterion.normal, 10);
-                const c4 = parseInt(criterion.crowded, 10);
-                const c5 = parseInt(criterion.Bustling, 10);
-
-                if (num <= c1) return 1;
-                if (num <= c2) return 2;
-                if (num <= c3) return 3;
-                if (num <= c4) return 4;
-                return 5;
+                if (count === null || count === undefined || String(count).trim() === '') return 0;
+                const num = Number(count);
+                if (!Number.isFinite(num) || num < 0 || !criterion) return 0;
+                if (personalIndex !== null) {
+                    const ratio = Number(criterion.Effective_area);
+                    if (!Number.isFinite(ratio) || ratio <= 0 || ratio > 1) return 0;
+                    if (num === 0) return 1;
+                    const areaPerPerson = Math.PI * 15 ** 2 * ratio / num;
+                    const selectedArea = IMAGE_AREA / LOS_COUNTS[personalIndex];
+                    const k = selectedArea / (35 * FT2_TO_M2);
+                    const i = FRUIN.findIndex(t => areaPerPerson >= t * FT2_TO_M2 * k - 1e-12);
+                    return i < 0 ? 6 : i + 1;
+                }
+                const fields = ['comfortable', 'notcrowded', 'normal', 'crowded', 'Bustling'];
+                if (fields.some(key => criterion[key] == null || String(criterion[key]).trim() === '')) return 0;
+                const limits = fields.map(key => Number(criterion[key]));
+                if (limits.some((v,i) => !Number.isFinite(v) || v < 0 || (i && v <= limits[i-1]))) return 0;
+                const i = limits.findIndex(limit => num <= limit);
+                return i < 0 ? 6 : i + 1;
+            }
+            function statusMessage(level, criterion) {
+                const p = Number(criterion?.Effective_area);
+                if (personalIndex !== null && !(p > 0 && p <= 1)) return 'ゆとり判定に必要な面積が未設定です';
+                return CONGESTION_LEVELS[level].message;
             }
 
             // --- モーダル制御 ---
@@ -568,8 +579,8 @@
                 const content = document.getElementById('modal-body-content');
                 const footerBtn = document.getElementById('close-modal-btn-footer');
 
-                header.textContent = "実証実験中です";
-                content.innerHTML = `<p class="text-center font-bold text-lg mb-4">このアプリは実証実験中のため、実際の入込状況と異なる場合がございますが、ご了承ください。</p>`;
+                header.textContent = "実証実験中です · v2.0.1";
+                content.innerHTML = `<p class="text-center font-bold text-lg mb-4">このアプリは実証実験中のため、実際の入込状況と異なる場合がございますが、ご了承ください。</p><p class="text-center text-sm">「快適度」を自分好みにゆとり設定を行うことが出来ます。</p>`;
                 footerBtn.textContent = "確認しました";
                 
                 modal.style.display = 'flex';
@@ -605,9 +616,9 @@
                 const facilityDataPromises = masterData.map(async (master) => {
                     const name = master.地点名.trim();
                     const csvUrl = FACILITY_CSV_URLS[name];
-                    if (!csvUrl) return null;
+                    
                     const criterion = criterionData.find(c => c.地点名 && c.地点名.trim() === name);
-                    const rawMilliData = await loadCsvData(csvUrl);
+                    const rawMilliData = csvUrl ? await loadCsvData(csvUrl) : [];
                     const milli = processNewCsvData(rawMilliData);
                     return { ...master, criterion, milli };
                 });
@@ -619,8 +630,9 @@
 
                 const mapElement = document.getElementById('map');
                 mapInstance = L.map(mapElement).setView([36.565, 136.658], 14);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    maxZoom: 19,
                 }).addTo(mapInstance);
                 L.Util.getMapInstance = () => mapInstance;
 
@@ -628,6 +640,7 @@
                 updateMap(facilityData, latestDateObj);
                 displayTodayAllFacilitiesCalendar(facilityData, latestDateObj);
                 setupEventListeners(facilityData, latestDateObj);
+                updatePersonalBadge();
 
             } catch (error) {
                 console.error("Initialization failed:", error);
@@ -655,7 +668,8 @@
             // 【修正箇所】直近1時間以内のデータがない場合は「データなし（レベル0）」と判定する
             function updateMap(facilityData, latestDateObj) {
                 const map = L.Util.getMapInstance();
-                
+                mapMarkers.forEach(marker => map.removeLayer(marker));
+                mapMarkers.length = 0;
                 // 常に実行日（今日）を基準にする
                 const todayString = formatDateForCsv(new Date()); 
                 const currentHour = new Date().getHours();
@@ -673,6 +687,7 @@
                     const level = latestRecord ? getCongestionLevel(latestRecord.人数, facility.criterion) : 0;
                     const marker = L.marker([lat, lon], { icon: createCustomIcon(level, facility.地点名) }).addTo(map);
                     
+                    mapMarkers.push(marker);
                     marker.bindPopup(() => {
                         const levelInfo = CONGESTION_LEVELS[level];
                         const svgPath = `./${levelInfo.svg}`;
@@ -681,10 +696,10 @@
                             <h3 class="text-lg font-bold text-center">${facility.地点名}</h3>
                             <div class="flex flex-col items-center gap-2 my-2">
                                 <div class="w-full flex justify-center items-center">
-                                    <img src="${svgPath}" alt="congestion" class="popup-congestion-icon">
+                                    <img src="${svgPath}" alt="congestion" class="popup-congestion-icon ${level === 3 ? 'tone-normal' : level === 0 ? 'tone-off' : ''}">
                                 </div>
                                 <div class="w-full text-center">
-                                    <p class="font-bold text-base level-${level}-text">${levelInfo.message}</p>
+                                    <p class="font-bold text-base level-${level}-text">${statusMessage(level, facility.criterion)}</p>
                                 </div>
                             </div>
                             <p class="text-xs text-gray-500 mb-2">本日の実績推移</p>
@@ -705,12 +720,12 @@
                 for (let h = 8; h <= 20; h++) {
                     const record = facility.milli.find(d => d.年月日 === dateStr && parseInt(d.時刻, 10) === h);
                     const isFuture = h > currentHour;
-                    let bgClass = 'future-time-bg';
+                    let bgClass = 'level-0-bg';
                     if (!isFuture && record) {
                         const level = getCongestionLevel(record.人数, facility.criterion);
                         bgClass = `level-${level}-bg`;
                     }
-                    html += `<td class="${bgClass}"></td>`;
+                    html += `<td class="${bgClass}" title="${isFuture ? '未観測' : statusMessage(record ? getCongestionLevel(record.人数, facility.criterion) : 0, facility.criterion)}"></td>`;
                 }
                 return html + '</tr></tbody></table>';
             }
@@ -737,6 +752,7 @@
 
             // --- Calendar View ---
             function displayTodayAllFacilitiesCalendar(facilityData, latestDateObj) {
+                calendarFacility = null;
                 const latestDateString = formatDateForCsv(latestDateObj);
                 document.getElementById('calendar-title').textContent = '時間帯別 入込実績';
                 document.getElementById('calendar-info').textContent = `全スポット（${latestDateString}）`;
@@ -757,13 +773,13 @@
                         const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
                         bodyHtml += `<tr><td class="time-header">${timeStr}</td>`;
                         facilityData.forEach(f => {
-                            let isFuture = (h > currentHour) || (h === currentHour && m > currentMin);
+                            let isFuture = latestDateObj.toDateString() === new Date().toDateString() && ((h > currentHour) || (h === currentHour && m > currentMin));
                             if (isFuture) {
                                 bodyHtml += `<td class="future-time-bg"></td>`;
                             } else {
                                 const record = f.milli.find(d => d.年月日 === latestDateString && parseInt(d.時刻, 10) === h);
                                 const level = record ? getCongestionLevel(record.人数, f.criterion) : 0;
-                                bodyHtml += `<td class="${level > 0 ? 'level-'+level+'-bg' : 'future-time-bg'}"></td>`;
+                                bodyHtml += `<td class="${level > 0 ? 'level-'+level+'-bg' : 'level-0-bg'}" title="${statusMessage(level, f.criterion)}"></td>`;
                             }
                         });
                         bodyHtml += '</tr>';
@@ -806,28 +822,112 @@
 
                 document.getElementById('close-facility-modal-btn').onclick = () => document.getElementById('facility-modal-overlay').style.display = 'none';
 
-                // ハンバーガーメニューの制御
-                const btnPc = document.getElementById('hamburger-btn-pc');
-                const menuPc = document.getElementById('pc-menu-dropdown');
-                if(btnPc && menuPc) {
-                    btnPc.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        menuPc.classList.toggle('hidden');
-                    });
-                    document.addEventListener('click', (e) => {
-                        if (!menuPc.contains(e.target) && !btnPc.contains(e.target)) {
-                            menuPc.classList.add('hidden');
-                        }
-                    });
-                }
+                setupPersonalControls();
+            }
 
-                const btnMobile = document.getElementById('hamburger-btn-mobile');
-                const menuMobile = document.getElementById('mobile-menu-dropdown');
-                if(btnMobile && menuMobile) {
-                    btnMobile.addEventListener('click', () => {
-                        menuMobile.classList.toggle('hidden');
-                    });
-                }
+            function updatePersonalBadge() {
+                const active = personalIndex !== null;
+                document.getElementById('comfort-open').setAttribute('aria-pressed', String(active));
+                document.getElementById('comfort-mode').textContent = active ? 'ゆとり設定を適用中 · 画像 ' + (personalIndex + 1) + ' / 6' : '標準設定';
+            }
+            function applyPersonalSetting(index) {
+                personalIndex = index;
+                try { if (index === null) localStorage.removeItem(STORAGE_KEY); else localStorage.setItem(STORAGE_KEY, JSON.stringify(index)); } catch (_) {}
+                updatePersonalBadge();
+                updateMap(facilityData, latestDateObj);
+                if (calendarFacility) displayDailyCalendarForFacility(calendarFacility, facilityData, latestDateObj);
+                else displayTodayAllFacilitiesCalendar(facilityData, latestDateObj);
+            }
+            function openComfortModal() {
+                selectedImage = personalIndex ?? 3;
+                document.getElementById('modal-header-title').textContent = 'ゆとり設定';
+                document.getElementById('modal-body-content').innerHTML = `
+                    <p class="comfort-question">あなたが快適に観光が出来ると感じる周囲の人数はどれですか？</p>
+                    <p class="comfort-help">快適に過ごせる、最も人数の多い画像を選んでください。</p>
+                    <div class="comfort-scene"><button id="los-prev" class="comfort-arrow" aria-label="人数の少ない画像">‹</button><img id="los-image" alt=""><button id="los-next" class="comfort-arrow" aria-label="人数の多い画像">›</button></div>
+                    <p id="los-image-error" class="text-sm text-red-700" hidden>画像を読み込めません。images/los1.png〜los6.png の配置を確認してください。</p>
+                    <p id="los-status" class="comfort-status" aria-live="polite"></p>
+                    <div class="comfort-actions"><button id="los-apply" class="btn-primary">この画像で設定</button></div>
+                    <div class="comfort-actions"><button id="los-reset" class="btn-outline">初期設定に戻す</button></div>`;
+                document.getElementById('close-modal-btn-footer').textContent = '閉じる';
+                const redraw = () => {
+                    const img = document.getElementById('los-image');
+                    document.getElementById('los-image-error').hidden = true;
+                    img.src = './images/los' + (selectedImage + 1) + '.png';
+                    img.alt = LOS_COUNTS[selectedImage] + '人が歩いている画像（中央の赤い服が自分）';
+                    document.getElementById('los-prev').disabled = selectedImage === 0;
+                    document.getElementById('los-next').disabled = selectedImage === 5;
+                    document.getElementById('los-status').textContent = (selectedImage + 1) + ' / 6 · ' + (personalIndex === null ? '画像を切り替えると即時反映します' : '適用中 · 変更は自動で反映されます');
+                    document.getElementById('los-apply').hidden = personalIndex !== null;
+                };
+                document.getElementById('los-image').onerror = () => { document.getElementById('los-image-error').hidden = false; };
+                const move = delta => { selectedImage = Math.max(0, Math.min(5, selectedImage + delta)); applyPersonalSetting(selectedImage); redraw(); };
+                document.getElementById('los-prev').onclick = () => move(-1);
+                document.getElementById('los-next').onclick = () => move(1);
+                // Opening alone does not enable personalization; the default fourth image can be explicitly selected.
+                document.getElementById('los-apply').onclick = () => { applyPersonalSetting(selectedImage); redraw(); };
+                document.getElementById('los-image').onclick = () => { applyPersonalSetting(selectedImage); redraw(); };
+                document.getElementById('los-reset').onclick = () => { selectedImage = 3; applyPersonalSetting(null); redraw(); };
+                redraw();
+                openOverlay('modal-overlay');
+            }
+            function showAboutModal() {
+                document.getElementById('modal-header-title').textContent = 'このアプリについて';
+                document.getElementById('modal-body-content').innerHTML = `<div class="about-copy">
+                    <h3>M5 Stackによる観測</h3><p>各地点のM5 StackでWi-Fiのプローブデータを取得し、入込状況の参考情報として表示しています。検出数は実人数と一致するとは限らず、端末の保有状況・電波環境・遮蔽物などの影響を受けます。このアプリでは時間帯ごとの検出数の平均値（四捨五入）を使用しています。</p>
+                    <h3>標準設定：統計的な水準による6段階表示</h3><p>各地点の統計的数値から設定された crowded_milli_criterion.csv の5つの境界値を使います。境界値ちょうどは、人数の少ない側に含めます。</p>
+                    <p>① 0 ≤ N ≤ comfortable：快適<br>② comfortable &lt; N ≤ notcrowded：ゆとりあり<br>③ notcrowded &lt; N ≤ normal：通常（白）<br>④ normal &lt; N ≤ crowded：やや混雑<br>⑤ crowded &lt; N ≤ Bustling：混雑<br>⑥ Bustling &lt; N：賑やか</p>
+                    <h3>ゆとり設定：選んだ画像を快適さの限界に</h3><p>画像の床面積を14.52㎡（4.4m × 3.3m）と推定し、6枚の人数を順に1・2・3・4・15・35人（自分を含む）とします。画像の推定面積は仮定であり、厳密な実測値ではありません。選択時は統計的な人数境界を使わず、Fruinの面積基準を比例調整します。</p>
+                    <code>A_user = 14.52 / n<br>k = A_user / (35 × 0.09290304)</code>
+                    <p>nは選んだ画像の人数、A_userは快適さの限界となる1人あたり面積（㎡/人）、kはFruin基準の倍率です。1 ft² = 0.09290304㎡。</p>
+                    <code>S_eff = π × 15² × p<br>A_obs = S_eff / N</code>
+                    <p>半径は15m、pはCSVのEffective_area（0.1698なら16.98%）、S_effは地点の有効面積（㎡）、Nは観測値を人数相当として扱う値です。有効面積率は面積だけに掛け、観測数には掛けません。空欄・0以下・1超の有効面積率は推測で補わず、ゆとり判定不可として灰色表示にします。</p>
+                    <code>T = [35, 25, 15, 10, 5] × 0.09290304 × k</code>
+                    <p>A′：A_obs ≥ T₁<br>B′：T₂ ≤ A_obs &lt; T₁<br>C′：T₃ ≤ A_obs &lt; T₂<br>D′：T₄ ≤ A_obs &lt; T₃<br>E′：T₅ ≤ A_obs &lt; T₄<br>F′：A_obs &lt; T₅</p>
+                    <p>A′〜F′を順に①快適〜⑥賑やかに対応させます。観測値が0で有効面積が設定済みの場合はA′とします。選択画像より1人あたり面積が小さくなるとB′以下になります。Fruin本来の歩行サービス水準を観光の快適さに応用した試行モデルであり、快適さそのものの実測ではありません。</p>
+                    <h3>身体コアとパーソナルスペース</h3><code>a = √(0.3 / π) ≈ 0.309 m<br>A = π(a + r)²<br>r = √(A / π) − a</code><p>aは身体コア半径、0.3㎡は身体コア面積、rは身体の外側の余裕です。面積Aが0.3㎡未満なら非負のrは算出できず、面積による判定は参考値です。この関係式によって面積に身体コアを二重加算することはありません。</p>
+                    <h3>表示と保存</h3><p>通常は白（ひゃくまんさんは薄い灰色）、データなし・判定不可は灰色（ひゃくまんさんは濃い灰色）です。未来の時間帯も未観測として灰色です。ゆとり設定はこのブラウザに保存され、マップ・ポップアップ・カレンダーに適用されます。「初期設定に戻す」で標準設定に戻せます。</p><p>Version 2.0.1 · 2026-10-20</p></div>`;
+                document.getElementById('close-modal-btn-footer').textContent = '閉じる';
+                openOverlay('modal-overlay');
+            }
+            let overlayOrigin = null;
+            function openOverlay(id) {
+                overlayOrigin = document.activeElement;
+                const el = document.getElementById(id);
+                if (id === 'settings-drawer') el.classList.add('open'); else el.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                el.querySelector('button')?.focus();
+            }
+            function closeOverlay(id) {
+                const el = document.getElementById(id);
+                el.classList.remove('open'); el.style.display = '';
+                document.body.style.overflow = '';
+                overlayOrigin?.focus();
+            }
+            function setupPersonalControls() {
+                ['hamburger-btn-pc','hamburger-btn-mobile'].forEach(id => {
+                    const btn = document.getElementById(id);
+                    btn.setAttribute('aria-label','設定を開く');
+                    btn.onclick = () => openOverlay('settings-drawer');
+                });
+                document.getElementById('drawer-close').onclick = () => closeOverlay('settings-drawer');
+                document.getElementById('drawer-ja').onclick = e => { e.preventDefault(); closeOverlay('settings-drawer'); };
+                document.getElementById('drawer-comfort').onclick = () => { closeOverlay('settings-drawer'); openComfortModal(); };
+                document.getElementById('drawer-about').onclick = () => { closeOverlay('settings-drawer'); showAboutModal(); };
+                document.getElementById('comfort-open').onclick = openComfortModal;
+                ['close-modal-btn','close-modal-btn-footer'].forEach(id => { document.getElementById(id).onclick = () => closeOverlay('modal-overlay'); });
+                ['modal-overlay','settings-drawer'].forEach(id => document.getElementById(id).addEventListener('click', e => { if(e.target.id === id) closeOverlay(id); }));
+                document.addEventListener('keydown', e => {
+                    const id = document.getElementById('modal-overlay').style.display === 'flex' ? 'modal-overlay' : document.getElementById('settings-drawer').classList.contains('open') ? 'settings-drawer' : null;
+                    if (!id) return;
+                    if (e.key === 'Escape') { closeOverlay(id); return; }
+                    if (e.key === 'Tab') {
+                        const buttons = [...document.getElementById(id).querySelectorAll('button,a[href],[tabindex="0"]')].filter(el => !el.disabled && !el.hidden && el.getClientRects().length);
+                        const first = buttons[0], last = buttons[buttons.length-1];
+                        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+                        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+                    }
+                });
             }
 
             function switchToTab(tabId) {
@@ -858,6 +958,7 @@
             }
 
             function displayDailyCalendarForFacility(facility, facilityData, latestDateObj) {
+                calendarFacility = facility;
                 document.getElementById('calendar-title').textContent = `${facility.地点名} 実績推移`;
                 document.getElementById('calendar-info').textContent = '直近7日間の時間帯別入込状況';
                 const toggleBtn = document.getElementById('calendar-toggle-btn');
@@ -894,7 +995,7 @@
                             } else {
                                 const record = facility.milli.find(r => r.年月日 === formatDateForCsv(d) && parseInt(r.時刻, 10) === h);
                                 const level = record ? getCongestionLevel(record.人数, facility.criterion) : 0;
-                                bodyHtml += `<td class="${level > 0 ? 'level-'+level+'-bg' : 'future-time-bg'}"></td>`;
+                                bodyHtml += `<td class="${level > 0 ? 'level-'+level+'-bg' : 'level-0-bg'}" title="${statusMessage(level, facility.criterion)}"></td>`;
                             }
                         });
                         bodyHtml += '</tr>';
