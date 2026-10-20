@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Version 2.0.1 | 2026-10-20 -->
+    <!-- Version 2.0.2 | 2026-10-20 -->
     <title>いしかわ観光地リアルタイムナビ</title>
     <link rel="icon" href="./favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -231,16 +231,17 @@
         .comfort-arrow{height:48px;border:1px solid #ddd;border-radius:12px;font-size:24px;background:white}.comfort-arrow:disabled{opacity:.3}
         .comfort-status{text-align:center;font-size:12px;min-height:22px;margin:8px 0}.comfort-actions{display:flex;justify-content:center;margin-top:12px}
         .about-copy{font-size:14px;line-height:1.8}.about-copy h3{font-weight:bold;margin:18px 0 5px}.about-copy code{display:block;white-space:normal;background:#f5f3f8;padding:10px;border-radius:8px;margin:8px 0}
-        .popup-congestion-icon.tone-normal{filter:grayscale(1) brightness(1.7);opacity:.65}.popup-congestion-icon.tone-off{filter:grayscale(1) brightness(.5)}
+        .popup-congestion-icon.tone-normal{filter:saturate(.65) brightness(1.2);opacity:1}.popup-congestion-icon.tone-off{filter:grayscale(1) brightness(.5)}
         @media(max-width:480px){.realtime-heading h2{font-size:18px}.realtime-heading{gap:6px}.comfort-trigger{padding:7px 9px;font-size:12px}.modal-content{padding:14px}.modal-header,.modal-footer{padding:12px 14px}.comfort-question{font-size:14px}.comfort-scene{grid-template-columns:36px minmax(0,1fr) 36px}.header-title{white-space:normal}}
 .level-1-bg{background-color:#64a0af}.level-1-text{color:#64a0af}.custom-div-icon .level-1-border{border-color:#64a0af}.custom-div-icon .level-1-border .marker-pin{border-top-color:#64a0af}
 .level-2-bg{background-color:#96B464}.level-2-text{color:#96B464}.custom-div-icon .level-2-border{border-color:#96B464}.custom-div-icon .level-2-border .marker-pin{border-top-color:#96B464}
-.level-3-bg{background-color:#ffffff}.level-3-text{color:#555}.custom-div-icon .level-3-border{border-color:#ffffff}.custom-div-icon .level-3-border .marker-pin{border-top-color:#ffffff}
+.level-3-bg{background-color:#C7D99B}.level-3-text{color:#555}.custom-div-icon .level-3-border{border-color:#C7D99B}.custom-div-icon .level-3-border .marker-pin{border-top-color:#C7D99B}
 .level-4-bg{background-color:#D2AF50}.level-4-text{color:#D2AF50}.custom-div-icon .level-4-border{border-color:#D2AF50}.custom-div-icon .level-4-border .marker-pin{border-top-color:#D2AF50}
 .level-5-bg{background-color:#D27341}.level-5-text{color:#D27341}.custom-div-icon .level-5-border{border-color:#D27341}.custom-div-icon .level-5-border .marker-pin{border-top-color:#D27341}
 .level-6-bg{background-color:#B43C46}.level-6-text{color:#B43C46}.custom-div-icon .level-6-border{border-color:#B43C46}.custom-div-icon .level-6-border .marker-pin{border-top-color:#B43C46}
 .level-0-bg,.future-time-bg{background-color:#9ca3af}.level-0-text{color:#555}.custom-div-icon .level-0-border{border-color:#9ca3af}.custom-div-icon .level-0-border .marker-pin{border-top-color:#9ca3af}
-</style>
+.comfort-reset{border:0;background:transparent;color:#6b7280;font-size:12px;padding:10px 8px;text-decoration:underline;min-height:44px;cursor:pointer}.comfort-confirm{min-width:180px;min-height:46px}.comfort-modal #close-modal-btn-footer{background:transparent;color:#666;border:1px solid #d1d5db;box-shadow:none;font-weight:400;font-size:13px;padding:8px 20px}.comfort-status:empty{display:none}
+    </style>
 </head>
 <body>
 
@@ -305,11 +306,11 @@
         <div id="map-content" class="tab-content active">
             <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
-                    <div class="realtime-heading"><h2 class="text-2xl font-bold text-gray-800">リアルタイム入込状況</h2><button id="comfort-open" class="comfort-trigger"><i data-lucide="user-round" class="icon-sm"></i><span>ゆとり設定</span></button></div><p class="mode-note" style="font-weight:bold">ゆとり設定対応版 v2.0.1</p><p id="comfort-mode" class="mode-note">標準設定</p>
+                    <div class="realtime-heading"><h2 class="text-2xl font-bold text-gray-800">リアルタイム入込状況</h2><button id="comfort-open" class="comfort-trigger"><i data-lucide="user-round" class="icon-sm"></i><span>ゆとり設定</span></button></div>
                     <p class="text-gray-500">現在の入込状況をマップで確認できます。</p>
                 </div>
                 <div class="barometer-container">
-                    <div class="barometer-colors"><div class="bar-color" style="background-color:#64a0af" title="快適"></div><div class="bar-color" style="background-color:#96B464" title="ゆとりあり"></div><div class="bar-color" style="background-color:#ffffff" title="通常"></div><div class="bar-color" style="background-color:#D2AF50" title="やや混雑"></div><div class="bar-color" style="background-color:#D27341" title="混雑"></div><div class="bar-color" style="background-color:#B43C46" title="賑やか"></div></div><div class="six-labels"><span>快適</span><span>ゆとりあり</span><span>通常</span><span>やや混雑</span><span>混雑</span><span>賑やか</span></div><div class="no-data-key"><span></span>データなし／判定不可</div>
+                    <div class="barometer-colors"><div class="bar-color" style="background-color:#64a0af" title="快適"></div><div class="bar-color" style="background-color:#96B464" title="ゆとりあり"></div><div class="bar-color" style="background-color:#C7D99B" title="通常"></div><div class="bar-color" style="background-color:#D2AF50" title="ほどよい賑わい"></div><div class="bar-color" style="background-color:#D27341" title="賑わい"></div><div class="bar-color" style="background-color:#B43C46" title="賑やか"></div></div><div class="barometer-labels"><span>快適</span><span class="bar-label-center">通常</span><span>賑やか</span></div><div class="no-data-key"><span></span>データなし／判定不可</div>
                 </div>
             </div>
             <div id="map"></div>
@@ -325,7 +326,7 @@
             </div>
             <div class="flex flex-col items-center mb-6">
                 <div class="barometer-container">
-                    <div class="barometer-colors"><div class="bar-color" style="background-color:#64a0af" title="快適"></div><div class="bar-color" style="background-color:#96B464" title="ゆとりあり"></div><div class="bar-color" style="background-color:#ffffff" title="通常"></div><div class="bar-color" style="background-color:#D2AF50" title="やや混雑"></div><div class="bar-color" style="background-color:#D27341" title="混雑"></div><div class="bar-color" style="background-color:#B43C46" title="賑やか"></div></div><div class="six-labels"><span>快適</span><span>ゆとりあり</span><span>通常</span><span>やや混雑</span><span>混雑</span><span>賑やか</span></div><div class="no-data-key"><span></span>データなし／判定不可</div>
+                    <div class="barometer-colors"><div class="bar-color" style="background-color:#64a0af" title="快適"></div><div class="bar-color" style="background-color:#96B464" title="ゆとりあり"></div><div class="bar-color" style="background-color:#C7D99B" title="通常"></div><div class="bar-color" style="background-color:#D2AF50" title="ほどよい賑わい"></div><div class="bar-color" style="background-color:#D27341" title="賑わい"></div><div class="bar-color" style="background-color:#B43C46" title="賑やか"></div></div><div class="barometer-labels"><span>快適</span><span class="bar-label-center">通常</span><span>賑やか</span></div><div class="no-data-key"><span></span>データなし／判定不可</div>
                 </div>
             </div>
             <div class="calendar-container-wrapper">
@@ -365,7 +366,7 @@
         </button>
     </nav>
 
-<div id="settings-drawer" class="drawer-backdrop" role="dialog" aria-modal="true" aria-label="設定" tabindex="-1"><aside class="side-drawer"><div class="drawer-heading">設定<button id="drawer-close" class="modal-close-btn" aria-label="設定を閉じる">×</button></div><button id="drawer-comfort" class="drawer-link"><i data-lucide="user-round" class="icon-sm"></i>ゆとり設定</button><button id="drawer-about" class="drawer-link"><i data-lucide="info" class="icon-sm"></i>このアプリについて</button><p class="text-xs text-gray-500 mt-6">言語 / Language</p><a href="#" id="drawer-ja" class="drawer-link">日本語</a><a href="https://beeb-c4n.github.io/crowdedmap2/en/index.html" class="drawer-link">English</a><p class="text-xs text-gray-400 mt-6">Version 2.0.1</p></aside></div>
+<div id="settings-drawer" class="drawer-backdrop" role="dialog" aria-modal="true" aria-label="設定" tabindex="-1"><aside class="side-drawer"><div class="drawer-heading">設定<button id="drawer-close" class="modal-close-btn" aria-label="設定を閉じる">×</button></div><button id="drawer-comfort" class="drawer-link"><i data-lucide="user-round" class="icon-sm"></i>ゆとり設定</button><button id="drawer-about" class="drawer-link"><i data-lucide="info" class="icon-sm"></i>このアプリについて</button><p class="text-xs text-gray-500 mt-6">言語 / Language</p><a href="#" id="drawer-ja" class="drawer-link">日本語</a><a href="https://beeb-c4n.github.io/crowdedmap2/en/index.html" class="drawer-link">English</a></aside></div>
     <!-- 起動時・免責事項モーダル -->
     <div id="modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-header-title" tabindex="-1">
         <div class="modal-container">
@@ -379,7 +380,7 @@
                 <!-- 内容は動的に書き換え -->
             </div>
             <div class="modal-footer"> 
-                <button id="close-modal-btn-footer" class="btn-primary">閉じる</button>
+                <button id="close-modal-btn-footer" class="btn-primary">閉じる</button><button id="los-reset" class="comfort-reset" hidden>初期設定に戻す</button>
             </div>
         </div>
     </div>
@@ -459,9 +460,9 @@
             const CONGESTION_LEVELS = {
                 1: { message: "快適に観光いただけます", svg: "only_daruma_blue.svg" },
                 2: { message: "ゆとりをもって観光いただけます", svg: "only_daruma_olive.svg" },
-                3: { message: "通常の混み具合です", svg: "only_daruma_off.svg" },
-                4: { message: "やや混み合っています", svg: "only_daruma_turmeric.svg" },
-                5: { message: "混み合っています", svg: "only_daruma_rawsienna.svg" },
+                3: { message: "通常の入込状況です", svg: "only_daruma_olive.svg" },
+                4: { message: "ほどよく賑わっています", svg: "only_daruma_turmeric.svg" },
+                5: { message: "賑わっています", svg: "only_daruma_rawsienna.svg" },
                 6: { message: "非常に賑わっています", svg: "only_daruma_mediumcarmine.svg" },
                 0: { message: "データなし／判定できません", svg: "only_daruma_off.svg" }
             };
@@ -579,7 +580,7 @@
                 const content = document.getElementById('modal-body-content');
                 const footerBtn = document.getElementById('close-modal-btn-footer');
 
-                header.textContent = "実証実験中です · v2.0.1";
+                header.textContent = "実証実験中です";
                 content.innerHTML = `<p class="text-center font-bold text-lg mb-4">このアプリは実証実験中のため、実際の入込状況と異なる場合がございますが、ご了承ください。</p><p class="text-center text-sm">「快適度」を自分好みにゆとり設定を行うことが出来ます。</p>`;
                 footerBtn.textContent = "確認しました";
                 
@@ -828,7 +829,7 @@
             function updatePersonalBadge() {
                 const active = personalIndex !== null;
                 document.getElementById('comfort-open').setAttribute('aria-pressed', String(active));
-                document.getElementById('comfort-mode').textContent = active ? 'ゆとり設定を適用中 · 画像 ' + (personalIndex + 1) + ' / 6' : '標準設定';
+
             }
             function applyPersonalSetting(index) {
                 personalIndex = index;
@@ -840,6 +841,8 @@
             }
             function openComfortModal() {
                 selectedImage = personalIndex ?? 3;
+                document.getElementById('modal-overlay').classList.add('comfort-modal');
+                document.getElementById('los-reset').hidden = false;
                 document.getElementById('modal-header-title').textContent = 'ゆとり設定';
                 document.getElementById('modal-body-content').innerHTML = `
                     <p class="comfort-question">あなたが快適に観光が出来ると感じる周囲の人数はどれですか？</p>
@@ -847,8 +850,7 @@
                     <div class="comfort-scene"><button id="los-prev" class="comfort-arrow" aria-label="人数の少ない画像">‹</button><img id="los-image" alt=""><button id="los-next" class="comfort-arrow" aria-label="人数の多い画像">›</button></div>
                     <p id="los-image-error" class="text-sm text-red-700" hidden>画像を読み込めません。images/los1.png〜los6.png の配置を確認してください。</p>
                     <p id="los-status" class="comfort-status" aria-live="polite"></p>
-                    <div class="comfort-actions"><button id="los-apply" class="btn-primary">この画像で設定</button></div>
-                    <div class="comfort-actions"><button id="los-reset" class="btn-outline">初期設定に戻す</button></div>`;
+                    <div class="comfort-actions"><button id="los-apply" class="btn-primary comfort-confirm">決定</button></div>`;
                 document.getElementById('close-modal-btn-footer').textContent = '閉じる';
                 const redraw = () => {
                     const img = document.getElementById('los-image');
@@ -857,17 +859,17 @@
                     img.alt = LOS_COUNTS[selectedImage] + '人が歩いている画像（中央の赤い服が自分）';
                     document.getElementById('los-prev').disabled = selectedImage === 0;
                     document.getElementById('los-next').disabled = selectedImage === 5;
-                    document.getElementById('los-status').textContent = (selectedImage + 1) + ' / 6 · ' + (personalIndex === null ? '画像を切り替えると即時反映します' : '適用中 · 変更は自動で反映されます');
-                    document.getElementById('los-apply').hidden = personalIndex !== null;
+                    document.getElementById('los-status').textContent = '';
+
                 };
                 document.getElementById('los-image').onerror = () => { document.getElementById('los-image-error').hidden = false; };
-                const move = delta => { selectedImage = Math.max(0, Math.min(5, selectedImage + delta)); applyPersonalSetting(selectedImage); redraw(); };
+                const move = delta => { selectedImage = Math.max(0, Math.min(5, selectedImage + delta)); redraw(); };
                 document.getElementById('los-prev').onclick = () => move(-1);
                 document.getElementById('los-next').onclick = () => move(1);
                 // Opening alone does not enable personalization; the default fourth image can be explicitly selected.
-                document.getElementById('los-apply').onclick = () => { applyPersonalSetting(selectedImage); redraw(); };
-                document.getElementById('los-image').onclick = () => { applyPersonalSetting(selectedImage); redraw(); };
-                document.getElementById('los-reset').onclick = () => { selectedImage = 3; applyPersonalSetting(null); redraw(); };
+                document.getElementById('los-apply').onclick = () => { applyPersonalSetting(selectedImage); closeOverlay('modal-overlay'); };
+
+                document.getElementById('los-reset').onclick = () => { selectedImage = 3; applyPersonalSetting(null); closeOverlay('modal-overlay'); };
                 redraw();
                 openOverlay('modal-overlay');
             }
@@ -876,7 +878,7 @@
                 document.getElementById('modal-body-content').innerHTML = `<div class="about-copy">
                     <h3>M5 Stackによる観測</h3><p>各地点のM5 StackでWi-Fiのプローブデータを取得し、入込状況の参考情報として表示しています。検出数は実人数と一致するとは限らず、端末の保有状況・電波環境・遮蔽物などの影響を受けます。このアプリでは時間帯ごとの検出数の平均値（四捨五入）を使用しています。</p>
                     <h3>標準設定：統計的な水準による6段階表示</h3><p>各地点の統計的数値から設定された crowded_milli_criterion.csv の5つの境界値を使います。境界値ちょうどは、人数の少ない側に含めます。</p>
-                    <p>① 0 ≤ N ≤ comfortable：快適<br>② comfortable &lt; N ≤ notcrowded：ゆとりあり<br>③ notcrowded &lt; N ≤ normal：通常（白）<br>④ normal &lt; N ≤ crowded：やや混雑<br>⑤ crowded &lt; N ≤ Bustling：混雑<br>⑥ Bustling &lt; N：賑やか</p>
+                    <p>① 0 ≤ N ≤ comfortable：快適<br>② comfortable &lt; N ≤ notcrowded：ゆとりあり<br>③ notcrowded &lt; N ≤ normal：通常（淡い黄緑）<br>④ normal &lt; N ≤ crowded：ほどよい賑わい<br>⑤ crowded &lt; N ≤ Bustling：賑わい<br>⑥ Bustling &lt; N：賑やか</p>
                     <h3>ゆとり設定：選んだ画像を快適さの限界に</h3><p>画像の床面積を14.52㎡（4.4m × 3.3m）と推定し、6枚の人数を順に1・2・3・4・15・35人（自分を含む）とします。画像の推定面積は仮定であり、厳密な実測値ではありません。選択時は統計的な人数境界を使わず、Fruinの面積基準を比例調整します。</p>
                     <code>A_user = 14.52 / n<br>k = A_user / (35 × 0.09290304)</code>
                     <p>nは選んだ画像の人数、A_userは快適さの限界となる1人あたり面積（㎡/人）、kはFruin基準の倍率です。1 ft² = 0.09290304㎡。</p>
@@ -886,7 +888,7 @@
                     <p>A′：A_obs ≥ T₁<br>B′：T₂ ≤ A_obs &lt; T₁<br>C′：T₃ ≤ A_obs &lt; T₂<br>D′：T₄ ≤ A_obs &lt; T₃<br>E′：T₅ ≤ A_obs &lt; T₄<br>F′：A_obs &lt; T₅</p>
                     <p>A′〜F′を順に①快適〜⑥賑やかに対応させます。観測値が0で有効面積が設定済みの場合はA′とします。選択画像より1人あたり面積が小さくなるとB′以下になります。Fruin本来の歩行サービス水準を観光の快適さに応用した試行モデルであり、快適さそのものの実測ではありません。</p>
                     <h3>身体コアとパーソナルスペース</h3><code>a = √(0.3 / π) ≈ 0.309 m<br>A = π(a + r)²<br>r = √(A / π) − a</code><p>aは身体コア半径、0.3㎡は身体コア面積、rは身体の外側の余裕です。面積Aが0.3㎡未満なら非負のrは算出できず、面積による判定は参考値です。この関係式によって面積に身体コアを二重加算することはありません。</p>
-                    <h3>表示と保存</h3><p>通常は白（ひゃくまんさんは薄い灰色）、データなし・判定不可は灰色（ひゃくまんさんは濃い灰色）です。未来の時間帯も未観測として灰色です。ゆとり設定はこのブラウザに保存され、マップ・ポップアップ・カレンダーに適用されます。「初期設定に戻す」で標準設定に戻せます。</p><p>Version 2.0.1 · 2026-10-20</p></div>`;
+                    <h3>表示と保存</h3><p>通常は淡い黄緑（ひゃくまんさんも淡い黄緑）、データなし・判定不可は灰色（ひゃくまんさんは濃い灰色）です。未来の時間帯も未観測として灰色です。ゆとり設定は「決定」を押すとこのブラウザに保存され、マップ・ポップアップ・カレンダーに適用されます。「初期設定に戻す」で標準設定に戻せます。</p></div>`;
                 document.getElementById('close-modal-btn-footer').textContent = '閉じる';
                 openOverlay('modal-overlay');
             }
@@ -900,7 +902,8 @@
             }
             function closeOverlay(id) {
                 const el = document.getElementById(id);
-                el.classList.remove('open'); el.style.display = '';
+                el.classList.remove('open'); el.classList.remove('comfort-modal'); el.style.display = '';
+                document.getElementById('los-reset').hidden = true;
                 document.body.style.overflow = '';
                 overlayOrigin?.focus();
             }
