@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Version 2.0.3 | 2026-10-20 -->
+    <!-- Version 2.1.0 | 2026-11-11 -->
     <title>いしかわ観光地リアルタイムナビ</title>
     <link rel="icon" href="./favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -241,9 +241,23 @@
 .level-6-bg{background-color:#B43C46}.level-6-text{color:#B43C46}.custom-div-icon .level-6-border{border-color:#B43C46}.custom-div-icon .level-6-border .marker-pin{border-top-color:#B43C46}
 .level-0-bg,.future-time-bg{background-color:#e5e7eb}.level-0-text{color:#555}.custom-div-icon .level-0-border{border-color:#e5e7eb}.custom-div-icon .level-0-border .marker-pin{border-top-color:#e5e7eb}
 .comfort-reset{border:0;background:transparent;color:#6b7280;font-size:12px;padding:10px 8px;text-decoration:underline;min-height:44px;cursor:pointer}.comfort-confirm{min-width:180px;min-height:46px}.comfort-modal #close-modal-btn-footer{background:transparent;color:#666;border:1px solid #d1d5db;box-shadow:none;font-weight:400;font-size:13px;padding:8px 20px}.comfort-status:empty{display:none}
+    
+        body.launching{overflow:hidden}#app-shell{flex:1;display:flex;flex-direction:column}
+        #launch-screen{position:fixed;inset:0;z-index:5000;overflow:auto;background:radial-gradient(ellipse at 80% 10%,#ebe7f2 0,transparent 55%),radial-gradient(ellipse at 10% 90%,#e6efdf 0,transparent 50%),#faf9f5;display:grid;place-items:center;padding:24px}
+        .launch-inner{text-align:center;width:min(100%,640px);margin:auto}.launch-brand{display:flex;gap:20px;justify-content:center;align-items:center;color:#482e6e}.launch-logo{width:70px;height:85px;object-fit:contain}.launch-brand h1{font-size:clamp(18px,4.5vw,26px);line-height:1.6;text-align:left}.launch-message{font-size:clamp(27px,6.7vw,45px);line-height:1.85;letter-spacing:.09em;color:#482e6e;margin:40px 0 30px;opacity:0;animation:launch-in 1.2s ease 1s forwards}.launch-button-space{min-height:64px}#launch-start{border:0;border-radius:32px;background:#5A3A8A;color:white;font-size:17px;padding:16px 56px;box-shadow:0 6px 22px #5a3a8a25;cursor:pointer;animation:launch-in .5s ease both}#launch-start:disabled{background:#8b809a;cursor:wait}.data-notice{background:#faf7ed;border:1px solid #e8e0cd;border-radius:8px;padding:10px 14px;font-size:12px;color:#665b42;margin-bottom:12px}@keyframes launch-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        @media(prefers-reduced-motion:reduce){.launch-message{animation:none;opacity:1}#launch-start{animation:none}}
+        @media(max-height:560px){.launch-message{font-size:25px;line-height:1.5;margin:16px 0}.launch-logo{height:55px}.launch-brand h1{font-size:18px}}
     </style>
 </head>
-<body>
+<body class="launching">
+    <section id="launch-screen" aria-label="いしかわ観光地リアルタイムナビ 起動画面">
+      <div class="launch-inner">
+        <div class="launch-brand"><img src="./logo_kanazawa_notext.svg" alt="" class="launch-logo"><h1 class="font-mincho">いしかわ観光地<br>リアルタイムナビ</h1></div>
+        <p class="launch-message font-mincho">次はどこ行く？<br>ゆとりある私らしい<br>いしかわ観光</p>
+        <div class="launch-button-space"><button id="launch-start" hidden disabled>はじめる</button></div>
+      </div>
+    </section>
+    <div id="app-shell" hidden>
 
     <div class="background-svg-top"></div>
 
@@ -313,7 +327,7 @@
                     <div class="barometer-colors"><div class="bar-color" style="background-color:#64a0af" title="快適"></div><div class="bar-color" style="background-color:#96B464" title="ゆとりあり"></div><div class="bar-color" style="background-color:#C7D99B" title="通常"></div><div class="bar-color" style="background-color:#D2AF50" title="ほどよい賑わい"></div><div class="bar-color" style="background-color:#D27341" title="賑わい"></div><div class="bar-color" style="background-color:#B43C46" title="賑やか"></div></div><div class="barometer-labels"><span>快適</span><span class="bar-label-center">通常</span><span>賑やか</span></div><div class="no-data-key"><span></span>データなし／判定不可</div>
                 </div>
             </div>
-            <div id="map"></div>
+            <p id="data-notice" class="data-notice" role="status" hidden></p><div id="map"></div>
         </div>
         
         <div id="calendar-content" class="tab-content">
@@ -420,9 +434,94 @@
         </div>
     </div>
     
+    </div>
     <script>
+        const RECENT_MS = 60 * 60 * 1000;
+        const JST_MS = 9 * 60 * 60 * 1000;
+        const DIRECT_LOG_URLS = {
+            '近江町市場':'https://ifdl.jp/akita/WiScount/log/4827e2e3b2b4.txt',
+            '兼六園（桂坂口）':'https://ifdl.jp/akita/WiScount/log/c04e30114f5c.txt',
+            'ひがし茶屋街':'https://ifdl.jp/akita/WiScount/log/c04e3012ef88.txt',
+            '金沢21世紀美術館':'https://ifdl.jp/akita/WiScount/log/c04e3012f04c.txt',
+            '金沢駅（東口バス乗り場）':'https://ifdl.jp/akita/WiScount/log/4827e2e3b99c.txt',
+            '長町武家屋敷跡（野村家）':'https://ifdl.jp/akita/WiScount/log/4827e2e3c1fc.txt'
+        };
+        function jstParts(timestamp = Date.now()) {
+            const d = new Date(timestamp + JST_MS);
+            return {year:d.getUTCFullYear(),month:d.getUTCMonth()+1,day:d.getUTCDate(),hour:d.getUTCHours(),minute:d.getUTCMinutes(),second:d.getUTCSeconds()};
+        }
+        // Calendar functions use a local Date carrying Japan's calendar fields only.
+        function japanCalendarNow() {
+            const p = jstParts(); return new Date(p.year,p.month-1,p.day,p.hour,p.minute,p.second);
+        }
+        function normalizeObservation(row, utc = false) {
+            const keys=['year','month','day','hour','minute','second','count'];
+            if(keys.some(k => row[k] == null || String(row[k]).trim() === '')) return null;
+            const [y,m,d,h,mi,se,count]=keys.map(k=>Number(row[k]));
+            if (![y,m,d,h,mi,se].every(Number.isInteger) || !Number.isFinite(count) || count<0 || y<2000 || y>2100 || m<1 || m>12 || d<1 || h<0 || h>23 || mi<0 || mi>59 || se<0 || se>59) return null;
+            const wall=Date.UTC(y,m-1,d,h,mi,se), check=new Date(wall);
+            if(check.getUTCMonth()!==m-1 || check.getUTCDate()!==d) return null;
+            const timestamp=wall-(utc?0:JST_MS);
+            return {...jstParts(timestamp),count,timestamp};
+        }
+        function parseDirectLog(text) {
+            return text.replace(/^\uFEFF/,'').split(/\r?\n/).map(line=>{
+                const fields=line.trim().split(',').map(v=>v.trim());
+                if(fields.length!==7)return null;
+                return normalizeObservation(Object.fromEntries(['year','month','day','hour','minute','second','count'].map((k,i)=>[k,fields[i]])),true);
+            }).filter(Boolean);
+        }
+        function latestRecent(rows, now=Date.now()) {
+            return rows.reduce((latest,r)=>r.timestamp<=now && now-r.timestamp<=RECENT_MS && (!latest || r.timestamp>latest.timestamp)?r:latest,null);
+        }
+        function mergeObservations(github,direct) {
+            const byTime=new Map();
+            for(const r of [...github,...direct])byTime.set(r.timestamp,r);
+            return [...byTime.values()].sort((a,b)=>a.timestamp-b.timestamp);
+        }
+        async function fetchTextBounded(url,timeout=15000) {
+            const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),timeout);
+            try {
+                const response=await fetch(url,{signal:controller.signal,cache:'no-store',credentials:'omit'});
+                if(!response.ok)throw new Error('HTTP '+response.status);
+                return await response.text();
+            } finally {clearTimeout(timer);}
+        }
+        async function loadObservations(name,url,loadCsv,now=()=>Date.now()) {
+            const github=(url?await loadCsv(url):[]).map(r=>normalizeObservation(r)).filter(Boolean);
+            if(!url || latestRecent(github,now()))return {records:mergeObservations(github,[]),fallback:false,failed:false};
+            try {
+                const direct=parseDirectLog(await fetchTextBounded(DIRECT_LOG_URLS[name],20000));
+                if(!direct.length)throw new Error('No valid observations');
+                return {records:mergeObservations(github,direct),fallback:true,failed:false};
+            }catch(error){
+                console.warn('Direct observation fetch failed:',name,error);
+                return {records:mergeObservations(github,[]),fallback:true,failed:true};
+            }
+        }
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(initializeApp, 0);
+            const splash=document.getElementById('launch-screen'), start=document.getElementById('launch-start');
+            let ready=false, elapsed=false;
+            const update=()=>{
+                start.hidden=!elapsed;start.disabled=!ready;
+                start.textContent=ready?'はじめる':'読み込み中…';
+            };
+            setTimeout(()=>{elapsed=true;update();},3000);
+            initializeApp().then(()=>{ready=true;update();}).catch(error=>{
+                console.error(error);ready=true;update();
+                document.getElementById('data-notice').textContent='データを読み込めませんでした。時間をおいて再度お試しください。';
+                document.getElementById('data-notice').hidden=false;
+            });
+            start.onclick=()=>{
+                if(!ready)return;
+                document.getElementById('app-shell').hidden=false;
+                splash.hidden=true;
+                document.body.classList.remove('launching');
+                window.dispatchEvent(new Event('resize'));
+                if(window.L?.Util?.getMapInstance) setTimeout(()=>L.Util.getMapInstance().invalidateSize(),0);
+                document.getElementById('modal-overlay').style.display='flex';
+                document.getElementById('close-modal-btn-footer').focus();
+            };
         });
 
         async function initializeApp() {
@@ -481,6 +580,8 @@
 
             // 起動時モーダルを表示
             showStartupModal();
+            document.getElementById('modal-overlay').style.display='none';
+            ['close-modal-btn','close-modal-btn-footer'].forEach(id=>document.getElementById(id).onclick=()=>{document.getElementById('modal-overlay').style.display='none';});
 
             // --- Utility Functions ---
             const placeholderImg = (text = 'Image') => `https://placehold.co/300x200/cccccc/333333?text=${encodeURIComponent(text)}`;
@@ -520,9 +621,7 @@
 
             const loadCsvData = async (path) => {
                 try {
-                    const response = await fetch(path);
-                    if (!response.ok) throw new Error(`Failed to load ${path}`);
-                    const csvText = await response.text();
+                    const csvText = await fetchTextBounded(path, 12000);
                     const cleanCsvText = csvText.replace(/^\uFEFF/, '');
                     return new Promise((resolve) => {
                         Papa.parse(cleanCsvText, {
@@ -605,7 +704,7 @@
 
             // --- Main Execution ---
             let facilityData = [];
-            let latestDateObj = new Date();
+            let latestDateObj = japanCalendarNow();
             let mapInstance = null;
 
             try {
@@ -619,15 +718,21 @@
                     const csvUrl = FACILITY_CSV_URLS[name];
                     
                     const criterion = criterionData.find(c => c.地点名 && c.地点名.trim() === name);
-                    const rawMilliData = csvUrl ? await loadCsvData(csvUrl) : [];
-                    const milli = processNewCsvData(rawMilliData);
-                    return { ...master, criterion, milli };
+                    const result = await loadObservations(name, csvUrl, loadCsvData);
+                    const milli = processNewCsvData(result.records);
+                    return { ...master, criterion, milli, observations:result.records, fallbackFailed:result.failed };
                 });
 
                 facilityData = (await Promise.all(facilityDataPromises)).filter(f => f && f.緯度);
+                const missing = facilityData.filter(f=>FACILITY_CSV_URLS[f.地点名.trim()] && !latestRecent(f.observations));
+                const notice=document.getElementById('data-notice');
+                if(!facilityData.length || missing.length){
+                    notice.hidden=false;
+                    notice.textContent=!facilityData.length?'地点データを読み込めませんでした。時間をおいて再度お試しください。':missing.map(f=>f.地点名).join('・')+'：直近1時間のデータを取得できませんでした。現在の状況は灰色で表示します。';
+                }
                 
                 const allMilliData = facilityData.reduce((acc, f) => acc.concat(f.milli), []);
-                latestDateObj = getLatestDateFromData(allMilliData) || new Date();
+                latestDateObj = getLatestDateFromData(allMilliData) || japanCalendarNow();
 
                 const mapElement = document.getElementById('map');
                 mapInstance = L.map(mapElement).setView([36.565, 136.658], 14);
@@ -645,6 +750,7 @@
 
             } catch (error) {
                 console.error("Initialization failed:", error);
+                throw error;
             }
 
             // --- Marker & Popup ---
@@ -672,20 +778,16 @@
                 mapMarkers.forEach(marker => map.removeLayer(marker));
                 mapMarkers.length = 0;
                 // 常に実行日（今日）を基準にする
-                const todayString = formatDateForCsv(new Date()); 
-                const currentHour = new Date().getHours();
+                const todayString = formatDateForCsv(japanCalendarNow()); 
+                const currentHour = japanCalendarNow().getHours();
 
                 facilityData.forEach(facility => {
                     const lat = parseFloat(facility.緯度);
                     const lon = parseFloat(facility.経度);
                     if (isNaN(lat) || isNaN(lon)) return;
                     
-                    // 今日の「現在時刻」または「1時間前」のデータのみに絞り込む
-                    const latestRecord = facility.milli
-                        .filter(d => d.年月日 === todayString && (parseInt(d.時刻, 10) === currentHour || parseInt(d.時刻, 10) === currentHour - 1))
-                        .sort((a, b) => parseInt(b.時刻, 10) - parseInt(a.時刻, 10))[0];
-
-                    const level = latestRecord ? getCongestionLevel(latestRecord.人数, facility.criterion) : 0;
+                    const latestRecord = latestRecent(facility.observations || []);
+                    const level = latestRecord ? getCongestionLevel(latestRecord.count, facility.criterion) : 0;
                     const marker = L.marker([lat, lon], { icon: createCustomIcon(level, facility.地点名) }).addTo(map);
                     
                     mapMarkers.push(marker);
@@ -703,7 +805,7 @@
                                     <p class="font-bold text-base level-${level}-text">${statusMessage(level, facility.criterion)}</p>
                                 </div>
                             </div>
-                            <p class="text-xs text-gray-500 mb-2">本日の実績推移</p>
+                            <p class="text-xs text-gray-500 text-center">${latestRecord ? '観測時刻 '+String(latestRecord.hour).padStart(2,'0')+':'+String(latestRecord.minute).padStart(2,'0')+'（日本時間）' : '直近1時間のデータなし'}</p><p class="text-xs text-gray-500 mb-2">本日の実績推移</p>
                             ${createMiniCalendarHtml(facility, todayString, currentHour)}
                             <button class="btn-primary popup-calendar-btn mt-4 w-full" data-facility-name="${facility.地点名}">
                                 <img src="./calendar_icon.svg" class="icon-sm" style="filter:invert(1)">
@@ -761,8 +863,8 @@
                 toggleBtn.textContent = '観光スポット一覧から選ぶ';
                 toggleBtn.onclick = () => switchToTab('introduction-content');
 
-                const currentHour = new Date().getHours();
-                const currentMin = new Date().getMinutes();
+                const currentHour = japanCalendarNow().getHours();
+                const currentMin = japanCalendarNow().getMinutes();
 
                 let headerHtml = '<tr><th>時刻</th>';
                 facilityData.forEach(f => { headerHtml += `<th>${f.地点名}</th>`; });
@@ -774,7 +876,7 @@
                         const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
                         bodyHtml += `<tr><td class="time-header">${timeStr}</td>`;
                         facilityData.forEach(f => {
-                            let isFuture = latestDateObj.toDateString() === new Date().toDateString() && ((h > currentHour) || (h === currentHour && m > currentMin));
+                            let isFuture = latestDateObj.toDateString() === japanCalendarNow().toDateString() && ((h > currentHour) || (h === currentHour && m > currentMin));
                             if (isFuture) {
                                 bodyHtml += `<td class="future-time-bg"></td>`;
                             } else {
@@ -876,7 +978,7 @@
             function showAboutModal() {
                 document.getElementById('modal-header-title').textContent = 'このアプリについて';
                 document.getElementById('modal-body-content').innerHTML = `<div class="about-copy">
-                    <h3>M5 Stackによる観測</h3><p>各地点のM5 StackでWi-Fiのプローブデータを取得し、入込状況の参考情報として表示しています。検出数は実人数と一致するとは限らず、端末の保有状況・電波環境・遮蔽物などの影響を受けます。このアプリでは時間帯ごとの検出数の平均値（四捨五入）を使用しています。</p>
+                    <h3>M5 Stackによる観測</h3><p>各地点のM5 StackでWi-Fiのプローブデータを取得し、入込状況の参考情報として表示しています。検出数は実人数と一致するとは限らず、端末の保有状況・電波環境・遮蔽物などの影響を受けます。地図には直近60分以内の最新観測値を，時間別カレンダーには時間帯ごとの平均値（四捨五入）を使用します。GitHubに直近60分のデータがない地点は，観測サーバーからの取得を試みます。取得できない場合も過去の実績は残し，現在の状況は灰色で表示します。</p>
                     <h3>標準設定：統計的な水準による6段階表示</h3><p>各地点の統計的数値から設定された crowded_milli_criterion.csv の5つの境界値を使います。境界値ちょうどは、人数の少ない側に含めます。</p>
                     <p>① 0 ≤ N ≤ comfortable：快適<br>② comfortable &lt; N ≤ notcrowded：ゆとりあり<br>③ notcrowded &lt; N ≤ normal：通常（淡い黄緑）<br>④ normal &lt; N ≤ crowded：ほどよい賑わい<br>⑤ crowded &lt; N ≤ Bustling：賑わい<br>⑥ Bustling &lt; N：賑やか</p>
                     <h3>ゆとり設定：選んだ画像を快適さの限界に</h3><p>画像の床面積を14.52㎡（4.4m × 3.3m）と推定し、6枚の人数を順に1・2・3・4・15・35人（自分を含む）とします。画像の推定面積は仮定であり、厳密な実測値ではありません。選択時は統計的な人数境界を使わず、Fruinの面積基準を比例調整します。</p>
@@ -968,9 +1070,9 @@
                 toggleBtn.textContent = '全体表示に戻る';
                 toggleBtn.onclick = () => displayTodayAllFacilitiesCalendar(facilityData, latestDateObj);
 
-                const currentHour = new Date().getHours();
-                const currentMin = new Date().getMinutes();
-                const realToday = new Date();
+                const currentHour = japanCalendarNow().getHours();
+                const currentMin = japanCalendarNow().getMinutes();
+                const realToday = japanCalendarNow();
 
                 const dates = [];
                 for (let i = 6; i >= 0; i--) {
