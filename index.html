@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Version 2.1.1 | 2026-11-11 -->
     <title>いしかわ観光地リアルタイムナビ</title>
     <link rel="icon" href="./favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -137,7 +138,7 @@
         .custom-div-icon .marker-pin-container:hover { transform: translate(-40px, -80px) scale(1.1); }
         .custom-div-icon .marker-image-wrapper { width: 80px; height: 80px; border-radius: 50%; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.2); background-color: #1a1a1a; border: 4px solid white; }
         
-        /* 5段階ボーダー色 */
+        /* 6段階ボーダー色 */
         .custom-div-icon .level-1-border { border-color: #64a0af; }
         .custom-div-icon .level-2-border { border-color: #96B464; }
         .custom-div-icon .level-3-border { border-color: #D2AF50; }
@@ -187,7 +188,7 @@
         .barometer-labels { display: flex; justify-content: space-between; width: 100%; font-size: 0.75rem; color: #666; position: relative; }
         .bar-label-center { position: absolute; left: 50%; transform: translateX(-50%); }
 
-        /* 5段階背景色 */
+        /* 6段階背景色 */
         .level-1-bg { background-color: #64a0af; }
         .level-2-bg { background-color: #96B464; }
         .level-3-bg { background-color: #D2AF50; }
@@ -195,7 +196,7 @@
         .level-5-bg { background-color: #B43C46; }
         .future-time-bg { background-color: #f0f0f0; }
 
-        /* 5段階テキスト色 */
+        /* 6段階テキスト色 */
         .level-1-text { color: #64a0af; }
         .level-2-text { color: #96B464; }
         .level-3-text { color: #D2AF50; }
@@ -211,9 +212,60 @@
 
         /* ポップアップ内のダルマアイコンサイズを1/3程度に調整 */
         .popup-congestion-icon { width: 100%; height: auto; max-width: 50px; }
+    
+        /* Standard edition: six levels and fixed drawer */
+        [hidden]{display:none!important}
+        .realtime-heading{display:flex;align-items:center;gap:12px;justify-content:space-between}
+        
+        
+        .mode-note{font-size:12px;color:#5A3A8A;margin:5px 0}
+        .six-labels{display:grid;grid-template-columns:repeat(6,1fr);width:100%;font-size:10px;text-align:center;color:#555}
+        .no-data-key{font-size:10px;color:#666;align-self:flex-end;margin-top:6px;display:flex;align-items:center;gap:5px}.no-data-key span{width:12px;height:10px;background:#e5e7eb}
+        .drawer-backdrop{position:fixed;inset:0;background:#0006;z-index:1500;display:none;justify-content:flex-end}
+        .drawer-backdrop.open{display:flex}.side-drawer{width:min(320px,88vw);height:100%;background:white;padding:24px;overflow-y:auto;box-shadow:-8px 0 30px #0002}
+        .drawer-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;font-weight:bold}.drawer-link{display:flex;align-items:center;gap:10px;width:100%;padding:16px 8px;border-bottom:1px solid #eee;text-align:left}
+        .modal-overlay{z-index:2000}.modal-content{min-height:0;overscroll-behavior:contain}.modal-container{max-height:92dvh}
+        
+        
+        
+        
+        
+        .about-copy{font-size:14px;line-height:1.8}.about-copy h3{font-weight:bold;margin:18px 0 5px}.about-copy code{display:block;white-space:normal;background:#f5f3f8;padding:10px;border-radius:8px;margin:8px 0}
+        .popup-congestion-icon.tone-normal{filter:saturate(.65) brightness(1.2);opacity:1}.popup-congestion-icon.tone-off{filter:grayscale(1) brightness(1.15);opacity:.65}
+        @media(max-width:480px){.realtime-heading h2{font-size:18px}.realtime-heading{gap:6px}.modal-content{padding:14px}.modal-header,.modal-footer{padding:12px 14px}.header-title{white-space:normal}}
+.level-1-bg{background-color:#64a0af}.level-1-text{color:#64a0af}.custom-div-icon .level-1-border{border-color:#64a0af}.custom-div-icon .level-1-border .marker-pin{border-top-color:#64a0af}
+.level-2-bg{background-color:#96B464}.level-2-text{color:#96B464}.custom-div-icon .level-2-border{border-color:#96B464}.custom-div-icon .level-2-border .marker-pin{border-top-color:#96B464}
+.level-3-bg{background-color:#C7D99B}.level-3-text{color:#555}.custom-div-icon .level-3-border{border-color:#C7D99B}.custom-div-icon .level-3-border .marker-pin{border-top-color:#C7D99B}
+.level-4-bg{background-color:#D2AF50}.level-4-text{color:#D2AF50}.custom-div-icon .level-4-border{border-color:#D2AF50}.custom-div-icon .level-4-border .marker-pin{border-top-color:#D2AF50}
+.level-5-bg{background-color:#D27341}.level-5-text{color:#D27341}.custom-div-icon .level-5-border{border-color:#D27341}.custom-div-icon .level-5-border .marker-pin{border-top-color:#D27341}
+.level-6-bg{background-color:#B43C46}.level-6-text{color:#B43C46}.custom-div-icon .level-6-border{border-color:#B43C46}.custom-div-icon .level-6-border .marker-pin{border-top-color:#B43C46}
+.level-0-bg,.future-time-bg{background-color:#e5e7eb}.level-0-text{color:#555}.custom-div-icon .level-0-border{border-color:#e5e7eb}.custom-div-icon .level-0-border .marker-pin{border-top-color:#e5e7eb}
+
+    
+        body.launching{overflow:hidden}#app-shell{flex:1;display:flex;flex-direction:column}
+        #launch-screen{position:fixed;inset:0;z-index:5000;overflow:auto;background:radial-gradient(ellipse at 80% 10%,#ebe7f2 0,transparent 55%),radial-gradient(ellipse at 10% 90%,#e6efdf 0,transparent 50%),#faf9f5;display:grid;place-items:center;padding:24px}
+        .launch-inner{text-align:center;width:min(100%,640px);margin:auto}.launch-brand{display:flex;gap:20px;justify-content:center;align-items:center;color:#482e6e}.launch-logo{width:70px;height:85px;object-fit:contain}.launch-brand h1{font-size:clamp(18px,4.5vw,26px);line-height:1.6;text-align:left}.launch-message{font-size:clamp(27px,6.7vw,45px);line-height:1.85;letter-spacing:.09em;color:#482e6e;margin:40px 0 30px;opacity:0;animation:launch-in 1.2s ease 1s forwards}.launch-button-space{min-height:64px}#launch-start{border:0;border-radius:32px;background:#5A3A8A;color:white;font-size:17px;padding:16px 56px;box-shadow:0 6px 22px #5a3a8a25;cursor:pointer;animation:launch-in .5s ease both}#launch-start:disabled{background:#8b809a;cursor:wait}.data-notice{background:#faf7ed;border:1px solid #e8e0cd;border-radius:8px;padding:10px 14px;font-size:12px;color:#665b42;margin-bottom:12px}@keyframes launch-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        @media(prefers-reduced-motion:reduce){.launch-message{animation:none;opacity:1}#launch-start{animation:none}}
+        @media(max-height:560px){.launch-message{font-size:25px;line-height:1.5;margin:16px 0}.launch-logo{height:55px}.launch-brand h1{font-size:18px}}
+    
+        /* Keep the brand itself at the viewport center; supporting text sits below. */
+        #launch-screen{display:block}
+        .launch-inner{position:relative;height:calc(100vh - 48px);height:calc(100dvh - 48px);min-height:480px}
+        .launch-brand{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%)}
+        .launch-message{position:absolute;top:calc(50% + 64px);left:0;right:0;margin:0;font-size:clamp(15px,3.8vw,20px);font-weight:400;line-height:1.75;letter-spacing:.06em;color:#9b93a5}
+        .launch-button-space{position:absolute;top:calc(50% + 190px);left:0;right:0}
+        @media(max-height:560px){.launch-inner{min-height:380px}.launch-message{top:calc(50% + 45px);font-size:14px;line-height:1.5}.launch-button-space{top:calc(50% + 125px)}#launch-start{padding:12px 42px;font-size:15px}}
     </style>
 </head>
-<body>
+<body class="launching">
+    <section id="launch-screen" aria-label="いしかわ観光地リアルタイムナビ 起動画面">
+      <div class="launch-inner">
+        <div class="launch-brand"><img src="./logo_kanazawa_notext.svg" alt="" class="launch-logo"><h1 class="font-mincho">いしかわ観光地<br>リアルタイムナビ</h1></div>
+        <p class="launch-message font-mincho">次はどこ行く？<br>ゆとりある私らしい<br>いしかわ観光</p>
+        <div class="launch-button-space"><button id="launch-start" hidden disabled>はじめる</button></div>
+      </div>
+    </section>
+    <div id="app-shell" hidden>
 
     <div class="background-svg-top"></div>
 
@@ -250,13 +302,6 @@
                     <button id="hamburger-btn-pc" class="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition focus:outline-none">
                         <i data-lucide="menu" class="icon"></i>
                     </button>
-                    <div id="pc-menu-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
-                        <div class="px-4 py-1 text-xs font-bold text-gray-400 mb-1">言語 / Language</div>
-                        <a href="#" class="block px-4 py-2 text-sm text-purple-700 bg-purple-50 font-bold">日本語</a>
-                        <a href="https://beeb-c4n.github.io/crowdedmap2/en/index.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">English</a>
-                        <!-- 将来の拡張用 -->
-                        <!-- <a href="/zh/index.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">中文</a> -->
-                    </div>
                 </div>
             </div>
         </div>
@@ -276,15 +321,6 @@
                 <i data-lucide="menu" class="icon"></i>
             </button>
         </div>
-
-        <!-- モバイル用 ドロップダウンメニュー -->
-        <div id="mobile-menu-dropdown" class="hidden mt-3 border-t border-gray-200 pt-2">
-            <div class="px-2 py-1 text-xs font-bold text-gray-400">言語 / Language</div>
-            <a href="#" class="block px-4 py-3 text-sm text-purple-700 bg-purple-50 font-bold rounded-lg mb-1">日本語</a>
-            <a href="https://beeb-c4n.github.io/crowdedmap2/en/index.html" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition">English</a>
-            <!-- 将来の拡張用 -->
-            <!-- <a href="/zh/index.html" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition">中文</a> -->
-        </div>
     </header>
 
     <main class="container mx-auto p-4 md:p-8">
@@ -292,25 +328,14 @@
         <div id="map-content" class="tab-content active">
             <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">リアルタイム入込状況</h2>
+                    <div class="realtime-heading"><h2 class="text-2xl font-bold text-gray-800">リアルタイム入込状況</h2></div>
                     <p class="text-gray-500">現在の入込状況をマップで確認できます。</p>
                 </div>
                 <div class="barometer-container">
-                    <div class="barometer-colors">
-                        <div class="bar-color" style="background-color: #64a0af;"></div>
-                        <div class="bar-color" style="background-color: #96B464;"></div>
-                        <div class="bar-color" style="background-color: #D2AF50;"></div>
-                        <div class="bar-color" style="background-color: #D27341;"></div>
-                        <div class="bar-color" style="background-color: #B43C46;"></div>
-                    </div>
-                    <div class="barometer-labels">
-                        <span>快適</span>
-                        <span class="bar-label-center">通常</span>
-                        <span>賑やか</span>
-                    </div>
+                    <div class="barometer-colors"><div class="bar-color" style="background-color:#64a0af" title="快適"></div><div class="bar-color" style="background-color:#96B464" title="ゆとりあり"></div><div class="bar-color" style="background-color:#C7D99B" title="通常"></div><div class="bar-color" style="background-color:#D2AF50" title="ほどよい賑わい"></div><div class="bar-color" style="background-color:#D27341" title="賑わい"></div><div class="bar-color" style="background-color:#B43C46" title="賑やか"></div></div><div class="barometer-labels"><span>快適</span><span class="bar-label-center">通常</span><span>賑やか</span></div><div class="no-data-key"><span></span>データなし／判定不可</div>
                 </div>
             </div>
-            <div id="map"></div>
+            <p id="data-notice" class="data-notice" role="status" hidden></p><div id="map"></div>
         </div>
         
         <div id="calendar-content" class="tab-content">
@@ -323,18 +348,7 @@
             </div>
             <div class="flex flex-col items-center mb-6">
                 <div class="barometer-container">
-                    <div class="barometer-colors">
-                        <div class="bar-color" style="background-color: #64a0af;"></div>
-                        <div class="bar-color" style="background-color: #96B464;"></div>
-                        <div class="bar-color" style="background-color: #D2AF50;"></div>
-                        <div class="bar-color" style="background-color: #D27341;"></div>
-                        <div class="bar-color" style="background-color: #B43C46;"></div>
-                    </div>
-                    <div class="barometer-labels">
-                        <span>快適</span>
-                        <span class="bar-label-center">通常</span>
-                        <span>賑やか</span>
-                    </div>
+                    <div class="barometer-colors"><div class="bar-color" style="background-color:#64a0af" title="快適"></div><div class="bar-color" style="background-color:#96B464" title="ゆとりあり"></div><div class="bar-color" style="background-color:#C7D99B" title="通常"></div><div class="bar-color" style="background-color:#D2AF50" title="ほどよい賑わい"></div><div class="bar-color" style="background-color:#D27341" title="賑わい"></div><div class="bar-color" style="background-color:#B43C46" title="賑やか"></div></div><div class="barometer-labels"><span>快適</span><span class="bar-label-center">通常</span><span>賑やか</span></div><div class="no-data-key"><span></span>データなし／判定不可</div>
                 </div>
             </div>
             <div class="calendar-container-wrapper">
@@ -374,8 +388,9 @@
         </button>
     </nav>
 
+<div id="settings-drawer" class="drawer-backdrop" role="dialog" aria-modal="true" aria-label="設定" tabindex="-1"><aside class="side-drawer"><div class="drawer-heading">設定<button id="drawer-close" class="modal-close-btn" aria-label="設定を閉じる">×</button></div><button id="drawer-about" class="drawer-link"><i data-lucide="info" class="icon-sm"></i>このアプリについて</button><p class="text-xs text-gray-500 mt-6">言語 / Language</p><a href="#" id="drawer-ja" class="drawer-link">日本語</a><a href="https://beeb-c4n.github.io/crowdedmap2/en/index.html" class="drawer-link">English</a></aside></div>
     <!-- 起動時・免責事項モーダル -->
-    <div id="modal-overlay" class="modal-overlay">
+    <div id="modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-header-title" tabindex="-1">
         <div class="modal-container">
             <div class="modal-header">
                 <h2 id="modal-header-title" class="text-gray-800">免責事項</h2>
@@ -427,9 +442,95 @@
         </div>
     </div>
     
+    </div>
     <script>
+        const RECENT_MS = 60 * 60 * 1000;
+        const JST_MS = 9 * 60 * 60 * 1000;
+        const DIRECT_LOG_URLS = {
+            '近江町市場':'https://ifdl.jp/akita/WiScount/log/4827e2e3b2b4.txt',
+            '兼六園（桂坂口）':'https://ifdl.jp/akita/WiScount/log/c04e30114f5c.txt',
+            'ひがし茶屋街':'https://ifdl.jp/akita/WiScount/log/c04e3012ef88.txt',
+            '金沢21世紀美術館':'https://ifdl.jp/akita/WiScount/log/c04e3012f04c.txt',
+            '金沢駅（東口バス乗り場）':'https://ifdl.jp/akita/WiScount/log/4827e2e3b99c.txt',
+            '長町武家屋敷跡（野村家）':'https://ifdl.jp/akita/WiScount/log/4827e2e3c1fc.txt'
+        };
+        function jstParts(timestamp = Date.now()) {
+            const d = new Date(timestamp + JST_MS);
+            return {year:d.getUTCFullYear(),month:d.getUTCMonth()+1,day:d.getUTCDate(),hour:d.getUTCHours(),minute:d.getUTCMinutes(),second:d.getUTCSeconds()};
+        }
+        // Calendar functions use a local Date carrying Japan's calendar fields only.
+        function japanCalendarNow() {
+            const p = jstParts(); return new Date(p.year,p.month-1,p.day,p.hour,p.minute,p.second);
+        }
+        function normalizeObservation(row, utc = true) {
+            const keys=['year','month','day','hour','minute','second','count'];
+            if(keys.some(k => row[k] == null || String(row[k]).trim() === '')) return null;
+            const [y,m,d,h,mi,se,count]=keys.map(k=>Number(row[k]));
+            if (![y,m,d,h,mi,se].every(Number.isInteger) || !Number.isFinite(count) || count<0 || y<2000 || y>2100 || m<1 || m>12 || d<1 || h<0 || h>23 || mi<0 || mi>59 || se<0 || se>59) return null;
+            const wall=Date.UTC(y,m-1,d,h,mi,se), check=new Date(wall);
+            if(check.getUTCMonth()!==m-1 || check.getUTCDate()!==d) return null;
+            const timestamp=wall-(utc?0:JST_MS);
+            return {...jstParts(timestamp),count,timestamp};
+        }
+        function parseDirectLog(text) {
+            return text.replace(/^\uFEFF/,'').split(/\r?\n/).map(line=>{
+                const fields=line.trim().split(',').map(v=>v.trim());
+                if(fields.length!==7)return null;
+                return normalizeObservation(Object.fromEntries(['year','month','day','hour','minute','second','count'].map((k,i)=>[k,fields[i]])),true);
+            }).filter(Boolean);
+        }
+        function latestRecent(rows, now=Date.now()) {
+            return rows.reduce((latest,r)=>r.timestamp<=now && now-r.timestamp<=RECENT_MS && (!latest || r.timestamp>latest.timestamp)?r:latest,null);
+        }
+        function mergeObservations(github,direct) {
+            const byTime=new Map();
+            for(const r of [...github,...direct])byTime.set(r.timestamp,r);
+            return [...byTime.values()].sort((a,b)=>a.timestamp-b.timestamp);
+        }
+        async function fetchTextBounded(url,timeout=15000) {
+            const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),timeout);
+            try {
+                const response=await fetch(url,{signal:controller.signal,cache:'no-store',credentials:'omit'});
+                if(!response.ok)throw new Error('HTTP '+response.status);
+                return await response.text();
+            } finally {clearTimeout(timer);}
+        }
+        // Both GitHub CSV and direct logs contain UTC/GMT date fields.
+        async function loadObservations(name,url,loadCsv,now=()=>Date.now()) {
+            const github=(url?await loadCsv(url):[]).map(r=>normalizeObservation(r, true)).filter(Boolean);
+            if(!url || latestRecent(github,now()))return {records:mergeObservations(github,[]),fallback:false,failed:false};
+            try {
+                const direct=parseDirectLog(await fetchTextBounded(DIRECT_LOG_URLS[name],20000));
+                if(!direct.length)throw new Error('No valid observations');
+                return {records:mergeObservations(github,direct),fallback:true,failed:false};
+            }catch(error){
+                console.warn('Direct observation fetch failed:',name,error);
+                return {records:mergeObservations(github,[]),fallback:true,failed:true};
+            }
+        }
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(initializeApp, 0);
+            const splash=document.getElementById('launch-screen'), start=document.getElementById('launch-start');
+            let ready=false, elapsed=false;
+            const update=()=>{
+                start.hidden=!elapsed;start.disabled=!ready;
+                start.textContent=ready?'はじめる':'読み込み中…';
+            };
+            setTimeout(()=>{elapsed=true;update();},3000);
+            initializeApp().then(()=>{ready=true;update();}).catch(error=>{
+                console.error(error);ready=true;update();
+                document.getElementById('data-notice').textContent='データを読み込めませんでした。時間をおいて再度お試しください。';
+                document.getElementById('data-notice').hidden=false;
+            });
+            start.onclick=()=>{
+                if(!ready)return;
+                document.getElementById('app-shell').hidden=false;
+                splash.hidden=true;
+                document.body.classList.remove('launching');
+                window.dispatchEvent(new Event('resize'));
+                if(window.L?.Util?.getMapInstance) setTimeout(()=>L.Util.getMapInstance().invalidateSize(),0);
+                document.getElementById('modal-overlay').style.display='flex';
+                document.getElementById('close-modal-btn-footer').focus();
+            };
         });
 
         async function initializeApp() {
@@ -464,20 +565,24 @@
                 "金沢城公園": "./images/金沢城公園.jpg"
             };
 
-            // 5段階の混雑度定義
             const CONGESTION_LEVELS = {
-                1: { message: "非常に快適に観光いただけます", className: "level-1", svg: "only_daruma_blue.svg" },
-                2: { message: "快適に観光いただけます", className: "level-2", svg: "only_daruma_olive.svg" },
-                3: { message: "通常の混み具合です", className: "level-3", svg: "only_daruma_turmeric.svg" },
-                4: { message: "やや混み合っています", className: "level-4", svg: "only_daruma_rawsienna.svg" },
-                5: { message: "非常に賑わっています", className: "level-5", svg: "only_daruma_mediumcarmine.svg" },
-                0: { message: "データがありません", className: "level-off", svg: "only_daruma_off.svg" }
+                1: { message: "快適に観光いただけます", svg: "only_daruma_blue.svg" },
+                2: { message: "ゆとりをもって観光いただけます", svg: "only_daruma_olive.svg" },
+                3: { message: "通常の入込状況です", svg: "only_daruma_olive.svg" },
+                4: { message: "ほどよく賑わっています", svg: "only_daruma_turmeric.svg" },
+                5: { message: "賑わっています", svg: "only_daruma_rawsienna.svg" },
+                6: { message: "非常に賑わっています", svg: "only_daruma_mediumcarmine.svg" },
+                0: { message: "データなし／判定できません", svg: "only_daruma_off.svg" }
             };
+            let calendarFacility = null;
+            const mapMarkers = [];
 
             lucide.createIcons();
 
             // 起動時モーダルを表示
             showStartupModal();
+            document.getElementById('modal-overlay').style.display='none';
+            ['close-modal-btn','close-modal-btn-footer'].forEach(id=>document.getElementById(id).onclick=()=>{document.getElementById('modal-overlay').style.display='none';});
 
             // --- Utility Functions ---
             const placeholderImg = (text = 'Image') => `https://placehold.co/300x200/cccccc/333333?text=${encodeURIComponent(text)}`;
@@ -486,12 +591,12 @@
                 if (!data || data.length === 0) return [];
                 const hourlyAgg = {};
                 data.forEach(row => {
-                    if (row.year && row.month && row.day && row.hour && row.count) {
+                    if ([row.year,row.month,row.day,row.hour,row.count].every(v => v !== undefined && v !== null && String(v).trim() !== '')) {
                         try {
                             const dateStr = `${parseInt(row.year, 10)}/${parseInt(row.month, 10)}/${parseInt(row.day, 10)}`;
                             const hourStr = parseInt(row.hour, 10).toString();
                             const countVal = parseFloat(row.count);
-                            if (isNaN(countVal)) return;
+                            if (!Number.isFinite(countVal) || countVal < 0) return;
                             if (!hourlyAgg[dateStr]) hourlyAgg[dateStr] = {};
                             if (!hourlyAgg[dateStr][hourStr]) hourlyAgg[dateStr][hourStr] = { total: 0, numRecords: 0 };
                             hourlyAgg[dateStr][hourStr].total += countVal;
@@ -517,9 +622,7 @@
 
             const loadCsvData = async (path) => {
                 try {
-                    const response = await fetch(path);
-                    if (!response.ok) throw new Error(`Failed to load ${path}`);
-                    const csvText = await response.text();
+                    const csvText = await fetchTextBounded(path, 12000);
                     const cleanCsvText = csvText.replace(/^\uFEFF/, '');
                     return new Promise((resolve) => {
                         Papa.parse(cleanCsvText, {
@@ -542,23 +645,20 @@
 
             const formatDateForCsv = (date) => `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
 
-            // 混雑度判定ロジックを5段階に更新
+            // Standard edition: upper-inclusive statistical thresholds only.
             function getCongestionLevel(count, criterion) {
-                if (!criterion || count === null || count === undefined) return 0;
-                const num = parseInt(count, 10);
-                if (isNaN(num)) return 0;
-
-                const c1 = parseInt(criterion.comfortable, 10);
-                const c2 = parseInt(criterion.notcrowded, 10);
-                const c3 = parseInt(criterion.normal, 10);
-                const c4 = parseInt(criterion.crowded, 10);
-                const c5 = parseInt(criterion.Bustling, 10);
-
-                if (num <= c1) return 1;
-                if (num <= c2) return 2;
-                if (num <= c3) return 3;
-                if (num <= c4) return 4;
-                return 5;
+                if (count == null || String(count).trim() === '') return 0;
+                const num = Number(count);
+                if (!Number.isFinite(num) || num < 0 || !criterion) return 0;
+                const fields = ['comfortable', 'notcrowded', 'normal', 'crowded', 'Bustling'];
+                if (fields.some(key => criterion[key] == null || String(criterion[key]).trim() === '')) return 0;
+                const limits = fields.map(key => Number(criterion[key]));
+                if (limits.some((v,i) => !Number.isFinite(v) || v < 0 || (i > 0 && v <= limits[i-1]))) return 0;
+                const index = limits.findIndex(limit => num <= limit);
+                return index < 0 ? 6 : index + 1;
+            }
+            function statusMessage(level) {
+                return CONGESTION_LEVELS[level].message;
             }
 
             // --- モーダル制御 ---
@@ -593,7 +693,7 @@
 
             // --- Main Execution ---
             let facilityData = [];
-            let latestDateObj = new Date();
+            let latestDateObj = japanCalendarNow();
             let mapInstance = null;
 
             try {
@@ -605,22 +705,29 @@
                 const facilityDataPromises = masterData.map(async (master) => {
                     const name = master.地点名.trim();
                     const csvUrl = FACILITY_CSV_URLS[name];
-                    if (!csvUrl) return null;
+                    
                     const criterion = criterionData.find(c => c.地点名 && c.地点名.trim() === name);
-                    const rawMilliData = await loadCsvData(csvUrl);
-                    const milli = processNewCsvData(rawMilliData);
-                    return { ...master, criterion, milli };
+                    const result = await loadObservations(name, csvUrl, loadCsvData);
+                    const milli = processNewCsvData(result.records);
+                    return { ...master, criterion, milli, observations:result.records, fallbackFailed:result.failed };
                 });
 
                 facilityData = (await Promise.all(facilityDataPromises)).filter(f => f && f.緯度);
+                const missing = facilityData.filter(f=>FACILITY_CSV_URLS[f.地点名.trim()] && !latestRecent(f.observations));
+                const notice=document.getElementById('data-notice');
+                if(!facilityData.length || missing.length){
+                    notice.hidden=false;
+                    notice.textContent=!facilityData.length?'地点データを読み込めませんでした。時間をおいて再度お試しください。':missing.map(f=>f.地点名).join('・')+'：直近1時間のデータを取得できませんでした。現在の状況は灰色で表示します。';
+                }
                 
                 const allMilliData = facilityData.reduce((acc, f) => acc.concat(f.milli), []);
-                latestDateObj = getLatestDateFromData(allMilliData) || new Date();
+                latestDateObj = getLatestDateFromData(allMilliData) || japanCalendarNow();
 
                 const mapElement = document.getElementById('map');
                 mapInstance = L.map(mapElement).setView([36.565, 136.658], 14);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    maxZoom: 19,
                 }).addTo(mapInstance);
                 L.Util.getMapInstance = () => mapInstance;
 
@@ -631,6 +738,7 @@
 
             } catch (error) {
                 console.error("Initialization failed:", error);
+                throw error;
             }
 
             // --- Marker & Popup ---
@@ -655,24 +763,22 @@
             // 【修正箇所】直近1時間以内のデータがない場合は「データなし（レベル0）」と判定する
             function updateMap(facilityData, latestDateObj) {
                 const map = L.Util.getMapInstance();
-                
+                mapMarkers.forEach(marker => map.removeLayer(marker));
+                mapMarkers.length = 0;
                 // 常に実行日（今日）を基準にする
-                const todayString = formatDateForCsv(new Date()); 
-                const currentHour = new Date().getHours();
+                const todayString = formatDateForCsv(japanCalendarNow()); 
+                const currentHour = japanCalendarNow().getHours();
 
                 facilityData.forEach(facility => {
                     const lat = parseFloat(facility.緯度);
                     const lon = parseFloat(facility.経度);
                     if (isNaN(lat) || isNaN(lon)) return;
                     
-                    // 今日の「現在時刻」または「1時間前」のデータのみに絞り込む
-                    const latestRecord = facility.milli
-                        .filter(d => d.年月日 === todayString && (parseInt(d.時刻, 10) === currentHour || parseInt(d.時刻, 10) === currentHour - 1))
-                        .sort((a, b) => parseInt(b.時刻, 10) - parseInt(a.時刻, 10))[0];
-
-                    const level = latestRecord ? getCongestionLevel(latestRecord.人数, facility.criterion) : 0;
+                    const latestRecord = latestRecent(facility.observations || []);
+                    const level = latestRecord ? getCongestionLevel(latestRecord.count, facility.criterion) : 0;
                     const marker = L.marker([lat, lon], { icon: createCustomIcon(level, facility.地点名) }).addTo(map);
                     
+                    mapMarkers.push(marker);
                     marker.bindPopup(() => {
                         const levelInfo = CONGESTION_LEVELS[level];
                         const svgPath = `./${levelInfo.svg}`;
@@ -681,13 +787,13 @@
                             <h3 class="text-lg font-bold text-center">${facility.地点名}</h3>
                             <div class="flex flex-col items-center gap-2 my-2">
                                 <div class="w-full flex justify-center items-center">
-                                    <img src="${svgPath}" alt="congestion" class="popup-congestion-icon">
+                                    <img src="${svgPath}" alt="congestion" class="popup-congestion-icon ${level === 3 ? 'tone-normal' : level === 0 ? 'tone-off' : ''}">
                                 </div>
                                 <div class="w-full text-center">
-                                    <p class="font-bold text-base level-${level}-text">${levelInfo.message}</p>
+                                    <p class="font-bold text-base level-${level}-text">${statusMessage(level, facility.criterion)}</p>
                                 </div>
                             </div>
-                            <p class="text-xs text-gray-500 mb-2">本日の実績推移</p>
+                            <p class="text-xs text-gray-500 text-center">${latestRecord ? '観測時刻 '+String(latestRecord.hour).padStart(2,'0')+':'+String(latestRecord.minute).padStart(2,'0')+'（日本時間）' : '直近1時間のデータなし'}</p><p class="text-xs text-gray-500 mb-2">本日の実績推移</p>
                             ${createMiniCalendarHtml(facility, todayString, currentHour)}
                             <button class="btn-primary popup-calendar-btn mt-4 w-full" data-facility-name="${facility.地点名}">
                                 <img src="./calendar_icon.svg" class="icon-sm" style="filter:invert(1)">
@@ -705,12 +811,12 @@
                 for (let h = 8; h <= 20; h++) {
                     const record = facility.milli.find(d => d.年月日 === dateStr && parseInt(d.時刻, 10) === h);
                     const isFuture = h > currentHour;
-                    let bgClass = 'future-time-bg';
+                    let bgClass = 'level-0-bg';
                     if (!isFuture && record) {
                         const level = getCongestionLevel(record.人数, facility.criterion);
                         bgClass = `level-${level}-bg`;
                     }
-                    html += `<td class="${bgClass}"></td>`;
+                    html += `<td class="${bgClass}" title="${isFuture ? '未観測' : statusMessage(record ? getCongestionLevel(record.人数, facility.criterion) : 0, facility.criterion)}"></td>`;
                 }
                 return html + '</tr></tbody></table>';
             }
@@ -737,6 +843,7 @@
 
             // --- Calendar View ---
             function displayTodayAllFacilitiesCalendar(facilityData, latestDateObj) {
+                calendarFacility = null;
                 const latestDateString = formatDateForCsv(latestDateObj);
                 document.getElementById('calendar-title').textContent = '時間帯別 入込実績';
                 document.getElementById('calendar-info').textContent = `全スポット（${latestDateString}）`;
@@ -744,8 +851,8 @@
                 toggleBtn.textContent = '観光スポット一覧から選ぶ';
                 toggleBtn.onclick = () => switchToTab('introduction-content');
 
-                const currentHour = new Date().getHours();
-                const currentMin = new Date().getMinutes();
+                const currentHour = japanCalendarNow().getHours();
+                const currentMin = japanCalendarNow().getMinutes();
 
                 let headerHtml = '<tr><th>時刻</th>';
                 facilityData.forEach(f => { headerHtml += `<th>${f.地点名}</th>`; });
@@ -757,13 +864,13 @@
                         const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
                         bodyHtml += `<tr><td class="time-header">${timeStr}</td>`;
                         facilityData.forEach(f => {
-                            let isFuture = (h > currentHour) || (h === currentHour && m > currentMin);
+                            let isFuture = latestDateObj.toDateString() === japanCalendarNow().toDateString() && ((h > currentHour) || (h === currentHour && m > currentMin));
                             if (isFuture) {
                                 bodyHtml += `<td class="future-time-bg"></td>`;
                             } else {
                                 const record = f.milli.find(d => d.年月日 === latestDateString && parseInt(d.時刻, 10) === h);
                                 const level = record ? getCongestionLevel(record.人数, f.criterion) : 0;
-                                bodyHtml += `<td class="${level > 0 ? 'level-'+level+'-bg' : 'future-time-bg'}"></td>`;
+                                bodyHtml += `<td class="${level > 0 ? 'level-'+level+'-bg' : 'level-0-bg'}" title="${statusMessage(level, f.criterion)}"></td>`;
                             }
                         });
                         bodyHtml += '</tr>';
@@ -806,28 +913,55 @@
 
                 document.getElementById('close-facility-modal-btn').onclick = () => document.getElementById('facility-modal-overlay').style.display = 'none';
 
-                // ハンバーガーメニューの制御
-                const btnPc = document.getElementById('hamburger-btn-pc');
-                const menuPc = document.getElementById('pc-menu-dropdown');
-                if(btnPc && menuPc) {
-                    btnPc.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        menuPc.classList.toggle('hidden');
-                    });
-                    document.addEventListener('click', (e) => {
-                        if (!menuPc.contains(e.target) && !btnPc.contains(e.target)) {
-                            menuPc.classList.add('hidden');
-                        }
-                    });
-                }
+                setupSettingsControls();
+            }
 
-                const btnMobile = document.getElementById('hamburger-btn-mobile');
-                const menuMobile = document.getElementById('mobile-menu-dropdown');
-                if(btnMobile && menuMobile) {
-                    btnMobile.addEventListener('click', () => {
-                        menuMobile.classList.toggle('hidden');
-                    });
-                }
+            function showAboutModal() {
+                document.getElementById('modal-header-title').textContent = 'このアプリについて';
+                document.getElementById('modal-body-content').innerHTML = `<div class="about-copy">
+                    <h3>M5 Stackによる観測</h3><p>各地点のM5 StackでWi-Fiのプローブデータを取得し、入込状況の参考情報として表示しています。検出数は実人数と一致するとは限らず、端末の保有状況・電波環境・遮蔽物などの影響を受けます。地図には直近60分以内の最新観測値を，時間別カレンダーには時間帯ごとの平均値（四捨五入）を使用します。GitHubに直近60分のデータがない地点は，観測サーバーからの取得を試みます。取得できない場合も過去の実績は残し，現在の状況は灰色で表示します。</p>
+                    <h3>標準設定：統計的な水準による6段階表示</h3><p>各地点の統計的数値から設定された crowded_milli_criterion.csv の5つの境界値を使います。境界値ちょうどは、人数の少ない側に含めます。</p>
+                    <p>① 0 ≤ N ≤ comfortable：快適<br>② comfortable &lt; N ≤ notcrowded：ゆとりあり<br>③ notcrowded &lt; N ≤ normal：通常（淡い黄緑）<br>④ normal &lt; N ≤ crowded：ほどよい賑わい<br>⑤ crowded &lt; N ≤ Bustling：賑わい<br>⑥ Bustling &lt; N：賑やか</p>
+                    <h3>表示について</h3><p>通常は淡い黄緑、データなし・判定不可は薄い灰色です。未来の時間帯は未観測として灰色で表示します。</p></div>`;
+                document.getElementById('close-modal-btn-footer').textContent = '閉じる';
+                openOverlay('modal-overlay');
+            }
+            let overlayOrigin = null;
+            function openOverlay(id) {
+                overlayOrigin = document.activeElement;
+                const el = document.getElementById(id);
+                if (id === 'settings-drawer') el.classList.add('open'); else el.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                el.querySelector('button')?.focus();
+            }
+            function closeOverlay(id) {
+                const el = document.getElementById(id);
+                el.classList.remove('open'); el.style.display = '';
+                document.body.style.overflow = '';
+                overlayOrigin?.focus();
+            }
+            function setupSettingsControls() {
+                ['hamburger-btn-pc','hamburger-btn-mobile'].forEach(id => {
+                    const btn = document.getElementById(id);
+                    btn.setAttribute('aria-label','設定を開く');
+                    btn.onclick = () => openOverlay('settings-drawer');
+                });
+                document.getElementById('drawer-close').onclick = () => closeOverlay('settings-drawer');
+                document.getElementById('drawer-ja').onclick = e => { e.preventDefault(); closeOverlay('settings-drawer'); };
+                document.getElementById('drawer-about').onclick = () => { closeOverlay('settings-drawer'); showAboutModal(); };
+                ['close-modal-btn','close-modal-btn-footer'].forEach(id => { document.getElementById(id).onclick = () => closeOverlay('modal-overlay'); });
+                ['modal-overlay','settings-drawer'].forEach(id => document.getElementById(id).addEventListener('click', e => { if(e.target.id === id) closeOverlay(id); }));
+                document.addEventListener('keydown', e => {
+                    const id = document.getElementById('modal-overlay').style.display === 'flex' ? 'modal-overlay' : document.getElementById('settings-drawer').classList.contains('open') ? 'settings-drawer' : null;
+                    if (!id) return;
+                    if (e.key === 'Escape') { closeOverlay(id); return; }
+                    if (e.key === 'Tab') {
+                        const buttons = [...document.getElementById(id).querySelectorAll('button,a[href],[tabindex="0"]')].filter(el => !el.disabled && !el.hidden && el.getClientRects().length);
+                        const first = buttons[0], last = buttons[buttons.length-1];
+                        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+                        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+                    }
+                });
             }
 
             function switchToTab(tabId) {
@@ -858,15 +992,16 @@
             }
 
             function displayDailyCalendarForFacility(facility, facilityData, latestDateObj) {
+                calendarFacility = facility;
                 document.getElementById('calendar-title').textContent = `${facility.地点名} 実績推移`;
                 document.getElementById('calendar-info').textContent = '直近7日間の時間帯別入込状況';
                 const toggleBtn = document.getElementById('calendar-toggle-btn');
                 toggleBtn.textContent = '全体表示に戻る';
                 toggleBtn.onclick = () => displayTodayAllFacilitiesCalendar(facilityData, latestDateObj);
 
-                const currentHour = new Date().getHours();
-                const currentMin = new Date().getMinutes();
-                const realToday = new Date();
+                const currentHour = japanCalendarNow().getHours();
+                const currentMin = japanCalendarNow().getMinutes();
+                const realToday = japanCalendarNow();
 
                 const dates = [];
                 for (let i = 6; i >= 0; i--) {
@@ -894,7 +1029,7 @@
                             } else {
                                 const record = facility.milli.find(r => r.年月日 === formatDateForCsv(d) && parseInt(r.時刻, 10) === h);
                                 const level = record ? getCongestionLevel(record.人数, facility.criterion) : 0;
-                                bodyHtml += `<td class="${level > 0 ? 'level-'+level+'-bg' : 'future-time-bg'}"></td>`;
+                                bodyHtml += `<td class="${level > 0 ? 'level-'+level+'-bg' : 'level-0-bg'}" title="${statusMessage(level, facility.criterion)}"></td>`;
                             }
                         });
                         bodyHtml += '</tr>';
