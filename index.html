@@ -462,7 +462,7 @@
         function japanCalendarNow() {
             const p = jstParts(); return new Date(p.year,p.month-1,p.day,p.hour,p.minute,p.second);
         }
-        function normalizeObservation(row, utc = true) {
+        function normalizeObservation(row, utc) {
             const keys=['year','month','day','hour','minute','second','count'];
             if(keys.some(k => row[k] == null || String(row[k]).trim() === '')) return null;
             const [y,m,d,h,mi,se,count]=keys.map(k=>Number(row[k]));
@@ -495,9 +495,10 @@
                 return await response.text();
             } finally {clearTimeout(timer);}
         }
-        // Both GitHub CSV and direct logs contain UTC/GMT date fields.
+        // GitHub CSV fields are already JST; direct server logs are UTC/GMT.
+        // Convert each source to an absolute timestamp before freshness checks and merging.
         async function loadObservations(name,url,loadCsv,now=()=>Date.now()) {
-            const github=(url?await loadCsv(url):[]).map(r=>normalizeObservation(r, true)).filter(Boolean);
+            const github=(url?await loadCsv(url):[]).map(r=>normalizeObservation(r, false)).filter(Boolean);
             if(!url || latestRecent(github,now()))return {records:mergeObservations(github,[]),fallback:false,failed:false};
             try {
                 const direct=parseDirectLog(await fetchTextBounded(DIRECT_LOG_URLS[name],20000));
