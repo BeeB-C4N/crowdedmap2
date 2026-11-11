@@ -653,27 +653,32 @@
 
             const formatDateForCsv = (date) => `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
 
-            // Standard intervals include their upper boundary; personal A includes its limit.
-            function getCongestionLevel(count, criterion) {
-                if (count === null || count === undefined || String(count).trim() === '') return 0;
+            // One classifier for every map, popup and calendar. Pass the committed
+            // selection explicitly; compare observed counts with site-specific limits.
+            function classifyObservation(count, criterion, imageIndex) {
+                if (count == null || String(count).trim() === '') return 0;
                 const num = Number(count);
                 if (!Number.isFinite(num) || num < 0 || !criterion) return 0;
-                if (personalIndex !== null) {
+                let limits;
+                if (imageIndex !== null) {
+                    if (!Number.isInteger(imageIndex) || imageIndex < 0 || imageIndex >= LOS_COUNTS.length) return 0;
                     const ratio = Number(criterion.Effective_area);
                     if (!Number.isFinite(ratio) || ratio <= 0 || ratio > 1) return 0;
-                    if (num === 0) return 1;
-                    const areaPerPerson = Math.PI * 15 ** 2 * ratio / num;
-                    const selectedArea = IMAGE_AREA / LOS_COUNTS[personalIndex];
-                    const k = selectedArea / (35 * FT2_TO_M2);
-                    const i = FRUIN.findIndex(t => areaPerPerson >= t * FT2_TO_M2 * k - 1e-12);
-                    return i < 0 ? 6 : i + 1;
+                    const effectiveArea = Math.PI * 15 ** 2 * ratio;
+                    const comfortableArea = IMAGE_AREA / LOS_COUNTS[imageIndex];
+                    // N_A = S_eff / A_user; B–E retain Fruin's area ratios.
+                    limits = FRUIN.map(area => effectiveArea / (comfortableArea * area / 35));
+                } else {
+                    const fields = ['comfortable', 'notcrowded', 'normal', 'crowded', 'Bustling'];
+                    if (fields.some(key => criterion[key] == null || String(criterion[key]).trim() === '')) return 0;
+                    limits = fields.map(key => Number(criterion[key]));
                 }
-                const fields = ['comfortable', 'notcrowded', 'normal', 'crowded', 'Bustling'];
-                if (fields.some(key => criterion[key] == null || String(criterion[key]).trim() === '')) return 0;
-                const limits = fields.map(key => Number(criterion[key]));
-                if (limits.some((v,i) => !Number.isFinite(v) || v < 0 || (i && v <= limits[i-1]))) return 0;
-                const i = limits.findIndex(limit => num <= limit);
-                return i < 0 ? 6 : i + 1;
+                if (limits.some((v,i) => !Number.isFinite(v) || v < 0 || (i > 0 && v <= limits[i-1]))) return 0;
+                const index = limits.findIndex(limit => num <= limit + 1e-10);
+                return index < 0 ? 6 : index + 1;
+            }
+            function getCongestionLevel(count, criterion) {
+                return classifyObservation(count, criterion, personalIndex);
             }
             function statusMessage(level, criterion) {
                 const p = Number(criterion?.Effective_area);
@@ -942,13 +947,21 @@
                 document.getElementById('comfort-open').setAttribute('aria-pressed', String(active));
 
             }
-            function applyPersonalSetting(index) {
-                personalIndex = index;
-                try { if (index === null) localStorage.removeItem(STORAGE_KEY); else localStorage.setItem(STORAGE_KEY, JSON.stringify(index)); } catch (_) {}
-                updatePersonalBadge();
+            function refreshSituationViews() {
+                // Discard popups whose closures retain the preceding level.
+                mapInstance?.closePopup();
                 updateMap(facilityData, latestDateObj);
                 if (calendarFacility) displayDailyCalendarForFacility(calendarFacility, facilityData, latestDateObj);
                 else displayTodayAllFacilitiesCalendar(facilityData, latestDateObj);
+                updatePersonalBadge();
+            }
+            function applyPersonalSetting(index) {
+                if (index !== null && (!Number.isInteger(index) || index < 0 || index >= LOS_COUNTS.length)) {
+                    throw new RangeError('Invalid comfort selection');
+                }
+                personalIndex = index;
+                try { if (index === null) localStorage.removeItem(STORAGE_KEY); else localStorage.setItem(STORAGE_KEY, JSON.stringify(index)); } catch (_) {}
+                refreshSituationViews();
             }
             function openComfortModal() {
                 selectedImage = personalIndex ?? 3;
@@ -966,6 +979,7 @@
                 const redraw = () => {
                     const img = document.getElementById('los-image');
                     document.getElementById('los-image-error').hidden = true;
+                    img.dataset.selection = String(selectedImage);
                     img.src = './images/los' + (selectedImage + 1) + '.png';
                     img.alt = LOS_COUNTS[selectedImage] + '人が歩いている画像（中央の赤い服が自分）';
                     document.getElementById('los-prev').disabled = selectedImage === 0;
@@ -978,7 +992,7 @@
                 document.getElementById('los-prev').onclick = () => move(-1);
                 document.getElementById('los-next').onclick = () => move(1);
                 // Opening alone does not enable personalization; the default fourth image can be explicitly selected.
-                document.getElementById('los-apply').onclick = () => { applyPersonalSetting(selectedImage); closeOverlay('modal-overlay'); };
+                document.getElementById('los-apply').onclick = () => { applyPersonalSetting(Number(document.getElementById('los-image').dataset.selection)); closeOverlay('modal-overlay'); };
 
                 document.getElementById('los-reset').onclick = () => { selectedImage = 3; applyPersonalSetting(null); closeOverlay('modal-overlay'); };
                 redraw();
