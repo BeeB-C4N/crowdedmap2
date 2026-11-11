@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Version 2.1.0 | 2026-11-11 -->
+    <!-- Version 2.1.1 | 2026-11-11 -->
     <title>いしかわ観光地リアルタイムナビ</title>
     <link rel="icon" href="./favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -247,6 +247,14 @@
         .launch-inner{text-align:center;width:min(100%,640px);margin:auto}.launch-brand{display:flex;gap:20px;justify-content:center;align-items:center;color:#482e6e}.launch-logo{width:70px;height:85px;object-fit:contain}.launch-brand h1{font-size:clamp(18px,4.5vw,26px);line-height:1.6;text-align:left}.launch-message{font-size:clamp(27px,6.7vw,45px);line-height:1.85;letter-spacing:.09em;color:#482e6e;margin:40px 0 30px;opacity:0;animation:launch-in 1.2s ease 1s forwards}.launch-button-space{min-height:64px}#launch-start{border:0;border-radius:32px;background:#5A3A8A;color:white;font-size:17px;padding:16px 56px;box-shadow:0 6px 22px #5a3a8a25;cursor:pointer;animation:launch-in .5s ease both}#launch-start:disabled{background:#8b809a;cursor:wait}.data-notice{background:#faf7ed;border:1px solid #e8e0cd;border-radius:8px;padding:10px 14px;font-size:12px;color:#665b42;margin-bottom:12px}@keyframes launch-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
         @media(prefers-reduced-motion:reduce){.launch-message{animation:none;opacity:1}#launch-start{animation:none}}
         @media(max-height:560px){.launch-message{font-size:25px;line-height:1.5;margin:16px 0}.launch-logo{height:55px}.launch-brand h1{font-size:18px}}
+    
+        /* Keep the brand itself at the viewport center; supporting text sits below. */
+        #launch-screen{display:block}
+        .launch-inner{position:relative;height:calc(100vh - 48px);height:calc(100dvh - 48px);min-height:480px}
+        .launch-brand{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%)}
+        .launch-message{position:absolute;top:calc(50% + 64px);left:0;right:0;margin:0;font-size:clamp(15px,3.8vw,20px);font-weight:400;line-height:1.75;letter-spacing:.06em;color:#9b93a5}
+        .launch-button-space{position:absolute;top:calc(50% + 190px);left:0;right:0}
+        @media(max-height:560px){.launch-inner{min-height:380px}.launch-message{top:calc(50% + 45px);font-size:14px;line-height:1.5}.launch-button-space{top:calc(50% + 125px)}#launch-start{padding:12px 42px;font-size:15px}}
     </style>
 </head>
 <body class="launching">
@@ -454,7 +462,7 @@
         function japanCalendarNow() {
             const p = jstParts(); return new Date(p.year,p.month-1,p.day,p.hour,p.minute,p.second);
         }
-        function normalizeObservation(row, utc = false) {
+        function normalizeObservation(row, utc = true) {
             const keys=['year','month','day','hour','minute','second','count'];
             if(keys.some(k => row[k] == null || String(row[k]).trim() === '')) return null;
             const [y,m,d,h,mi,se,count]=keys.map(k=>Number(row[k]));
@@ -487,8 +495,9 @@
                 return await response.text();
             } finally {clearTimeout(timer);}
         }
+        // Both GitHub CSV and direct logs contain UTC/GMT date fields.
         async function loadObservations(name,url,loadCsv,now=()=>Date.now()) {
-            const github=(url?await loadCsv(url):[]).map(r=>normalizeObservation(r)).filter(Boolean);
+            const github=(url?await loadCsv(url):[]).map(r=>normalizeObservation(r, true)).filter(Boolean);
             if(!url || latestRecent(github,now()))return {records:mergeObservations(github,[]),fallback:false,failed:false};
             try {
                 const direct=parseDirectLog(await fetchTextBounded(DIRECT_LOG_URLS[name],20000));
